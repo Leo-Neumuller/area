@@ -25,7 +25,7 @@
 
 <style lang="postcss">
 	header {
-		background-color: theme(colors.violet.600);
+		background-color: theme(colors.primary);
 		color: #fff;
 		padding: 1rem;
 	}
