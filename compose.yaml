@@ -1,0 +1,31 @@
+services:
+  client_web:
+    build:
+      context: ./Website
+      dockerfile: client_web.Dockerfile
+    ports:
+      - "8081:4173"
+    depends_on:
+      - client_mobile
+      - server
+  server:
+    build:
+      context: ./Api
+      dockerfile: server.Dockerfile
+    ports:
+      - '8080:8000'
+    volumes:
+      - api:/usr/src/api
+  client_mobile:
+    build:
+      context: .
+      dockerfile: ./App/client_mobile.Dockerfile
+    environment:
+      - EXPO_TOKEN=${EXPO_TOKEN}
+    volumes:
+      - api:/usr/src/api
+    command: /bin/bash -c "npx eas build -p android --profile preview --local --non-interactive &&
+      mv *.apk build.apk &&
+      cp /app/App/build.apk /usr/src/api/"
+volumes:
+  api:
