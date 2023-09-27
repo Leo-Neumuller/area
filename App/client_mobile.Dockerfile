@@ -30,3 +30,5 @@ RUN apt install openjdk-11-jdk -y
 WORKDIR App
 
 RUN npm install
+
+RUN npx eas build -p android --profile preview --local --non-interactive
