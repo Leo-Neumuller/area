@@ -2,5 +2,10 @@
 if [ ! -d "venv" ]; then
     python3 -m venv venv
 fi
-venv/bin/uvicorn main:app --reload
+
+if [ "$1" = "tests" ]; then
+  coverage run -m unittest discover -s tests && coverage report
+else
+  venv/bin/uvicorn main:app --reload
+fi
 
