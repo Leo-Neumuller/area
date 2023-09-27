@@ -24,8 +24,6 @@ services:
       - EXPO_TOKEN=${EXPO_TOKEN}
     volumes:
       - api:/usr/src/api
-    command: /bin/bash -c "npx eas build -p android --profile preview --local --non-interactive &&
-      mv *.apk build.apk &&
-      cp /app/App/build.apk /usr/src/api/"
+    command: /bin/bash -c " mv *.apk build.apk && cp /app/App/build.apk /usr/src/api/"
 volumes:
   api:
