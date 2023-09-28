@@ -1,4 +1,4 @@
-name: Build the mobile apk
+name: Test the mobile app
 
 on:
   workflow_dispatch:
@@ -8,7 +8,7 @@ on:
     branches: [ "dev" ]
 
 jobs:
-  build:
+  test:
     timeout-minutes: 20
     runs-on: ubuntu-latest
     defaults:
@@ -32,13 +32,6 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Build app
-        run: eas build -p android --profile preview --local --non-interactive
-      
-      - name: Apk artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: build
-          path: |
-            ./*.apk
-            ./App/*.apk
+      - name: Run tests
+        run: ./run.sh tests
+    
