@@ -1,7 +1,10 @@
 import {StyleSheet, Text, View} from "react-native";
 import {StatusBar} from "expo-status-bar";
+import { BottomBar } from "../../components/BottomBar";
+import React, { useState } from 'react';
 
 export default function Home() {
+
     return (
         <View style={styles.container}>
             <Text>Hello World Home.tsx</Text>
