@@ -6,7 +6,6 @@ from src.utils.Database import get_db
 from src.models.User import create_user, UserCreate, UserCreateException, UserToken, UserLoginException, UserLogin, \
     login_user, UserMe
 from src.utils.Jwt import create_jwt_from_user, JWTException
-import warnings
 
 from src.utils.Warn import warn
 

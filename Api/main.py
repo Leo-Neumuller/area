@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from src.constants import Environment
 
 from src.utils import Database
-from src.routers import User
+from src.routers import routers
 
 env = Environment.Settings()
 
@@ -37,4 +37,5 @@ async def startup_event(): # pragma: no cover
 async def root(): # pragma: no cover
     return {"name": app.env.APP_NAME, "version": app.env.APP_VERSION}
 
-app.include_router(User.UsersRouter)
+for router in routers.values():
+    app.include_router(router)
