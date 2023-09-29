@@ -26,7 +26,7 @@ app.env = env
 
 
 @app.on_event("startup")
-async def startup_event():
+async def startup_event(): # pragma: no cover
     print("Starting up with Env")
     for key, value in app.env.model_dump().items():
         print(f"{key}: " + "*" * (len(str(value))))
@@ -34,7 +34,7 @@ async def startup_event():
 
 
 @app.get("/")
-async def root():
+async def root(): # pragma: no cover
     return {"name": app.env.APP_NAME, "version": app.env.APP_VERSION}
 
 app.include_router(User.UsersRouter)

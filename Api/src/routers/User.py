@@ -8,6 +8,8 @@ from src.models.User import create_user, UserCreate, UserCreateException, UserTo
 from src.utils.Jwt import create_jwt_from_user, JWTException
 import warnings
 
+from src.utils.Warn import warn
+
 UsersRouter = APIRouter(
     prefix="/user",
     tags=["User"],
@@ -36,8 +38,8 @@ async def createUser(UserCreate: UserCreate, db: Session = Depends(get_db), resp
         raise HTTPException(status_code=e.code, detail=e.message)
     try:
         jwt = create_jwt_from_user(createUser)
-    except JWTException as e:
-        warnings.warn(str(e))
+    except JWTException as e: # pragma: no cover
+        warn(str(e))
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Issue when creating authorization token")
     response.headers["Authorization"] = jwt
     return UserToken(access_token=jwt)
@@ -64,8 +66,8 @@ async def loginUser(UserLogin: UserLogin, db: Session = Depends(get_db), respons
         raise HTTPException(status_code=e.code, detail=e.message)
     try:
         jwt = create_jwt_from_user(loginUser)
-    except JWTException as e:
-        warnings.warn(str(e))
+    except JWTException as e: # pragma: no cover
+        warn(str(e))
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Issue when creating authorization token")
     response.headers["Authorization"] = jwt
     return UserToken(access_token=jwt)

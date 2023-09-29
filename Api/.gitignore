@@ -1,2 +1,6 @@
 .coverage
 area.db
+area.db-journal
+area_test.db
+area_test.db-journal
+htmlcov

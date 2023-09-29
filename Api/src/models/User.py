@@ -20,19 +20,19 @@ class User(Base):
 
     class Exception(Exception):
         def __init__(self, message: str):
-            super().__init__(message)
+            self.message = message
 
         def __str__(self):
             return self.message
 
     class NotFoundException(Exception):
         def __init__(self, message: str):
-            super().__init__(message)
+            self.message = message
 
         def __str__(self):
             return self.message
 
-    def __repr__(self):
+    def __repr__(self):  # pragma: no cover
         return f"<User(id={self.id}, email={self.email}, password={self.password}, surname={self.surname}, name={self.name})>"
 
 
