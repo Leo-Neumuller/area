@@ -4,7 +4,7 @@ from sqlalchemy import create_engine, inspect
 from sqlalchemy.ext.declarative import declarative_base, as_declarative
 from sqlalchemy.orm import sessionmaker
 from src.constants import Environment
-from src.utils.Test import inTestMode
+from src.utils.Helper import inTestMode
 
 env = Environment.Settings()
 
@@ -23,15 +23,6 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
 
-@as_declarative()
-class Base:
-    """Base Model"""
-
-    def _asdict(self):
-        return {c.key: getattr(self, c.key)
-                for c in inspect(self).mapper.column_attrs}
-
-
 def get_db() -> SessionLocal:  # pragma: no cover
     """
     Get database session
@@ -42,3 +33,12 @@ def get_db() -> SessionLocal:  # pragma: no cover
         yield db
     finally:
         db.close()
+
+
+@as_declarative()
+class Base:
+    """Base Model"""
+
+    def _asdict(self):
+        return {c.key: getattr(self, c.key)
+                for c in inspect(self).mapper.column_attrs}

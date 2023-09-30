@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from src.models.User import get_user_by_id, User, UserMe
 from src.utils.Database import get_db
 from src.utils.Jwt import decode_jwt, JWTException, JWTExpiredException
-from src.utils.Warn import warn
+from src.utils.Helper import warn, DefaultErrorResponse
 
 
 class MiddlewareUser:
@@ -38,7 +38,5 @@ class MiddlewareUser:
     @staticmethod
     def responses():
         return {
-            status.HTTP_401_UNAUTHORIZED: {"description": "Unauthorized",
-                                           "content": {
-                                               "application/json": {"example": {"detail": "string"}}}},
+            status.HTTP_401_UNAUTHORIZED: {"description": "Unauthorized", **DefaultErrorResponse()},
         }

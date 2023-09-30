@@ -7,7 +7,7 @@ from src.constants import Environment
 from src.models.User import User
 from jose import jwt, JWTError, ExpiredSignatureError
 
-from src.utils.Warn import warn
+from src.utils.Helper import warn
 
 
 class JWTException(Exception):

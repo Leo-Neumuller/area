@@ -1,11 +1,12 @@
 import sqlalchemy
 from pydantic import BaseModel
 from sqlalchemy import Column, Integer, String
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, relationship
 from fastapi import status
 
 from src.utils.Database import Base
 from src.utils.Crypt import get_password_hash, verify_password
+from src.utils.Helper import DefaultErrorResponse
 from src.utils.RegexChecker import check_email, check_password
 
 
@@ -17,6 +18,8 @@ class User(Base):
     password = Column(String)
     surname = Column(String)
     name = Column(String)
+
+    services = relationship("Service", back_populates="user")
 
     class Exception(Exception):
         def __init__(self, message: str):
@@ -74,12 +77,8 @@ class UserCreateException(Exception):
     @staticmethod
     def responses():
         return {
-            status.HTTP_400_BAD_REQUEST: {"description": "Bad Request",
-                                          "content": {
-                                              "application/json": {"example": {"detail": "string"}}}},
-            status.HTTP_409_CONFLICT: {"description": "Conflict",
-                                       "content": {
-                                           "application/json": {"example": {"detail": "string"}}}},
+            status.HTTP_400_BAD_REQUEST: {"description": "Bad Request", **DefaultErrorResponse()},
+            status.HTTP_409_CONFLICT: {"description": "Conflict", **DefaultErrorResponse()},
         }
 
 
@@ -140,9 +139,7 @@ class UserLoginException(Exception):
     @staticmethod
     def responses():
         return {
-            status.HTTP_400_BAD_REQUEST: {"description": "Bad Request",
-                                          "content": {
-                                              "application/json": {"example": {"detail": "string"}}}},
+            status.HTTP_400_BAD_REQUEST: {"description": "Bad Request", **DefaultErrorResponse()},
         }
 
 

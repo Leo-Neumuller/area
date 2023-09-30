@@ -3,11 +3,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from src.constants import Environment
 
 from src.utils import Database
+
 from src.routers import routers
+from src.services import services
 
 env = Environment.Settings()
 
-Database.Base.metadata.create_all(bind=Database.engine)
+Database.Base.metadata.create_all(bind=Database.engine, checkfirst=True)
 
 app = FastAPI(
     title=env.APP_NAME,
