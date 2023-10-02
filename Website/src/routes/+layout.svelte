@@ -10,8 +10,8 @@
 		<slot />
 	</main>
 
-	<footer>
-		<p>This is The footer for all the page</p>
+	<footer class="my-20">
+
 	</footer>
 </div>
 

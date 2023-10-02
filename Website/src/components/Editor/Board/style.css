@@ -1,0 +1,17 @@
+.board {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background-size: 30px 30px;
+    background-image: radial-gradient(circle, #373637, 1px, rgba(0, 0, 0, 0) 1px);
+    cursor: grab;
+}
+
+.boardDragging {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background-size: 30px 30px;
+    background-image: radial-gradient(circle, #373637, 1px, rgba(0, 0, 0, 0) 1px);
+    cursor: grabbing;
+}

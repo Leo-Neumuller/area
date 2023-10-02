@@ -1,4 +1,155 @@
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Zen+Tokyo+Zoo&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+nav ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+nav ul li {
+    --c: white;
+    color: rgb(55, 54, 55);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+    transition: 0.5s;
+    background-color: rgb(217, 198, 244);
+}
+
+nav ul li span {
+    position: absolute;
+    width: 25%;
+    height: 100%;
+    background-color: var(--c);
+    transform: translateY(150%);
+    border-radius: 50%;
+    left: calc((var(--n) - 1) * 25%);
+    transition: 0.5s;
+    transition-delay: calc((var(--n) - 1) * 0.1s);
+    z-index: -1;
+}
+
+nav ul li:hover {
+    color: rgb(55, 54, 55);
+    border: 1px solid rgb(55, 54, 55);
+}
+
+nav ul li:hover span {
+    transform: translateY(0) scale(2);
+}
+
+nav ul li span:nth-child(1) {
+    --n: 1;
+}
+
+nav ul li span:nth-child(2) {
+    --n: 2;
+}
+
+nav ul li span:nth-child(3) {
+    --n: 3;
+}
+
+nav ul li span:nth-child(4) {
+    --n: 4;
+}
+
+.animate {
+    animation: animate 0.3s linear;
+}
+
+@keyframes animate {
+    0% {
+        transform: translate(-10%, 0) scale(1);
+        opacity: 0%;
+    }
+
+    100% {
+    }
+}
+
+.hover-underline-animation {
+    position: relative;
+    text-decoration: none;
+}
+  
+.hover-underline-animation:hover {
+    color: rgb(55, 54, 55);
+}
+
+.hover-underline-animation::before {
+    content: "";
+    position: absolute;
+    display: block;
+    width: 100%;
+    height: 2px;
+    bottom: 0;
+    left: 0;
+    background-color: rgb(55, 54, 55);
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.hover-underline-animation:hover::before {
+    transform: scaleX(1);
+}
+
+
+
+
+.hover-underline-animation-alt {
+    position: relative;
+    text-decoration: none;
+}
+  
+.hover-underline-animation-alt:hover {
+    color: #F3F3F3;
+}
+
+.hover-underline-animation-alt::before {
+    content: "";
+    position: absolute;
+    display: block;
+    width: 100%;
+    height: 2px;
+    bottom: 0;
+    left: 0;
+    background-color: #F3F3F3;
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.hover-underline-animation-alt:hover::before {
+    transform: scaleX(1);
+}
+
+.scrolling-text-title {
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    animation: slide-left 15s linear infinite;
+}
+
+.scrolling-text-title div {
+    margin: 5px 10px;
+}
+
+@keyframes slide-left {
+    from {
+      -webkit-transform: translateX(0);
+      transform: translateX(0);
+    }
+    to {
+      -webkit-transform: translateX(-100%);
+      transform: translateX(-100%);
+    }
+  }
+  
