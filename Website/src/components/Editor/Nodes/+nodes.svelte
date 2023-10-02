@@ -2,6 +2,7 @@
     import './style.css'
 
     export let id: string;
+    export let type: string;
     export let pos: { x: number, y: number };
     export let numberOfInputs: number;
     export let numberOfOutputs: number;
@@ -45,7 +46,7 @@
     }
 </script>
 
-<div role="presentation" class={selected ? "nodeSelected" : "node"} style="transform: translate({pos.x}px, {pos.y}px)" on:mousedown={(e) => {
+<div role="presentation" class={`${selected ? "nodeSelected" : "node"} ${type}`} style="transform: translate({pos.x}px, {pos.y}px)" on:mousedown={(e) => {
         e.stopPropagation();
         onMouseDownNode(id, e);
     }}>

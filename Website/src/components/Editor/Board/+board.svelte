@@ -138,7 +138,7 @@
     }
     
 
-    function handleOnCLickAdd(numberInputs: number, numberOutputs: number) {
+    function handleOnCLickAdd(numberInputs: number, numberOutputs: number, type: string) {
         const randomX = Math.random() * (window.innerWidth - 300) + 300;
         const randomY = Math.random() * (window.innerHeight - 300) + 300;
 
@@ -155,6 +155,7 @@
                 currPosition: nodeCurr,
                 numberInputs: numberInputs,
                 numberOutputs: numberOutputs,
+                type: type,
                 inputEdgeIds: inputs,
                 outputEdgeIds: outputs
             }
@@ -325,6 +326,7 @@
         {#each nodes as node}
             <NodeComponent 
                 id={node.id} 
+                type={node.type}
                 pos={node.currPosition} 
                 numberOfInputs={node.numberInputs} 
                 numberOfOutputs={node.numberOutputs}

@@ -1,11 +1,12 @@
 <script lang="ts">
     export let showDelete: boolean;
-    export let onCLickAdd: (numberInputs: number, numberOutputs: number) => void;
+    export let onCLickAdd: (numberInputs: number, numberOutputs: number, type: string) => void;
     export let onClickDelete: () => void;
 
     let open: boolean = false;
     let numberOfInput = 0;
     let numberOfOutput = 0;
+    let type: string = "";
 
     function handleChangeNumberOfInput(e: any) {
         numberOfInput = e.target.value;
@@ -15,14 +16,19 @@
         numberOfOutput = e.target.value;
     }
 
+    function handleChangeType(e: any) {
+        type = e.target.value;
+    }
+
     function handleAddNode(e: any) {
         e.stopPropagation();
         if (numberOfInput > 4 || numberOfInput < 0 || numberOfOutput > 4 || numberOfOutput < 0) return;
 
         open = false;
-        onCLickAdd(numberOfInput, numberOfOutput);
+        onCLickAdd(numberOfInput, numberOfOutput, type);
         numberOfInput = 0;
         numberOfOutput = 0;
+        type = "";
     }
 </script>
 
@@ -43,6 +49,11 @@
             on:input={handleChangeNumberOfInput}/>
         <input type="number" placeholder="number of output" class="border border-black" value={numberOfOutput}
             on:input={handleChangeNumberOfOutput}/>
+        <select name="types" id="lang" on:input={handleChangeType} class="border border-black">
+            <option disabled selected value> -- select an option -- </option>
+            <option value="Action">Action</option>
+            <option value="Reaction">Reaction</option>
+        </select>
         <button class="border border-black" on:click={handleAddNode}>
             Add node
         </button>

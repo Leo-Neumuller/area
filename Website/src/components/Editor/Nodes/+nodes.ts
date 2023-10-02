@@ -2,6 +2,7 @@ import Nodes__SvelteComponent_ from "./+nodes.svelte";
 
 export interface ChildProps {
     id: string;
+    type: string;
     pos: { x: number, y: number };
     numberOfInputs: number;
     numberOfOutputs: number;

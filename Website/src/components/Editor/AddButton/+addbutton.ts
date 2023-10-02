@@ -2,7 +2,7 @@ import Addbutton__SvelteComponent_ from "./+addbutton.svelte";
 
 export interface ChildProps {
     showDelete: boolean;
-    onCLickAdd: (numberInputs: number, numberOutputs: number) => void;
+    onCLickAdd: (numberInputs: number, numberOutputs: number, type: string) => void;
     onClickDelete: () => void;
 }
 
