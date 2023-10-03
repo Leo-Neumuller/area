@@ -8,8 +8,8 @@
 </svelte:head>
 
 <section class="flex justify-center items-center w-full">
-  <div class="flex justify-center w-11/12 gap-[2vw] pb-4">
-    <div class="flex flex-col float-right ml-[9vw] w-3/6">
+  <div class="flex justify-around w-11/12 pb-4">
+    <div class="flex flex-col float-right w-3/6">
       <h1 class="font-bold text-[4.2vw] text-black mt-[10vw] self-center w-9/12">
         <p>Bon retour parmis nous</p>
       </h1>
