@@ -2,9 +2,13 @@ import os
 from typing import List, Tuple
 
 import google_auth_oauthlib
+import googleapiclient.discovery
+import google.oauth2.credentials
+from sqlalchemy.orm import Session
 
 from src.constants import Environment
 from src.models.Services import Service
+from src.models.User import UserMe
 
 
 class Google:
@@ -70,4 +74,25 @@ class Google:
         credentials = flow.credentials
         return Google.credentials_to_dict(credentials)
 
+    @staticmethod
+    def get_service(service: str, User: UserMe, db: Session, version: str) -> googleapiclient.discovery.Resource:
+        """
+        Get service from service name and user (optional refresh the credentials)
+        :param service: Service
+        :param User: User
+        :param db: Session of database
+        :param version: Version
+        :return: Service
+        """
+        refresh = db.query(Service).filter(Service.name == service,
+                                           Service.user_id == User.id).first().refresh
+        if not refresh:
+            db.query(Service).filter(Service.name == service, Service.user_id == User.id).delete()
+            db.commit()
+            raise Service.Exception.InvalidService("Service not found or not authorized")
 
+        credentials = google.oauth2.credentials.Credentials(**refresh)
+        db.query(Service).filter(Service.name == service, Service.user_id == User.id).update(
+            {"refresh": Google.credentials_to_dict(credentials)})
+        db.commit()
+        return googleapiclient.discovery.build(service.lower(), version, credentials=credentials)
