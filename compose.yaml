@@ -16,12 +16,16 @@ services:
       - '8080:8000'
     volumes:
       - api:/usr/src/api
+    environment:
+      - APP_NAME=${APP_NAME}
+      - APP_VERSION=${APP_VERSION}
+      - SQL_URL=${SQL_URL}
   client_mobile:
     build:
       context: .
       dockerfile: ./App/client_mobile.Dockerfile
-    environment:
-      - EXPO_TOKEN=${EXPO_TOKEN}
+      args:
+        - EXPO_TOKEN=${EXPO_TOKEN}
     volumes:
       - api:/usr/src/api
     command: /bin/bash -c " mv *.apk build.apk && cp /app/App/build.apk /usr/src/api/"

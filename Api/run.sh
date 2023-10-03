@@ -4,7 +4,7 @@ if [ ! -d "venv" ]; then
 fi
 
 if [ "$1" = "tests" ]; then
-  coverage run -m unittest discover -s tests && coverage report
+  coverage run --branch -m unittest discover -s tests -f && coverage report
 else
   venv/bin/uvicorn main:app --reload
 fi
