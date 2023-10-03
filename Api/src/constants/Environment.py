@@ -9,6 +9,8 @@ class Settings(BaseSettings):
     JWT_ALGORITHM: str
     JWT_EXPIRE_DAYS: int
     JWT_EXPIRE_SECONDS: int
+    SQL_TEST_URL: str
+    REDIRECT_URI: str
 
     class Config:
         env_file = ".env"

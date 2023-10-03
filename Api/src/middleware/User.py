@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from src.models.User import get_user_by_id, User, UserMe
 from src.utils.Database import get_db
 from src.utils.Jwt import decode_jwt, JWTException, JWTExpiredException
+from src.utils.Helper import warn, DefaultErrorResponse
 
 
 class MiddlewareUser:
@@ -18,15 +19,14 @@ class MiddlewareUser:
         :param db: Session of database
         :return: User
         """
-        print(access_token)
         if access_token is None:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized")
         try:
             decoded_user = decode_jwt(access_token)
-        except JWTException as e:
-            warnings.warn(str(e))
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized")
         except JWTExpiredException as e:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized")
+        except JWTException as e:
+            warn(str(e))
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized")
         if "id" not in decoded_user:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized")
@@ -38,7 +38,5 @@ class MiddlewareUser:
     @staticmethod
     def responses():
         return {
-            status.HTTP_401_UNAUTHORIZED: {"description": "Unauthorized",
-                                           "content": {
-                                               "application/json": {"example": {"detail": "string"}}}},
+            status.HTTP_401_UNAUTHORIZED: {"description": "Unauthorized", **DefaultErrorResponse()},
         }
