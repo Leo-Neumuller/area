@@ -2,5 +2,11 @@
 if [ ! -d "node_modules" ]; then
   ./install.sh
 fi
-npm run start
+
+
+if [ "$1" = "tests" ]; then
+  echo "No tests"
+else
+  npm run start
+fi
 
