@@ -31,6 +31,9 @@ jobs:
         shell: bash
 
       - name: test job
+        run: env
+        
+      - name: test job2
         run: cat .env
       
       - name: Test api
