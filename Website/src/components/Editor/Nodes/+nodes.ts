@@ -11,6 +11,10 @@ export interface ChildProps {
     onMouseDownOutput: (outputPositionX: number, outputPositionY: number, nodeId: string,  outputIndex: number) => void;
     onMouseEnterInput: (inputPositionX: number, inputPositionY: number, nodeId: string, inputIndex: number) => void;
     onMouseLeaveInput: (nodeId: string, inputIndex: Number) => void;
+
+    modify: boolean;
+    title: string;
+    img: string;
 }
 
 export default Nodes__SvelteComponent_;

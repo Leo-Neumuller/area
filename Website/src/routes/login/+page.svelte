@@ -4,12 +4,8 @@
   import { loginPost } from "../../api/+api";
   import Input from "../../components/Input/+input.svelte";
 
-  if (document.cookie.includes("access_token")) {
-    goto("/flux-editor");
-  }
-
   let errorMsg: string;
-
+  
   if (document.cookie.includes("access_token")) {
     goto("/flux-editor");
   }
@@ -40,11 +36,11 @@
 
 </script>
 <svelte:head>
-  <title>Se Connecter</title>
-  <meta name="description" content="AREA"/>
+    <title>Se Connecter</title>
+    <meta name="description" content="AREA"/>
 </svelte:head>
 
-<section class="flex justify-center items-center w-full">
+<section class="flex justify-center items-center w-full font-SpaceGrotesk">
   <div class="flex justify-around w-11/12 pb-4">
     <div class="flex flex-col float-right w-3/6">
       <h1 class="font-bold text-[4.2vw] text-black mt-[10vw] self-center w-9/12">

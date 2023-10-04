@@ -7,6 +7,9 @@
     import type Node from "./NodeInterface";
     import type Edge from "./EdgeInterface";
     import Edges from "../Edges/+edges.svelte";
+    import Close from "../../SVGs/+Close";
+    import Modify from "../../SVGs/+Modify.svelte";
+    import AppPres from "../../AppPres/+AppPres.svelte";
 
     let grabbingBoard: boolean = false;
     let scale: number = 1;
@@ -18,10 +21,15 @@
     let newEdge: any = null;
     let insideInput: {nodeId: string, inputIndex: number, pos: {x: number, y: number}} | null = null;
 
+    let nodeRegister: Node;
+    let modifyService: boolean = false;
+    let modifyMenu: boolean = false;
+    let advancedModify: boolean = false;
+
     function handleMouseDown(e: any) {
         selectedNode = null;
         selectedEdge = null;
-        
+        modifyMenu = false;
         grabbingBoard = true;
         clickedPosition = {x: e.x, y: e.y};
     }
@@ -91,8 +99,10 @@
             let deltaY = e.y - clickedPosition.y;
 
             if (selectedNode) {
+                    modifyMenu = false;
                 const node = nodes.find((node) => node.id === selectedNode);
                 if (node) {
+                    nodeRegister = node;
                     node.currPosition = {x: (node.currPosition.x + deltaX) * scale, y: (node.currPosition.y + deltaY) * scale};
                     clickedPosition = {x: e.x, y: e.y};
                     for (let i = 0; i < node.inputEdgeIds.length; i++) {
@@ -157,7 +167,9 @@
                 numberOutputs: numberOutputs,
                 type: type,
                 inputEdgeIds: inputs,
-                outputEdgeIds: outputs
+                outputEdgeIds: outputs,
+                title: type,
+                img: "test",
             }
         ];
     }
@@ -199,6 +211,7 @@
         clickedPosition = {x: e.x, y: e.y};
         const node = nodes.find((node) => node.id === id);
         if (node) {
+            nodeRegister = node;
             const x = node.currPosition.x * scale;
             const y = node.currPosition.y * scale;
             node.prevPosition = {x: x, y: y};
@@ -226,7 +239,6 @@
                     edges = [...edges];
                 }
             }
-            console.log(edges);
         }
     }
 
@@ -302,6 +314,11 @@
         }
     }
 
+    function handleModifyNode() {
+        console.log(nodeRegister);
+        modifyService = true;
+    }
+
     onMount(() => {
         const board = document.getElementById("board");
         if (board) {
@@ -317,50 +334,105 @@
     })
 </script>
   
-<div id="boardWrapper" class="fixed w-screen h-screen top-0 left-0 overflow-scroll">
-    <Addbutton showDelete={selectedNode === null} onCLickAdd={handleOnCLickAdd} onClickDelete={handleOnClickDelete} />
-    <div class={`${grabbingBoard ? "boardDragging" : "board"}`} role="presentation" id="board" 
-        on:mousedown={(e) => {handleMouseDown(e)}}
-        on:mouseup={(e) => {handleMouseUp(e)}}
-        on:mousemove={(e) => {handleMouseMove(e)}}>
-        {#each nodes as node}
-            <NodeComponent 
-                id={node.id} 
-                type={node.type}
-                pos={node.currPosition} 
-                numberOfInputs={node.numberInputs} 
-                numberOfOutputs={node.numberOutputs}
-                selected={node.id === selectedNode} 
-                onMouseDownNode={handleOnMouseDownNode} 
-                onMouseDownOutput={handleOnMouseDownOutput}
-                onMouseEnterInput={handleOnMouseEnterInput} 
-                onMouseLeaveInput={handleOnMouseLeaveInput} />
-        {/each}
-        {#if (newEdge)} 
-            <EdgeComponent 
-                selected={false} 
-                isNew={true} 
-                position={{
-                    x0: newEdge.currStartPos.x,
-                    y0: newEdge.currStartPos.y,
-                    x1: newEdge.currEndPos.x,
-                    y1: newEdge.currEndPos.y
-                }} 
-                onMouseDownEdge={() => {}} 
-                onClickDeleteEdge={() => {}} />
-        {/if}
-        {#each edges as edge}
-            <EdgeComponent 
-                selected={selectedEdge === edge.id} 
-                isNew={false} 
-                position={{
-                    x0: edge.currStartPos.x,
-                    y0: edge.currStartPos.y,
-                    x1: edge.currEndPos.x,
-                    y1: edge.currEndPos.y
-                }} 
-                onMouseDownEdge={() => {handleOnMouseDownEdge(edge.id)}} 
-                onClickDeleteEdge={() => {HandleOnDeleteEdge(edge.id)}} />
-        {/each}
+<div>
+    <div class="">
+        <Addbutton showDelete={selectedNode === null} onCLickAdd={handleOnCLickAdd} onClickDelete={handleOnClickDelete} />
+    </div>
+    <div class={`${modifyService ? "flex" : "hidden"} flex-col bg-gray rounded-[20px] absolute w-[60%] h-[80%] top-[60%] left-[50%] -translate-x-[50%] -translate-y-[55%] z-[21] p-10`}>
+        <div class="flex w-full justify-between items-center">
+            <div class="text-[3.125rem] font-medium text-customWhite">
+                {nodeRegister?.type}
+            </div>
+            <button on:click={() => {
+                modifyService = false;
+            }}>
+                <Close className="w-8 h-8" color="#F3F3F3"/>
+            </button>
+        </div>
+        <button on:click={() => {
+            modifyService = false;
+            modifyMenu = false;
+            advancedModify = true
+        }}>
+            Advanced modification
+        </button>
+    </div>
+    {#if (advancedModify)}
+        <div class="fixed top-26 right-0 w-[30%] h-screen z-[100] bg-gray px-6 py-2">
+            <button on:click={() => {
+                advancedModify = false; 
+            }}>
+                <Close className="w-6 h-6" color="#F3F3F3"/>
+            </button>
+            <h1>ici</h1>
+        </div>
+    {/if}
+    {#if (modifyMenu)}
+        <div style="transform: translate(
+            {nodeRegister.currPosition.x}px, 
+            {nodeRegister.currPosition.y}px)" 
+            class={`rounded-[20px] cursor-pointer flex flex-col ${nodeRegister.type === "Action" ? "bg-gray text-customWhite" : "bg-primary text-gray"} box-border absolute left-[430px] -top-[8px] z-[20] w-[14rem] font-SpaceGrotesk p-5 gap-2`}>
+            <div class="flex w-full justify-between align-middle items-center">
+                <button on:click={handleModifyNode} class="text-[1.4rem] font-medium">
+                    Modifier
+                </button>
+                <Modify className="w-7 h-7" color={nodeRegister.type === "Action" ? "#F3F3F3" : "#373637"}/>
+            </div>
+            <div class="flex w-full justify-between align-middle items-center font-medium">
+                <button on:click={handleOnClickDelete} class="text-[1.4rem]">
+                    Supprimer
+                </button>
+                <Close className="w-6 h-6" color={nodeRegister.type === "Action" ? "#F3F3F3" : "#373637"}/>
+            </div>
+        </div>
+    {/if}
+    <div id="boardWrapper" class="fixed w-screen h-screen top-0 left-0 overflow-scroll">
+        <div class={`${grabbingBoard ? "boardDragging" : "board"}`} role="presentation" id="board" 
+            on:mousedown={(e) => {handleMouseDown(e)}}
+            on:mouseup={(e) => {handleMouseUp(e)}}
+            on:mousemove={(e) => {handleMouseMove(e)}}>
+            {#each nodes as node}
+                <NodeComponent 
+                    id={node.id} 
+                    type={node.type}
+                    pos={node.currPosition} 
+                    numberOfInputs={node.numberInputs} 
+                    numberOfOutputs={node.numberOutputs}
+                    selected={node.id === selectedNode}
+                    bind:modify={modifyMenu}
+                    title={node.title}
+                    img={node.img}
+                    onMouseDownNode={handleOnMouseDownNode} 
+                    onMouseDownOutput={handleOnMouseDownOutput}
+                    onMouseEnterInput={handleOnMouseEnterInput} 
+                    onMouseLeaveInput={handleOnMouseLeaveInput} />
+            {/each}
+            {#if (newEdge)} 
+                <EdgeComponent 
+                    selected={false} 
+                    isNew={true} 
+                    position={{
+                        x0: newEdge.currStartPos.x,
+                        y0: newEdge.currStartPos.y,
+                        x1: newEdge.currEndPos.x,
+                        y1: newEdge.currEndPos.y
+                    }} 
+                    onMouseDownEdge={() => {}} 
+                    onClickDeleteEdge={() => {}} />
+            {/if}
+            {#each edges as edge}
+                <EdgeComponent 
+                    selected={selectedEdge === edge.id} 
+                    isNew={false} 
+                    position={{
+                        x0: edge.currStartPos.x,
+                        y0: edge.currStartPos.y,
+                        x1: edge.currEndPos.x,
+                        y1: edge.currEndPos.y
+                    }} 
+                    onMouseDownEdge={() => {handleOnMouseDownEdge(edge.id)}} 
+                    onClickDeleteEdge={() => {HandleOnDeleteEdge(edge.id)}} />
+            {/each}
+        </div>
     </div>
 </div>
