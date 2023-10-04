@@ -26,7 +26,7 @@
     loginPost(data)
     .then((res: Response) => res.json())
     .then((res) => {
-      document.cookie = `access_token=${res.access_token}; path=/`;
+      document.cookie = `token=${res.access_token}; path=/`;
       goto("/flux-editor");
     })
     .catch((err: Error) => {
@@ -69,20 +69,6 @@
           </Button>
         </div>
       </div>
-      <div class="flex flex-col items-center w-5/6 mx-auto pt-[2vw] gap-[1vw] text-customWhite text-[1.4vw]">
-        <p class="self-start text-[1.4vw] text-customWhite">Password</p>
-        <input type="password" bind:value={password} class="self-start w-full rounded-md bg-lightgray placeholder:pl-3 placeholder:text-[1.4vw] placeholder:text-ultralightgray h-[2.7vw]" placeholder="Password" />
-      </div>
-      <div class="self-center mt-auto mb-7 pt-[2vw]">
-        <Button onClick={() => {
-            Promise.resolve(login(email, password)).then((res) => {
-                document.cookie = `token=${res.access_token}; path=/;`;
-                goto("/dashboard");
-            });
-        }}>
-          <p>Se connecter</p>
-        </Button>
-      </div>
-    </div>
+    </form>
   </div>
 </section>
