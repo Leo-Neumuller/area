@@ -22,8 +22,13 @@ jobs:
       - name: Setup Python
         run: ./install.sh
 
-      - name: Setup env
-        run: env > .env
+      - name: Create .env file
+        run: |
+          echo "# Automatically generated .env file" > .env
+          for var in $(compgen -e | grep '^PYTHON_'); do
+            echo "$var=${!var}" >> .env
+          done
+        shell: bash
       
       - name: Test api
         run: ./run.sh tests
