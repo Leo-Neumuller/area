@@ -2,15 +2,30 @@
 	import { page } from '$app/stores';
     import Button from '../components/Button/+button.svelte';
     import { goto } from '$app/navigation';
+
+    import LeftArrow from '../components/SVGs/+LeftArrow.svelte';
 </script>
 
 <header>
     <div id="test" class="fixed top-0 w-full bg-gray px-6 py-4 flex justify-between items-center font-SpaceGrotesk z-20">
+        {#if $page.url.pathname === '/flux-editor'}
+            <button on:click={() => {
+                goto('/dashboard');
+            }}>
+                <LeftArrow className="w-14 h-14" color="white" />
+            </button>
+        {/if}
         <button on:click={() => {
             goto('/');
         }}>
             <h1 class="font-Logo text-white text-[3.125rem]">FLUX</h1>
         </button>
+        {#if $page.url.pathname === '/flux-editor'}
+            <div>
+                <LeftArrow className="w-14 h-14" color=""/>
+            </div>
+        {/if}
+
         {#if $page.url.pathname === '/'}
         <div>
             <button class="hover-underline-animation-alt text-customWhite text-[1.775rem] font-medium px-6 py-2 rounded-full uppercase">
@@ -52,22 +67,3 @@
         {/if}
     </div>
 </header>
-
-
-<!-- <p>This is Header For All Pages</p>
-<p> Title:
-    {#if $page.url.pathname === '/'}
-        Home Page
-    {:else if $page.url.pathname === '/bonjour'}
-        Bonjour Page
-    {:else}
-        404 Page
-    {/if}
-</p>
-{#if $page.url.pathname === '/'}
-    <a href="/bonjour" class="underline">Go To Bonjour</a>
-{:else if $page.url.pathname === '/bonjour'}
-    <a href="/" class="underline">Go To Home</a>
-{:else}
-    <a href="/" class="underline">Go To Home</a>
-{/if} -->

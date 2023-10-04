@@ -36,7 +36,7 @@
 
 .edge {
     pointer-events: all;
-    stroke: rgba(168, 168, 168, 0.8);
+    stroke: #373637;
     stroke-width: 2;
     fill: transparent;
     cursor: pointer;

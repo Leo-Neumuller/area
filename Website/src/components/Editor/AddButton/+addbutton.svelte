@@ -1,11 +1,15 @@
 <script lang="ts">
+    import PlusSigne from "../../SVGs/+PlusSigne.svelte";
+    import TextInput from "../../TextInput/+TextInput.svelte";
+    import Close from "../../SVGs/+Close.svelte";
+
     export let showDelete: boolean;
     export let onCLickAdd: (numberInputs: number, numberOutputs: number, type: string) => void;
     export let onClickDelete: () => void;
 
     let open: boolean = false;
-    let numberOfInput = 0;
-    let numberOfOutput = 0;
+    let numberOfInput: number;
+    let numberOfOutput: number;
     let type: string = "";
 
     function handleChangeNumberOfInput(e: any) {
@@ -22,40 +26,52 @@
 
     function handleAddNode(e: any) {
         e.stopPropagation();
-        if (numberOfInput > 4 || numberOfInput < 0 || numberOfOutput > 4 || numberOfOutput < 0) return;
+        if (numberOfInput > 4 || numberOfInput < 0 || numberOfOutput > 4 || numberOfOutput < 0 || type === "") return;
 
         open = false;
         onCLickAdd(numberOfInput, numberOfOutput, type);
-        numberOfInput = 0;
-        numberOfOutput = 0;
-        type = "";
+        numberOfInput = undefined!;
+        numberOfOutput = undefined!;
+        type = " -- Choissisez un type --";
+        const selectElement = document.getElementById("lang") as HTMLSelectElement;
+        selectElement.selectedIndex = 0;
+
     }
 </script>
 
 <div>
-    <button
-        class={`${showDelete ? "hidden" : "flex"} cursor-pointer flex bg-primary box-border items-center justify-end fixed top-[400px] left-0 z-[100]`}
-        on:click={onClickDelete}>
-        Delete
-    </button>
-    <button class="cursor-pointer bg-primary flex justify-center items-center fixed top-[300px] left-10 z-10" 
+
+    <button class="cursor-pointer flex justify-center items-center absolute top-6 right-6 z-[30]" 
         on:click={() => {
             open = true;
         }}>
-        +
+        <PlusSigne className="w-14 h-14" color="white"/>
     </button>
-    <div class={`${open ? "flex" : "hidden"} flex-col top-[350px] fixed left-10 z-10 bg-white border border-black p-6`}>
-        <input type="number" placeholder="number of input" class="border border-black" value={numberOfInput} 
-            on:input={handleChangeNumberOfInput}/>
-        <input type="number" placeholder="number of output" class="border border-black" value={numberOfOutput}
-            on:input={handleChangeNumberOfOutput}/>
-        <select name="types" id="lang" on:input={handleChangeType} class="border border-black">
-            <option disabled selected value> -- select an option -- </option>
-            <option value="Action">Action</option>
-            <option value="Reaction">Reaction</option>
-        </select>
-        <button class="border border-black" on:click={handleAddNode}>
-            Add node
+    <div class={`${open ? "flex" : "hidden"} gap-3 rounded-xl flex-col absolute top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%] z-[30] bg-gray border border-black p-6`}>
+        <div class="flex justify-between items-center align-middle pb-4">
+            <h1 class="text-customWhite font-SpaceGrotesk uppercase">Nouveau node</h1>
+            <button on:click={() => {
+                open = false;
+            }}>
+                <Close className="w-4 h-4" color="#F3F3F3"/>
+            </button>
+        </div>
+        <TextInput label="Number of input" type="number" placeholder="Nombre d'entrées" value={numberOfInput} 
+            onInput={handleChangeNumberOfInput}/>
+        <TextInput label="Number of output" type="number" placeholder="Nombre de sorties" value={numberOfOutput}
+            onInput={handleChangeNumberOfOutput}/>
+    
+        <div class="w-full flex flex-col gap-2">
+            <h1 class="text-customWhite font-SpaceGrotesk">Type</h1>
+            <select name="types" id="lang" on:input={handleChangeType} class="w-full rounded-xl px-4 py-2 bg-customWhite/[10%] outline-none text-customWhite">
+                <option class="bg-gray" disabled selected value> -- Choissisez un type --</option>
+                <option class="bg-gray" value="Action">Action</option>
+                <option class="bg-gray" value="Reaction">Reaction</option>
+            </select>
+        </div>
+    
+        <button class="text-customWhite rounded border border-customWhite mt-2" on:click={handleAddNode}>
+            Ajouter un node
         </button>
     </div>
 </div>

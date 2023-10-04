@@ -8,4 +8,7 @@ export default interface Node {
     
     inputEdgeIds: String[];
     outputEdgeIds: String[];
+
+    title: string;
+    img: string;
 }

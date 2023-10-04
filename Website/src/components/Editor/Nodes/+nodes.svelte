@@ -1,5 +1,6 @@
 <script lang="ts">
     import './style.css'
+    import Modify from "../../SVGs/+Modify.svelte";
 
     export let id: string;
     export let type: string;
@@ -11,7 +12,10 @@
     export let onMouseDownOutput: (outputPositionX: number, outputPositionY: number, nodeId: string,  outputIndex: number) => void;
     export let onMouseEnterInput: (inputPositionX: number, inputPositionY: number, nodeId: string, inputIndex: number) => void;
     export let onMouseLeaveInput: (nodeId: string, inputIndex: Number) => void;
-
+    export let modify: boolean;
+    export let title: string;
+    export let img: string;
+    
     let refBinder: any = [];
     let refBinderOutput: any = [];
 
@@ -50,6 +54,16 @@
         e.stopPropagation();
         onMouseDownNode(id, e);
     }}>
+    <div class="flex h-full align-middle justify-between items-center px-6">
+        <div>
+            <h1 class={`text-[2.1rem] font-SpaceGrotesk ${type === "Action" ? "text-customWhite" : "text-gray"} text-customWhite font-semibold`}>{title}</h1>
+        </div>
+        <button on:click={() => {
+            modify = !modify;
+        }}>
+            <Modify className="w-10 h-10" color={type === "Action" ? "white" : "#373637"} />
+        </button>
+    </div>
     <div class="inputsWrapper">
         {#each {length: Number(numberOfInputs)} as _, index}
             <div role="presentation" class="input" bind:this={refBinder[index]}
