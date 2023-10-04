@@ -11,6 +11,7 @@ jobs:
   test:
     timeout-minutes: 20
     runs-on: ubuntu-latest
+    environment: Api
     defaults:
       run:
         working-directory: ./Api
