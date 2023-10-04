@@ -8,9 +8,19 @@
 
 <header>
     <div id="test" class="fixed top-0 w-full bg-gray px-6 py-4 flex justify-between items-center font-SpaceGrotesk z-20">
+        {#if $page.url.pathname === '/dashboard'}
+            <div>
+                
+            </div>
+        {/if}
         {#if $page.url.pathname === '/flux-editor'}
             <button on:click={() => {
-                goto('/dashboard');
+                console.log(document.cookie);
+                if (document.cookie.includes("token")) {
+                    goto("/dashboard");
+                } else {
+                    goto('/');
+                }
             }}>
                 <LeftArrow className="w-14 h-14" color="white" />
             </button>
@@ -20,6 +30,11 @@
         }}>
             <h1 class="font-Logo text-white text-[3.125rem]">FLUX</h1>
         </button>
+        {#if $page.url.pathname === '/dashboard'}
+            <div>
+                
+            </div>
+        {/if}
         {#if $page.url.pathname === '/flux-editor'}
             <div>
                 <LeftArrow className="w-14 h-14" color=""/>

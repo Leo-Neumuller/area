@@ -11,6 +11,10 @@
     import Timesave from "$lib/images/TimeSave.png";
 
     import { goto } from "$app/navigation";
+
+    if (document.cookie.includes("token")) {
+        goto("/dashboard");
+    }
 </script>
 
 <svelte:head>

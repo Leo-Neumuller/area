@@ -38,6 +38,7 @@
         <Button onClick={() => {
             Promise.resolve(login(email, password)).then((res) => {
                 document.cookie = `token=${res.access_token}; path=/;`;
+                goto("/dashboard");
             });
         }}>
           <p>Se connecter</p>
