@@ -12,6 +12,8 @@ import {
 import Home from '../screens/Home';
 import HomeLogin from '../screens/LoginScreens/HomeLogin';
 import Login from '../screens/LoginScreens/Login';
+import {NavigationContainer} from '@react-navigation/native';
+import { Routes } from '../screens/Routes';
 
 
 
@@ -33,7 +35,7 @@ export default function Main() {
     }
     return (
         <SafeAreaView style={style.container} onLayout={onLayoutRootView}>
-            <Login/>
+            <Routes />
         </SafeAreaView>
     );
 }
