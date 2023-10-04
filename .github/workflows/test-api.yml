@@ -29,6 +29,9 @@ jobs:
             echo "$var=${!var}" >> .env
           done
         shell: bash
+
+      - name: test job
+        run: cat .env
       
       - name: Test api
         run: ./run.sh tests
