@@ -37,3 +37,15 @@ export async function loginPost(data: { [key: string]: string }) {
     }
     return res;
 }
+
+export async function getServices(cookie: string) {
+    return await fetch('http://127.0.0.1:8000/services', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'access-token': cookie
+        }
+    }).then(res => {
+        return res.json();
+    });
+}

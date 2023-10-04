@@ -10,6 +10,8 @@
     import Close from "../../SVGs/+Close";
     import Modify from "../../SVGs/+Modify.svelte";
     import AppPres from "../../AppPres/+AppPres.svelte";
+    import { getServices } from "../../../api/+api";
+    import { getCookie } from "../../../api/helpers";
 
     let grabbingBoard: boolean = false;
     let scale: number = 1;
@@ -331,6 +333,10 @@
                 board.style.marginLeft = `${(scale - 1) * 50}vw`;
             });
         }
+        Promise.resolve(getServices(getCookie("token"))).then((res) => {
+            const services = res;
+            console.log(services);
+        })
     })
 </script>
   
@@ -436,3 +442,32 @@
         </div>
     </div>
 </div>
+
+
+<!-- 
+for (let i = 0; i < services.length; i++) {
+    const service = services[i];
+    const randomX = Math.random() * (window.innerWidth - 300) + 300;
+    const randomY = Math.random() * (window.innerHeight - 300) + 300;
+
+    let nodePrev: {x: number, y: number} = {x: randomX, y: randomY};
+    let nodeCurr: {x: number, y: number} = {x: randomX, y: randomY};
+    let inputs: String[] = [];
+    let outputs: String[] = [];
+
+    nodes = [
+        ...nodes,
+        {
+            id: `node_${Math.random().toString(36).substring(7)}`,
+            prevPosition: nodePrev,
+            currPosition: nodeCurr,
+            numberInputs: service.inputs.length,
+            numberOutputs: service.outputs.length,
+            type: "Service",
+            inputEdgeIds: inputs,
+            outputEdgeIds: outputs,
+            title: service.name,
+            img: "test",
+        }
+    ];
+} -->
