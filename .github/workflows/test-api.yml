@@ -21,9 +21,9 @@ jobs:
 
       - name: Setup Python
         run: ./install.sh
-      
-      - name: Test api
-        run: ./run.sh tests
 
       - name: Setup env
         run: env > .env
+      
+      - name: Test api
+        run: ./run.sh tests
