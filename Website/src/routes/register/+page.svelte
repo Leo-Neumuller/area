@@ -3,12 +3,15 @@
   import { goto } from "$app/navigation";
   import { signupPost } from "../../api/+api";
   import Input from "../../components/Input/+input.svelte";
+  import { onMount } from 'svelte';
 
   let errorMsg: string;
 
-  if (document.cookie.includes("access_token")) {
-    goto("/flux-editor");
-  }
+  onMount(() => {
+    if (document.cookie.includes("access_token")) {
+      goto("/flux-editor");
+    }
+  });
 
   function handleSubmit(event: SubmitEvent) {
     const formData = new FormData(event.target as HTMLFormElement);

@@ -1,4 +1,3 @@
-
 export interface signupProps {
     name: string;
     surname: string;
@@ -7,6 +6,7 @@ export interface signupProps {
 }
 
 export async function signupPost(data: { [key: string]: string }) {
+    console.log(import.meta.env.VITE_API_URL)
     const res = await fetch("http://127.0.0.1:8000/user/signup", {
             method: 'POST',
             body: JSON.stringify(data),
