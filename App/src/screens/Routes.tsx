@@ -12,9 +12,9 @@ export const Routes: React.FC = () => {
 
     return (
         <NavigationContainer>
-            <Stack.Navigator initialRouteName="Login">
-                <Stack.Screen name='BottomBar' component={BottomBar} options={{headerShown: false}}/>
-                <Stack.Screen name='FluxEditor' component={FluxEditor}/>
+            <Stack.Navigator initialRouteName="Login" screenOptions={{headerShown: false}}>
+                <Stack.Screen name='BottomBar' component={BottomBar}/>
+                <Stack.Screen name='FluxEditor' component={FluxEditor} options={{headerShown: true}}/>
                 <Stack.Screen name='Login' component={Login}/>
             </Stack.Navigator>
         </NavigationContainer>
