@@ -1,5 +1,8 @@
 FROM node:20-buster
 
+ARG EXPO_TOKEN
+ENV EXPO_TOKEN $EXPO_TOKEN
+
 WORKDIR /app
 
 COPY . .

@@ -1,10 +1,13 @@
+import warnings
 from datetime import datetime, timedelta
 
-from jose.exceptions import JWTClaimsError
+from jose.exceptions import JWTClaimsError, JWSError
 
 from src.constants import Environment
 from src.models.User import User
 from jose import jwt, JWTError, ExpiredSignatureError
+
+from src.utils.Helper import warn
 
 
 class JWTException(Exception):
@@ -39,7 +42,8 @@ def create_jwt(data: dict, expires_delta: timedelta | None = None,
     to_encode.update({"exp": expire})
     try:
         return jwt.encode(to_encode, Env.JWT_SECRET, algorithm=Env.JWT_ALGORITHM)
-    except JWTError as e:
+    except (JWTError, JWSError) as e:
+        warn(str(e))
         raise JWTException(str(e))
 
 
@@ -63,7 +67,7 @@ def decode_jwt(token: str, Env: Environment.Settings = Environment.Settings()) -
     """
     try:
         return jwt.decode(token, Env.JWT_SECRET, algorithms=[Env.JWT_ALGORITHM])
-    except (JWTError, JWTClaimsError) as e:
-        raise JWTException(str(e))
     except ExpiredSignatureError as e:
         raise JWTExpiredException(str(e))
+    except (JWTError, JWTClaimsError, JWSError) as e:
+        raise JWTException(str(e))
