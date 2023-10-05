@@ -6,8 +6,7 @@ export interface signupProps {
 }
 
 export async function signupPost(data: { [key: string]: string }) {
-    console.log(import.meta.env.VITE_API_URL)
-    const res = await fetch("http://127.0.0.1:8000/user/signup", {
+    const res = await fetch(import.meta.env.VITE_API_URL + "/user/signup", {
             method: 'POST',
             body: JSON.stringify(data),
             headers: {
@@ -23,7 +22,7 @@ export async function signupPost(data: { [key: string]: string }) {
 }
 
 export async function loginPost(data: { [key: string]: string }) {
-    const res = await fetch("http://127.0.0.1:8000/user/login", {
+    const res = await fetch(import.meta.env.VITE_API_URL + "/user/login", {
             method: 'POST',
             body: JSON.stringify(data),
             headers: {
@@ -39,7 +38,7 @@ export async function loginPost(data: { [key: string]: string }) {
 }
 
 export async function getServices(cookie: string) {
-    return await fetch('http://127.0.0.1:8000/services', {
+    return await fetch(import.meta.env.VITE_API_URL + '/services', {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
