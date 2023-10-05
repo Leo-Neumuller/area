@@ -1,7 +1,7 @@
-import FluxSvg from "../../assets/logos_flux.svg";
-import DashboardSvg from "../../assets/material-symbols_dashboard.svg"
-import AppSvg from "../../assets/tdesign_app.svg"
-import ProfileSvg from "../../assets/iconamoon_profile-fill.svg"
+import FluxSvg from "../../../assets/logos_flux.svg";
+import DashboardSvg from "../../../assets/material-symbols_dashboard.svg"
+import AppSvg from "../../../assets/tdesign_app.svg"
+import ProfileSvg from "../../../assets/iconamoon_profile-fill.svg"
 import { View, Text } from "react-native";
 
 export const Tmp: React.FC = () => {

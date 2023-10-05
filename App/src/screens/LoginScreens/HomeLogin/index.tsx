@@ -8,10 +8,10 @@ import {
     Image, ImageBackground
 } from "react-native";
 import {StatusBar} from "expo-status-bar";
-import {Theme} from "../../components/themeProvider"
-import useThemedStyles from "../../hooks/useThemedStyle";
-import ButtonCompenents from "../../components/buttonComponents"
-import useTheme from "../../hooks/useTheme";
+import {Theme} from "../../../components/themeProvider"
+import useThemedStyles from "../../../hooks/Theme/useThemedStyle";
+import ButtonCompenents from "../../../components/ButtonLogin"
+import useTheme from "../../../hooks/Theme/useTheme";
 import {BlurView} from 'expo-blur';
 import absoluteFill = StyleSheet.absoluteFill;
 import {RFValue} from "react-native-responsive-fontsize";

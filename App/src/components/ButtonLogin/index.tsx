@@ -1,5 +1,5 @@
 import {StyleSheet, Text, View, Button, Dimensions, SafeAreaView, TouchableOpacity} from "react-native";
-import useThemedStyles from "../hooks/useThemedStyle";
+import useThemedStyles from "../../hooks/Theme/useThemedStyle";
 
 export default function ButtonComponents({bgColor, hei, wid, text, textColor}) { // compenant bouton
     const Styles = useThemedStyles(styles);

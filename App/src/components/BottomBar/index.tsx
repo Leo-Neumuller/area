@@ -5,9 +5,9 @@ import { SvgUri } from 'react-native-svg';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationHelpers, ParamListBase, TabNavigationState } from '@react-navigation/native';
 import { MaterialTopTabDescriptorMap } from '@react-navigation/material-top-tabs/lib/typescript/src/types';
-import FluxEditorSVG from "../../assets/Vector.svg"
+import FluxEditorSVG from "../../../assets/Vector.svg"
 import { StackNavigationProp } from '@react-navigation/stack';
-import { bottomBarList } from '../constants/BottomBarList';
+import { bottomBarList } from '../../constants/BottomBarList';
 
 const Tab = createMaterialTopTabNavigator();
 

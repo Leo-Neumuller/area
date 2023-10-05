@@ -51,7 +51,7 @@ const Theme : ThemeType = {
             justifyContent: "center",
         },
         "Title": {
-            fontSize: RFValue(30),
+            fontSize: RFValue(30    ),
             fontFamily: 'space-grotesk',
         },
         "Subtitle": {

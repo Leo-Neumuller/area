@@ -9,11 +9,8 @@ import {
 }
     from "react-native";
 
-import Home from '../screens/Home';
-import HomeLogin from '../screens/LoginScreens/HomeLogin';
-import Login from '../screens/LoginScreens/Login';
 import {NavigationContainer} from '@react-navigation/native';
-import { Routes } from '../screens/Routes';
+import { Routes } from '../../screens/Routes';
 
 
 
@@ -22,8 +19,8 @@ SplashScreen.preventAutoHideAsync();
 
 export default function Main() {
     const [fontsLoaded] = useFonts({
-        'space-grotesk': require('../../assets/fonts/spaceGrotesk.ttf'),
-        'zen-tokyo-zoo': require('../../assets/fonts/zenTokyoZoo.ttf'),
+        'space-grotesk': require('../../../assets/fonts/spaceGrotesk.ttf'),
+        'zen-tokyo-zoo': require('../../../assets/fonts/zenTokyoZoo.ttf'),
     });
     const onLayoutRootView = useCallback(async () => {
         if (fontsLoaded) {

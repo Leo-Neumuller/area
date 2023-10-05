@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import ConstantTheme, {ThemeName} from "../constants/Theme";
+import ConstantTheme, {ThemeName} from "../../constants/Theme";
 export const ThemeContext = React.createContext({
     Default: ConstantTheme["Default"],
 });

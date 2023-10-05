@@ -6,9 +6,9 @@ import {
     from "react-native";
 
 
-import Main from './src/components/main';
+import Main from './src/components/Main';
 import ThemeProvider from "./src/components/themeProvider";
-import useThemedStyles from "./src/hooks/useThemedStyle";
+import useThemedStyles from "./src/hooks/Theme/useThemedStyle";
 import Theme from "./src/constants/Theme"
 
 export default function App() {
