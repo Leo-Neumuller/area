@@ -6,6 +6,6 @@ fi
 if [ "$1" = "tests" ]; then
   (. venv/bin/activate && coverage run --branch -m unittest discover -s tests -f && coverage report)
 else
-  env/bin/uvicorn main:app --reload
+  venv/bin/uvicorn main:app --reload
 fi
 
