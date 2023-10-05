@@ -14,7 +14,7 @@ type TextType = {
     fontFamily?: string;
 }
 
-type ThemeType = {
+export type ThemeType = {
     "Light" : {
         "colors": ColorType;
         "Button": TextStyle;
