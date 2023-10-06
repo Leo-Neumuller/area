@@ -1,3 +1,4 @@
+import 'react-native-gesture-handler';
 import React, {useCallback} from 'react';
 import * as SplashScreen from "expo-splash-screen";
 import {
@@ -14,7 +15,7 @@ import Theme from "./src/constants/Theme"
 export default function App() {
     return (
         <ThemeProvider>
-            <Main />
+                <Main />
         </ThemeProvider>
     );
 }
