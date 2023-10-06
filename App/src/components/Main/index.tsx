@@ -28,7 +28,7 @@ export default function Main() {
     async function checkLogged() {
         const jwt = await SecureStore.getItemAsync("userToken")
         try {
-            const data = jwt_decode(jwt);
+            const data: {[key: string]: any} = jwt_decode(jwt!);
             if (data.exp * 1000 < Date.now()) {
                 await SecureStore.setItemAsync("userToken", "");
                 setIsLogged(false);

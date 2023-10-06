@@ -1,5 +1,5 @@
 import {RFValue} from "react-native-responsive-fontsize";
-import { TextStyle } from "react-native";
+import {TextStyle} from "react-native";
 
 type ColorType = {
     [key: string]: string;
@@ -15,33 +15,41 @@ type TextType = {
 }
 
 export type ThemeType = {
-    "Light" : {
+    "Light": {
         "colors": ColorType;
         "Button": TextStyle;
         "Title": TextStyle;
         "Subtitle": TextStyle;
         "Text": TextStyle;
     },
-    "Default" : {
+    "Default": {
         "typography": TextType;
         "colors": ColorType;
     }
 }
 
-export type ThemeContextType = {
-    colors: ColorType;
-    default: ThemeType["Default"];
+export type ThemeTypeContext = {
+    "colors": ColorType;
+    "Button": TextStyle;
+    "Title": TextStyle;
+    "Subtitle": TextStyle;
+    "Text": TextStyle;
+    "Default": {
+        "typography": TextType;
+        "colors": ColorType;
+    }
 }
+
 
 export type ThemeName = "Light";
 
-const Theme : ThemeType = {
-    "Light" : {
+const Theme: ThemeType = {
+    "Light": {
         "colors": {
             "Primary": '#D9C6F4',
-            "White" : "#f3f3f3",
-            "Black" : "#373637",
-            "Gray" : "#D9C6F41A",
+            "White": "#f3f3f3",
+            "Black": "#373637",
+            "Gray": "#D9C6F41A",
         },
         "Button": {
             fontSize: RFValue(25),
@@ -64,7 +72,7 @@ const Theme : ThemeType = {
             fontFamily: 'space-grotesk',
         }
     },
-    "Default" : {
+    "Default": {
         "typography": {
             "size": {
                 "sm": RFValue(20),

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {FunctionComponent, useState} from 'react';
 import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { NavigationHelpers, ParamListBase, TabNavigationState } from '@react-navigation/native';
@@ -7,7 +7,7 @@ import FluxEditorSVG from "../../../assets/Vector.svg"
 import { StackNavigationProp } from '@react-navigation/stack';
 import { bottomBarList } from '../../constants/BottomBarList';
 import useThemedStyles from '../../hooks/Theme/useThemedStyle';
-import { ThemeContextType, ThemeType } from '../../constants/Theme';
+import { ThemeType, ThemeTypeContext } from '../../constants/Theme';
 import useTheme from "../../hooks/Theme/useTheme";
 
 
@@ -133,7 +133,7 @@ export const BottomBar: React.FC<Props> = ({ navigation }) => {
     )
 } 
 
-const styles = (Theme) => StyleSheet.create({
+const styles = (Theme: ThemeTypeContext) => StyleSheet.create({
     text: {
         color: Theme.colors.White,
         textAlign: "center",

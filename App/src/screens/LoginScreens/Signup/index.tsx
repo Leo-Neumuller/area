@@ -24,6 +24,7 @@ import {signupPost} from "../../../api/api";
 
 
 import Login from "../Login";
+import {ThemeTypeContext} from "../../../constants/Theme";
 
 export default function Signup({navigation}) {
     const Styles = useThemedStyles(styles);
@@ -60,7 +61,7 @@ export default function Signup({navigation}) {
                 </View>
                 <View style={{
                     height: "72%",
-                    justifyContent: "1space-evenly",
+                    justifyContent: "space-evenly",
                     alignItems: "center"
 
                 }}>
@@ -234,7 +235,7 @@ export default function Signup({navigation}) {
     )
 }
 
-const styles = Theme => StyleSheet.create({
+const styles = (Theme: ThemeTypeContext) => StyleSheet.create({
     Text: {
         color: Theme.colors.Primary
     },

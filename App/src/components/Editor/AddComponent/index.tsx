@@ -4,11 +4,12 @@ import BottomSheet from '@gorhom/bottom-sheet';
 import useThemedStyles from '../../../hooks/Theme/useThemedStyle';
 import useTheme from '../../../hooks/Theme/useTheme';
 import { BottomSheetMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
+import { ThemeTypeContext } from '../../../constants/Theme';
 
 export type AddComponentProps = {
   children?: string | JSX.Element | JSX.Element[]
   opened?: boolean
-  setOpened?: React.Dispatch<React.SetStateAction<boolean>>
+  setOpened: React.Dispatch<React.SetStateAction<boolean>>
   ref?: React.Ref<BottomSheetMethods> | undefined
 }
 
@@ -33,7 +34,6 @@ export const AddComponent: React.FC<AddComponentProps> = React.forwardRef(({chil
         handleStyle={{backgroundColor: Theme.colors.Black, borderTopLeftRadius: 20, borderTopRightRadius: 20}}
         handleIndicatorStyle={{backgroundColor: Theme.colors.White}}
         backgroundStyle={{backgroundColor: Theme.colors.Black}}
-        // onChange={handleSheetChanges}
         backdropComponent={() => {
           return (
             <View style={opened ? Styles.containerUnfocused : Styles.container} onTouchStart={() => { sheetRef!.close(); setOpened(false) }}>
@@ -50,7 +50,7 @@ export const AddComponent: React.FC<AddComponentProps> = React.forwardRef(({chil
   );
 });
 
-const styles = (Theme) => StyleSheet.create({
+const styles = (Theme: ThemeTypeContext) => StyleSheet.create({
   containerUnfocused: {
     flex: 1,
     backgroundColor: 'grey',

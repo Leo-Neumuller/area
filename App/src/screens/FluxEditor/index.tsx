@@ -10,6 +10,7 @@ import useTheme from '../../hooks/Theme/useTheme';
 import {AREAComponent} from "../../components/Editor/AREAComponent";
 import BottomSheet from '@gorhom/bottom-sheet';
 import { AddComponent } from '../../components/Editor/AddComponent';
+import { ThemeTypeContext } from '../../constants/Theme';
 
 type RootStackParamList = {
     FluxEditor: undefined;
@@ -76,7 +77,7 @@ export const FluxEditor: React.FC<{navigation: StackNavigationProp<RootStackPara
     )
 }
 
-const styles = (Theme) => StyleSheet.create({
+const styles = (Theme: ThemeTypeContext) => StyleSheet.create({
     container: {
         flex: 1,
         alignItems: 'center',
