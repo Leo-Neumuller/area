@@ -18,9 +18,26 @@ import {BlurView} from 'expo-blur';
 import absoluteFill = StyleSheet.absoluteFill;
 import {RFValue} from "react-native-responsive-fontsize";
 
-export default function Login() {
+import Signup from "../Signup";
+import HomeLogin from "../HomeLogin";
+
+import React, {useState} from "react";
+import * as SecureStore from "expo-secure-store";
+
+import {loginPost} from "../../../api/api";
+
+
+export default function Login({navigation}) {
     const Styles = useThemedStyles(styles);
     const Theme = useTheme();
+
+    const [data, setData] = useState({
+        email: "",
+        password: ""
+    })
+
+    const [error, setError] = useState();
+
 
 
     return (
@@ -43,7 +60,7 @@ export default function Login() {
                     }}>FLUX</Text>
                 </View>
                 <View style={{
-                    height: "50%",
+                    height: "55%",
                     justifyContent: "space-evenly",
                     width: "100%",
                     alignItems: "center"
@@ -72,6 +89,8 @@ export default function Login() {
                                         }}
                                         placeholder="Email"
                                         placeholderTextColor="#FFFFFF80"
+                                        onChangeText={(email) => setData((prev) => ({...prev, email: email}))}
+
                                     />
                                 </View>
                             </View>
@@ -80,7 +99,7 @@ export default function Login() {
                                     ...Theme.Subtitle,
                                     color: Theme.colors.White,
                                 }
-                                }> Password </Text>
+                                }> Mot de passe </Text>
                                 <View style={{...Styles.styleInput}}>
                                     <TextInput
                                         style={{
@@ -89,15 +108,33 @@ export default function Login() {
                                             marginVertical: 5
 
                                         }}
-                                        placeholder="Password"
+                                        placeholder="Mot de passe"
                                         placeholderTextColor="#FFFFFF80"
+                                        secureTextEntry={true}
+                                        onChangeText={(password) => setData((prev) => ({...prev, password: password}))}
+
                                     />
                                 </View>
                             </View>
                         </View>
+                        <View style={{ height: "10%",
+                            width: "90%",
+                            marginHorizontal: "8%"
+                        }}>
+                            <View>
+                                {error ? <Text style={{
+                                    color: 'red',
+                                    flexWrap: "wrap",
+                                    position:"absolute",
+                                    textAlign: "center"
+                                }}>
+                                    {error}
+                                </Text> : null}
+                            </View>
+                        </View>
                         <View>
                             <View style={{
-                                height: "35%",
+                                height: "30%",
                                 justifyContent: "space-evenly",
                                 width: "100%",
                                 alignItems: "center"
@@ -109,18 +146,31 @@ export default function Login() {
                                     wid={"80%"}
                                     text={"SE CONNECTER"}
                                     textColor={Theme.colors.Black}
-
+                                    onPress={() => {
+                                        loginPost(data).then((res) => {
+                                            SecureStore.setItemAsync('userToken', res.access_token).then(() =>
+                                                navigation.push("BottomBar"))
+                                        }).catch((err) => {
+                                            setError(err.toString());
+                                        })
+                                    }}
                                 />
                             </View>
 
                             <View style={{margin: "5%",
                             alignItems: "center"}}>
-                                <TouchableOpacity>
+                                <Text style={{
+                                    ...Theme.Text,
+                                    color: Theme.colors.White,
+                                }}>
+                                    Première fois sur Flux ?
+                                </Text>
+                                <TouchableOpacity onPress={() => navigation.push('Signup')}>
                                     <Text style={{...Theme.Text,
                                         color: Theme.colors.White,
                                         textDecorationLine: "underline"
                                     }}>
-                                        Créer un compte
+                                        Créé ton compte !
                                     </Text>
                                 </TouchableOpacity>
                             </View>
