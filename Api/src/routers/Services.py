@@ -4,13 +4,14 @@ from fastapi import APIRouter, HTTPException, status, Depends
 
 from src.middleware.User import MiddlewareUser
 from src.models.Services import save_start_authorization, check_if_service_exist, AuthorizationUrl, Service, \
-    ServicesType, ServiceType, AREADataSmall, ServiceMetadata
+    ServicesType, ServiceType, AREADataSmall, ServiceMetadata, ServiceMetadataSend
 from src.models.User import UserMe
 from src.services import services
 from src.utils.Database import get_db
 from src.utils.Helper import DefaultErrorResponse
 
 ServicesRouter = APIRouter(
+    prefix="/services",
     tags=["Services"],
 )
 
@@ -36,22 +37,22 @@ async def get_services():
     )
 
 
-@ServicesRouter.get("/metadata/{AREA_id}",
+@ServicesRouter.get("/metadata/{areaId}",
                     summary="Get action or reaction input schema",
                     description="Get action or reaction input schema",
                     response_description="Action or reaction schema",
-                    response_model=ServiceMetadata,
                     status_code=status.HTTP_200_OK,
+                    response_model=ServiceMetadataSend,
                     dependencies=[Depends(MiddlewareUser.check)],
                     responses={**MiddlewareUser.responses(),
                                status.HTTP_404_NOT_FOUND: {"description": "Service not found",
                                                            **DefaultErrorResponse()}})
-async def get_action_or_reaction(AREA_id: str):
+async def get_action_or_reaction(areaId: str, User: UserMe = Depends(MiddlewareUser.check)):
     """
     Get action
     :return: Action
     """
-    splitted_reaction_id = AREA_id.split("_")
+    splitted_reaction_id = areaId.split("_")
     if len(splitted_reaction_id) < 2:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Service Schema not found")
     service_name = splitted_reaction_id[0]
@@ -62,11 +63,10 @@ async def get_action_or_reaction(AREA_id: str):
     if service_name not in services.keys():
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Service Schema not found")
     interface = services[service_name]().get_interface()[action]
-    if AREA_id not in interface.keys():
+    if areaId not in interface.keys():
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"This service doesn't have {action.value}")
-    data = interface[AREA_id]
-    data.function = None
-    return data
+    data = interface[areaId]
+    return ServiceMetadataSend.convert(data)
 
 
 @ServicesRouter.get("/{service}/authorize_url",
@@ -115,7 +115,7 @@ async def authorize(service: str, state: str, code: str, scope: str, error: str 
     return {"service": service}
 
 
-@ServicesRouter.get("/{service}/{type}",
+@ServicesRouter.get("/{service}/{serviceType}",
                     summary="Get all actions or reactions",
                     description="Get all actions or reactions",
                     response_description="List of actions or reactions",

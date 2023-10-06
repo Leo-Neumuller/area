@@ -1,7 +1,7 @@
 <script lang="ts">
   import Button from "../../components/Button/+button.svelte";
   import { goto } from "$app/navigation";
-  import { loginPost } from "../../api/+api";
+  import { loginPost } from "../../api/api";
   import Input from "../../components/Input/+input.svelte";
 
   let errorMsg: string;
