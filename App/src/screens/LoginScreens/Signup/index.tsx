@@ -9,6 +9,7 @@ import {
     Image, ImageBackground,
     ScrollView, TouchableOpacity
 } from "react-native";
+import React, {useState} from "react";
 import {StatusBar} from "expo-status-bar";
 import useThemedStyles from "../../../hooks/Theme/useThemedStyle";
 import ButtonCompenents from "../../../components/ButtonLogin"
@@ -17,15 +18,30 @@ import {BlurView} from 'expo-blur';
 import absoluteFill = StyleSheet.absoluteFill;
 import {RFValue} from "react-native-responsive-fontsize";
 import {get} from "react-native/Libraries/TurboModule/TurboModuleRegistry";
+import * as SecureStore from 'expo-secure-store';
 
-export default function Signin() {
+import {signupPost} from "../../../api/api";
+
+
+import Login from "../Login";
+
+export default function Signup({navigation}) {
     const Styles = useThemedStyles(styles);
     const Theme = useTheme();
+
+    const [data, setData] = useState({
+        name: "",
+        surname: "",
+        email: "",
+        password: ""
+    })
+
+    const [error, setError] = useState();
 
 
     return (
         <ScrollView>
-            <View style={{
+            <SafeAreaView style={{
                 backgroundColor: Theme.colors.White,
                 height: Dimensions.get("window").height * 0.97,
                 width: "100%"
@@ -44,7 +60,6 @@ export default function Signin() {
                 </View>
                 <View style={{
                     height: "72%",
-                    marginVertical: "8  %",
                     justifyContent: "1space-evenly",
                     alignItems: "center"
 
@@ -61,7 +76,7 @@ export default function Signin() {
                         }}>
                             <View style={{
                                 margin: "7%",
-                                height: "53%"
+                                height: "57%"
                             }}>
                                 <View style={{margin: "2%"}}>
                                     <Text style={{
@@ -71,14 +86,17 @@ export default function Signin() {
                                     }> Nom </Text>
                                     <View style={{...Styles.styleInput}}>
                                         <TextInput
+
                                             style={{
                                                 ...Theme.Text,
                                                 marginHorizontal: 20,
-                                                marginVertical: 5
+                                                marginVertical: 5,
+
 
                                             }}
                                             placeholder="Nom"
                                             placeholderTextColor="#FFFFFF80"
+                                            onChangeText={(surname) => setData((prev) => ({...prev, surname: surname}))}
                                         />
                                     </View>
                                 </View>
@@ -98,6 +116,7 @@ export default function Signin() {
                                             }}
                                             placeholder="Prénom"
                                             placeholderTextColor="#FFFFFF80"
+                                            onChangeText={(name) => setData((prev) => ({...prev, name: name}))}
                                         />
                                     </View>
                                 </View>
@@ -117,6 +136,7 @@ export default function Signin() {
                                             }}
                                             placeholder="Email"
                                             placeholderTextColor="#FFFFFF80"
+                                            onChangeText={(email) => setData((prev) => ({...prev, email: email}))}
                                         />
                                     </View>
                                 </View>
@@ -136,13 +156,30 @@ export default function Signin() {
                                             }}
                                             placeholder="Mot de passe"
                                             placeholderTextColor="#FFFFFF80"
+                                            secureTextEntry={true}
+                                            onChangeText={(password) => setData((prev) => ({...prev, password: password}))}
                                         />
                                     </View>
                                 </View>
 
                             </View>
-                            <View style={{height: "35%",
-                            margin: "5%"}}>
+                            <View style={{ height: "8%",
+                            width: "90%",
+                                marginHorizontal: "8%"
+                            }}>
+                                <View>
+                                    {error ? <Text style={{
+                                        color: 'red',
+                                        flexWrap: "wrap",
+                                        position:"absolute",
+                                        textAlign: "center"
+                                    }}>
+                                        {error}
+                                    </Text> : null}
+                                </View>
+                            </View>
+                            <View style={{height: "28%"}}>
+
                                 <View style={{
                                     height: "50%",
                                     justifyContent: "space-evenly",
@@ -156,14 +193,21 @@ export default function Signin() {
                                         wid={"80%"}
                                         text={"S'INSCRIRE"}
                                         textColor={Theme.colors.Black}
+                                        onPress={() => {
+                                            signupPost(data).then((res) => {
+                                                SecureStore.setItemAsync('userToken', res.access_token).then(() =>
+                                                navigation.push("Login"))
+                                            }).catch((err) => {
+                                                setError(err.toString());
+                                            })
+                                        }}
 
                                     />
                                 </View>
 
                                 <View style={{
-                                    margin: "5%",
                                     alignItems: "center",
-                                    height: "50%"
+                                    height: "30%"
                                 }}>
                                     <Text style={{
                                         ...Theme.Text,
@@ -171,7 +215,7 @@ export default function Signin() {
                                     }}>
                                         Déja un compte ?
                                     </Text>
-                                    <TouchableOpacity>
+                                    <TouchableOpacity onPress={() => navigation.push('Login')}>
                                         <Text style={{
                                             ...Theme.Text,
                                             color: Theme.colors.White,
@@ -185,7 +229,7 @@ export default function Signin() {
                         </View>
                     </View>
                 </View>
-            </View>
+            </SafeAreaView>
         </ScrollView>
     )
 }

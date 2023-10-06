@@ -16,7 +16,11 @@ import {BlurView} from 'expo-blur';
 import absoluteFill = StyleSheet.absoluteFill;
 import {RFValue} from "react-native-responsive-fontsize";
 
-export default function HomeLogin() {
+import Signup from "../Signup";
+import Login from "../Login";
+
+
+export default function HomeLogin({navigation}) {
     const Styles = useThemedStyles(styles);
     const Theme = useTheme();
 
@@ -50,6 +54,7 @@ export default function HomeLogin() {
                     wid={"70%"}
                     text={"S'INSCRIRE"}
                     textColor={Theme.colors.White}
+                    onPress={() => navigation.push('Signup')}
 
                 />
             </View>
@@ -66,6 +71,7 @@ export default function HomeLogin() {
                     wid={"70%"}
                     text={"SE CONNECTER"}
                     textColor={Theme.colors.White}
+                    onPress={() => navigation.push('Login')}
 
                 />
             </View>

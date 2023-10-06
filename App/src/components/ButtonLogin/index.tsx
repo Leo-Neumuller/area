@@ -1,21 +1,21 @@
 import {StyleSheet, Text, View, Button, Dimensions, SafeAreaView, TouchableOpacity} from "react-native";
 import useThemedStyles from "../../hooks/Theme/useThemedStyle";
 
-export default function ButtonComponents({bgColor, hei, wid, text, textColor}) { // compenant bouton
+export default function ButtonComponents(Props) { // compenent bouton
     const Styles = useThemedStyles(styles);
-
     return (
         <TouchableOpacity style={{
-            backgroundColor: bgColor,
-            height: hei,
-            width: wid,
+            backgroundColor: Props?.bgColor,
+            height: Props?.hei,
+            width: Props?.wid,
             ...Styles.container}
-            }>
+            }
+        onPress={(e) => (Props?.onPress) ? Props.onPress(e) : null}>
             <Text style={{
-                color: textColor,
+                color: Props?.textColor,
                 ...Styles.textStyles
             }}>
-                {text}
+                { Props?.text ? Props?.text : "" }
             </Text>
         </TouchableOpacity>
     )
