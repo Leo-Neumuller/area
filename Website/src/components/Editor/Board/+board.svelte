@@ -31,7 +31,7 @@
 
     let modifyMenu: boolean = false;
     let advancedModify: boolean = false;
-    let subServices: [{ [key: string]: string }] = [{}];
+    let subServices: { [key: string]: string }[] = [{}];
 
     let services: { [key: string]: string } = {};
 
@@ -363,13 +363,10 @@
                 services = res;
             })
         }
-
-        if (advancedModify && nodeRegister.service !== undefined && nodeRegister.subService === undefined && nodeRegister.subServiceId === undefined) {
-            if (nodeRegister.service !== undefined) {
-                getSubServices(getCookie("token"), nodeRegister.service, nodeRegister.type).then((res) => {
-                    subServices = res;
-                })
-            }
+        if (advancedModify && nodeRegister.service !== undefined && ((nodeRegister.subService === undefined && nodeRegister.subServiceId === undefined) || subServices[0]?.name === undefined)) {
+            getSubServices(getCookie("token"), nodeRegister.service, nodeRegister.type).then((res) => {
+                subServices = res;
+            })
         }
 
         if (advancedModify && nodeRegister.subServiceId !== undefined &&
@@ -446,6 +443,7 @@
         class="text-[2.1rem] font-SpaceGrotesk text-customWhite font-semibold w-full text-center">{nodeRegister.service}</h1>
       <div>
         <Select options={subServices.map((subService) => subService["name"])}
+                value={subServices.find((subService) => nodeRegister.subServiceId === subService["id"])?.name}
                 placeholder="Choisissez une action à éxecuter" on:change={(value) => {
                   nodeRegister.subService = value.detail
                   nodeRegister.subServiceId = subServices.find((subService) => subService["name"] === value.detail)?.id
