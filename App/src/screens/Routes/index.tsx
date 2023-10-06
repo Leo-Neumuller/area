@@ -20,7 +20,7 @@ export const Routes: React.FC<{isLogged: boolean}> = ({isLogged}) => {
     return (
         <NavigationContainer>
             <Stack.Navigator initialRouteName={isLogged? "BottomBar" : "HomeLogin"} screenOptions={{headerShown: false}}>
-                <Stack.Screen name='BottomBar' component={BottomBar}/>
+                <Stack.Screen name='BottomBar' component={BottomBar} />
                 {RoutesList.map((value, index) => {
                     return (<Stack.Screen key={index} {...value}/>);
                 })

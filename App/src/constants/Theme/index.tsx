@@ -40,7 +40,8 @@ const Theme : ThemeType = {
         "colors": {
             "Primary": '#D9C6F4',
             "White" : "#f3f3f3",
-            "Black" : "#373637"
+            "Black" : "#373637",
+            "Gray" : "#D9C6F41A",
         },
         "Button": {
             fontSize: RFValue(25),
@@ -51,7 +52,7 @@ const Theme : ThemeType = {
             justifyContent: "center",
         },
         "Title": {
-            fontSize: RFValue(30    ),
+            fontSize: RFValue(30),
             fontFamily: 'space-grotesk',
         },
         "Subtitle": {

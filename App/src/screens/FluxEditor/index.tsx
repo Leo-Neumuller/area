@@ -6,6 +6,8 @@ import EditSVG from "../../../assets/pepicons-pop_pen.svg";
 import { AddComponent } from '../../components/Editor/AddComponent';
 import { ScrollView } from 'react-native';
 import AddSVG from "../../../assets/AddComponent.svg";
+import useThemedStyles from '../../hooks/Theme/useThemedStyle';
+import useTheme from '../../hooks/Theme/useTheme';
 
 type RootStackParamList = {
     FluxEditor: undefined;
@@ -16,6 +18,7 @@ const HeaderTitle: React.FC<{props: HeaderTitleProps, setTitle: React.Dispatch<R
     const refInput: React.LegacyRef<TextInput> = React.useRef(null)
     const [editable, setEditable] = useState<boolean>(false);
 
+    const Theme = useTheme();
     useEffect(() => {
         if (editable) {
             refInput.current?.focus()
@@ -28,7 +31,7 @@ const HeaderTitle: React.FC<{props: HeaderTitleProps, setTitle: React.Dispatch<R
                 <TextInput
                     editable={editable}
                     ref={refInput}
-                    style={{ display: "flex", flexDirection: "column", color: '#f3f3f3', fontSize: 30, fontFamily: 'space-grotesk', maxWidth: 200}} 
+                    style={[Theme.Title, {color: Theme.colors.White, display: "flex", flexDirection: "column", maxWidth: 200}]} 
                     onChangeText={setTitle}
                     onEndEditing={() => { setEditable(false) }}
                 >
@@ -46,11 +49,13 @@ const HeaderTitle: React.FC<{props: HeaderTitleProps, setTitle: React.Dispatch<R
 
 export const FluxEditor: React.FC<{navigation: StackNavigationProp<RootStackParamList, 'FluxEditor'>}> = ({ navigation }) => {
     const [title, setTitle] = useState<string>("Sans nom");
-    const [bottomSheetOpened, setBottomSheetOpened] = useState<boolean>(true);
+    const [bottomSheetOpened, setBottomSheetOpened] = useState<boolean>(false);
 
+    // const Styles = useThemedStyles(styles);
+    const Theme = useTheme();
 
     useEffect(() => {
-        navigation.setOptions({ title: title, headerStyle: { backgroundColor: '#373637' }, headerTitle(props) { return <HeaderTitle props={props} setTitle={setTitle} /> }, headerTitleAlign: 'center' });
+        navigation.setOptions({ title: title, headerStyle: { backgroundColor: Theme.colors.Black }, headerTitle(props) { return <HeaderTitle props={props} setTitle={setTitle} /> }, headerTitleAlign: 'center' });
     }, [title]);
 
     return (

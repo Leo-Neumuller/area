@@ -6,6 +6,10 @@ import { MaterialTopTabDescriptorMap } from '@react-navigation/material-top-tabs
 import FluxEditorSVG from "../../../assets/Vector.svg"
 import { StackNavigationProp } from '@react-navigation/stack';
 import { bottomBarList } from '../../constants/BottomBarList';
+import useThemedStyles from '../../hooks/Theme/useThemedStyle';
+import { ThemeContextType, ThemeType } from '../../constants/Theme';
+import useTheme from "../../hooks/Theme/useTheme";
+
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -19,31 +23,35 @@ type Props = {
 };
 
 const TabItem: React.FC<{icon: any, label: string, focused: boolean}> = ({icon, label, focused}) => {
+    const Styles = useThemedStyles(styles);
+    const Theme = useTheme();
     return (
         focused ? 
-        <View style={Style.itemFocused}>
-            <View style={Style.boxFocused}>
-                {React.createElement(icon, {style: Style.iconFocused})}
-                <Text style={Style.text}>{label}</Text>
+        <View style={Styles.itemFocused}>
+            <View style={Styles.boxFocused}>
+                {React.createElement(icon, {style: Styles.iconFocused})}
+                <Text style={Styles.text}>{label}</Text>
             </View>
         </View>
         :
-        <View style={Style.item}>
-            {React.createElement(icon, {style: Style.icon})}
+        <View style={Styles.item}>
+            {React.createElement(icon, {style: Styles.icon})}
         </View>
     )
 }
 
 const FluxEditor: React.FC<{stackNavigation: StackNavigationProp<RootStackParamList, 'BottomBar'>}> = ({stackNavigation}) => {
+    const Styles = useThemedStyles(styles);
+    const Theme = useTheme();
 
     const onPress = () => {
           stackNavigation.navigate('FluxEditor' as never);
       };
 
     return (
-        <View style={Style.itemFocused}>
+        <View style={[Styles.itemFocused]}>
             <TouchableOpacity onPress={onPress}>
-                <FluxEditorSVG />
+                <FluxEditorSVG style={{color: Theme.colors.Primary}}/>
             </TouchableOpacity>
         </View>
     )
@@ -52,9 +60,11 @@ const FluxEditor: React.FC<{stackNavigation: StackNavigationProp<RootStackParamL
 export const MyTabBar: React.FC<{ state: TabNavigationState<ParamListBase>, navigation: NavigationHelpers<any>,
     descriptors: MaterialTopTabDescriptorMap, stackNavigation: StackNavigationProp<RootStackParamList, 'BottomBar'> }>
     = ({state, navigation, descriptors, stackNavigation}) => {
+        const Styles = useThemedStyles(styles);
+        const Theme = useTheme();
 
     return (
-        <View style={Style.tabBar}>
+        <View style={[{backgroundColor: Theme.colors.Black}, Styles.tabBar]}>
             {state.routes.map((route, index, array) => {
                 const {options} = descriptors[route.key];
 
@@ -98,9 +108,11 @@ export const MyTabBar: React.FC<{ state: TabNavigationState<ParamListBase>, navi
 
 export const BottomBar: React.FC<Props> = ({ navigation }) => {
     const routes = bottomBarList;
+    const Styles = useThemedStyles(styles);
+    const Theme = useTheme();
 
     return (
-        <View style={Style.container}>
+        <View style={Styles.container}>
             <Tab.Navigator
                 initialRouteName={routes[0].name}
                 tabBar={props => <MyTabBar {...{...props, stackNavigation: navigation}} />}
@@ -121,28 +133,27 @@ export const BottomBar: React.FC<Props> = ({ navigation }) => {
     )
 } 
 
-const Style = StyleSheet.create({
+const styles = (Theme: ConstantTheme) => StyleSheet.create({
+    text: {
+        color: Theme.colors.White,
+        textAlign: "center",
+        fontSize: Theme.Text.fontSize
+    },
     container: {
         width: "100%",
         height: "100%"
     },
-    text: {
-        color: "#F3F3F3",
-        fontSize: 17,
-        textAlign: "center"
-    },
     tabBar: {
-        backgroundColor: "#373637",
         width: "100%",
         height: "14%",
         display: "flex",
         flexDirection: "row"
     },
     icon: { 
-        color: "#F3F3F3"
+        color: Theme.colors.White
     },
     iconFocused: {
-        color: "#D9C6F4",
+        color: Theme.colors.Primary,
         width: "100%"
     },
     item: {
@@ -166,6 +177,6 @@ const Style = StyleSheet.create({
         paddingHorizontal: 5,
         borderCurve: 'circular',
         borderRadius: 10,
-        backgroundColor: "#D9C6F41A"
+        backgroundColor: Theme.colors.Gray
     }
-});
+})

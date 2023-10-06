@@ -13,12 +13,11 @@ export const AddComponent: React.FC<{ opened: boolean, setOpened: React.Dispatch
     } else {
       bottomSheetRef.current?.close();
     }
-  }
-  , [opened]);
+  }, [opened]);
 
   return (
       <BottomSheet
-        index={1}
+        index={-1}
         snapPoints={snapPoints}
         enablePanDownToClose={true}
         ref={bottomSheetRef}
