@@ -1,26 +1,31 @@
 import React from "react";
 import {NavigationContainer} from "@react-navigation/native";
 import {createStackNavigator} from "@react-navigation/stack";
-import {Editor} from "../Flux/Editor";
-import {Text, View} from "react-native";
 import {BottomBar} from "../../components/BottomBar";
-import HomeLogin from "../LoginScreens/HomeLogin";
-import Login from "../LoginScreens/Login";
-import Signup from "../LoginScreens/Signup";
-import { FluxEditor } from "../FluxEditor";
+import RoutesList from "../../constants/Routes"
+import {ActivityIndicator, View} from "react-native";
 
 const Stack = createStackNavigator()
 
-export const Routes: React.FC = () => {
+export const Routes: React.FC = ({isLogged}) => {
+
+    if (isLogged == null) {
+        return (
+            <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}>
+                <ActivityIndicator size="large"/>
+            </View>
+        );
+
+    }
 
     return (
         <NavigationContainer>
-            <Stack.Navigator initialRouteName="HomeLogin" screenOptions={{headerShown: false}}>
+            <Stack.Navigator initialRouteName={isLogged?"BottomBar" : "HomeLogin"} screenOptions={{headerShown: false}}>
                 <Stack.Screen name='BottomBar' component={BottomBar}/>
-                <Stack.Screen name='FluxEditor' component={FluxEditor} options={{headerShown: true}}/>
-                <Stack.Screen name='Login' component={Login}/>
-                <Stack.Screen name='Signup' component={Signup}/>
-                <Stack.Screen name='HomeLogin' component={HomeLogin}/>
+                {RoutesList.map((value, index) => {
+                    return (<Stack.Screen key={index} {...value}/>);
+                })
+                }
             </Stack.Navigator>
         </NavigationContainer>
     )

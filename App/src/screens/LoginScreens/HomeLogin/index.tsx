@@ -18,6 +18,7 @@ import {RFValue} from "react-native-responsive-fontsize";
 
 import Signup from "../Signup";
 import Login from "../Login";
+import {useEffect} from "react";
 
 
 export default function HomeLogin({navigation}) {

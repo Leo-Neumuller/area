@@ -149,7 +149,7 @@ export default function Login({navigation}) {
                                     onPress={() => {
                                         loginPost(data).then((res) => {
                                             SecureStore.setItemAsync('userToken', res.access_token).then(() =>
-                                                navigation.push("HomeLogin"))
+                                                navigation.push("BottomBar"))
                                         }).catch((err) => {
                                             setError(err.toString());
                                         })
