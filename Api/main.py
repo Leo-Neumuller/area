@@ -1,5 +1,7 @@
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
+
 from src.constants import Environment
 
 from src.utils import Database
@@ -37,7 +39,6 @@ async def startup_event():  # pragma: no cover
 @app.get("/")
 async def root():  # pragma: no cover
     return {"name": app.env.APP_NAME, "version": app.env.APP_VERSION}
-
 
 for router in routers.values():
     app.include_router(router)

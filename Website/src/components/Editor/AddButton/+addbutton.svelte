@@ -8,8 +8,8 @@
     export let onClickDelete: () => void;
 
     let open: boolean = false;
-    let numberOfInput: number;
-    let numberOfOutput: number;
+    let numberOfInput: number = 1;
+    let numberOfOutput: number = 1;
     let type: string = "";
 
     function handleChangeNumberOfInput(e: any) {
@@ -56,7 +56,7 @@
                 <Close className="w-4 h-4" color="#F3F3F3"/>
             </button>
         </div>
-        <TextInput label="Number of input" type="number" placeholder="Nombre d'entrées" value={numberOfInput} 
+        <TextInput label="Number of input" type="number" placeholder="Nombre d'entrées" value={numberOfInput}
             onInput={handleChangeNumberOfInput}/>
         <TextInput label="Number of output" type="number" placeholder="Nombre de sorties" value={numberOfOutput}
             onInput={handleChangeNumberOfOutput}/>
