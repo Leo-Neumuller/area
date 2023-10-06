@@ -7,7 +7,7 @@ import {ActivityIndicator, View} from "react-native";
 
 const Stack = createStackNavigator()
 
-export const Routes: React.FC = ({isLogged}) => {
+export const Routes: React.FC<{isLogged: boolean}> = ({isLogged}) => {
 
     if (isLogged == null) {
         return (
@@ -17,10 +17,9 @@ export const Routes: React.FC = ({isLogged}) => {
         );
 
     }
-
     return (
         <NavigationContainer>
-            <Stack.Navigator initialRouteName={isLogged?"BottomBar" : "HomeLogin"} screenOptions={{headerShown: false}}>
+            <Stack.Navigator initialRouteName={isLogged? "BottomBar" : "HomeLogin"} screenOptions={{headerShown: false}}>
                 <Stack.Screen name='BottomBar' component={BottomBar}/>
                 {RoutesList.map((value, index) => {
                     return (<Stack.Screen key={index} {...value}/>);
