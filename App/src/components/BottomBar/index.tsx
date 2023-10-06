@@ -133,7 +133,7 @@ export const BottomBar: React.FC<Props> = ({ navigation }) => {
     )
 } 
 
-const styles = (Theme: ConstantTheme) => StyleSheet.create({
+const styles = (Theme) => StyleSheet.create({
     text: {
         color: Theme.colors.White,
         textAlign: "center",

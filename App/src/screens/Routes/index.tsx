@@ -17,6 +17,7 @@ export const Routes: React.FC<{isLogged: boolean}> = ({isLogged}) => {
         );
 
     }
+    isLogged = true;
     return (
         <NavigationContainer>
             <Stack.Navigator initialRouteName={isLogged? "BottomBar" : "HomeLogin"} screenOptions={{headerShown: false}}>
