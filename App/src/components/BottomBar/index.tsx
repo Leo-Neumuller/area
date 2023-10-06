@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {FunctionComponent, useState} from 'react';
 import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { NavigationHelpers, ParamListBase, TabNavigationState } from '@react-navigation/native';
@@ -133,7 +133,7 @@ export const BottomBar: React.FC<Props> = ({ navigation }) => {
     )
 } 
 
-const styles = (Theme: ConstantTheme) => StyleSheet.create({
+const styles = (Theme: ThemeContextType) => StyleSheet.create({
     text: {
         color: Theme.colors.White,
         textAlign: "center",

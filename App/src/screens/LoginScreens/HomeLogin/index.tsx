@@ -2,23 +2,15 @@ import {
     StyleSheet,
     Text,
     View,
-    Button,
-    Dimensions,
     SafeAreaView,
-    Image, ImageBackground
 } from "react-native";
 import {StatusBar} from "expo-status-bar";
-import {Theme} from "../../../components/themeProvider"
 import useThemedStyles from "../../../hooks/Theme/useThemedStyle";
 import ButtonCompenents from "../../../components/ButtonLogin"
 import useTheme from "../../../hooks/Theme/useTheme";
-import {BlurView} from 'expo-blur';
-import absoluteFill = StyleSheet.absoluteFill;
 import {RFValue} from "react-native-responsive-fontsize";
+import {ThemeTypeContext} from "../../../constants/Theme";
 
-import Signup from "../Signup";
-import Login from "../Login";
-import {useEffect} from "react";
 
 
 export default function HomeLogin({navigation}) {
@@ -83,7 +75,7 @@ export default function HomeLogin({navigation}) {
     )
 }
 
-const styles = Theme => StyleSheet.create({
+const styles = (Theme: ThemeTypeContext) => StyleSheet.create({
     Text: {
         color: Theme.colors.Primary
     },

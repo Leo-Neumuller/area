@@ -7,7 +7,7 @@ import {ActivityIndicator, View} from "react-native";
 
 const Stack = createStackNavigator()
 
-export const Routes: React.FC<{isLogged: boolean}> = ({isLogged}) => {
+export const Routes: React.FC<{isLogged: boolean | null}> = ({isLogged}) => {
 
     if (isLogged == null) {
         return (

@@ -1,6 +1,5 @@
 import {StyleSheet, Text, View, Button, Dimensions, SafeAreaView} from "react-native";
 import {StatusBar} from "expo-status-bar";
-import { Theme } from "../../components/themeProvider"
 import useThemedStyles from "../../hooks/useThemedStyle";
 import ButtonCompenents from "../../components/buttonComponents"
 import useTheme from "../../hooks/useTheme";
