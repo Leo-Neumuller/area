@@ -45,8 +45,8 @@ const FluxEditor: React.FC<{stackNavigation: StackNavigationProp<RootStackParamL
     const Theme = useTheme();
 
     const onPress = () => {
-          stackNavigation.navigate('FluxEditor' as never);
-      };
+        stackNavigation.navigate('FluxEditor' as never);
+    };
 
     return (
         <View style={[Styles.itemFocused]}>

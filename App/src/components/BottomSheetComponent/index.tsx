@@ -1,19 +1,20 @@
 import React, { useCallback, useEffect, useMemo, useRef, Children, useState, useImperativeHandle } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import BottomSheet from '@gorhom/bottom-sheet';
-import useThemedStyles from '../../../hooks/Theme/useThemedStyle';
-import useTheme from '../../../hooks/Theme/useTheme';
+import useThemedStyles from '../../hooks/Theme/useThemedStyle';
+import useTheme from '../../hooks/Theme/useTheme';
 import { BottomSheetMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
-import { ThemeTypeContext } from '../../../constants/Theme';
+import { ThemeTypeContext } from '../../constants/Theme';
 
 export type AddComponentProps = {
   children?: string | JSX.Element | JSX.Element[]
   opened?: boolean
   setOpened: React.Dispatch<React.SetStateAction<boolean>>
   ref?: React.Ref<BottomSheetMethods> | undefined
+  content?: React.ReactNode
 }
 
-export const AddComponent: React.FC<AddComponentProps> = React.forwardRef(({children, opened, setOpened}, ref) => {
+export const BottomSheetComponent: React.FC<AddComponentProps> = React.forwardRef(({children, opened, setOpened, content}, ref) => {
   const Styles = useThemedStyles(styles);
   const Theme = useTheme();
   const snapPoints = useMemo(() => ['25%', '50%', '75%'], []);
@@ -31,6 +32,7 @@ export const AddComponent: React.FC<AddComponentProps> = React.forwardRef(({chil
           } else if (ref) {
             ref.current = node;
           }}}
+        onClose={() => { setOpened(false) }}
         handleStyle={{backgroundColor: Theme.colors.Black, borderTopLeftRadius: 20, borderTopRightRadius: 20}}
         handleIndicatorStyle={{backgroundColor: Theme.colors.White}}
         backgroundStyle={{backgroundColor: Theme.colors.Black}}
@@ -43,8 +45,7 @@ export const AddComponent: React.FC<AddComponentProps> = React.forwardRef(({chil
         }}
       >
         <View style={Styles.contentContainer}>
-          <Text style={[Theme.Title, {color: Theme.colors.White}]}>Action</Text>
-
+          {content}
         </View>
       </BottomSheet>
   );
