@@ -1,30 +1,43 @@
 <script lang="ts">
     import "./style.css";
-    import { onMount } from "svelte";
+    import {onMount} from "svelte";
+    import {page} from "$app/stores";
+    import {goto} from "$app/navigation";
     import Addbutton from "../AddButton/+addbutton.svelte";
     import NodeComponent from "../Nodes/+nodes.svelte";
     import EdgeComponent from "../Edges/+edges.svelte";
     import type Node from "./NodeInterface";
     import type Edge from "./EdgeInterface";
-    import Edges from "../Edges/+edges.svelte";
     import Close from "../../SVGs/+Close";
     import Modify from "../../SVGs/+Modify.svelte";
-    import AppPres from "../../AppPres/+AppPres.svelte";
+    import {createFlux, getFlux, getServices, getSubServiceMetadata, getSubServices} from "../../../api/api";
+    import {getCookie} from "../../../api/helpers";
+    import Select from "../../Select/+select.svelte";
+    import InputData from "../InputData/+InputData.svelte"
 
     let grabbingBoard: boolean = false;
     let scale: number = 1;
-    let clickedPosition: {x: number, y: number} = {x: 0, y: 0};
+    let clickedPosition: { x: number, y: number } = {x: 0, y: 0};
     let selectedNode: string | null = null;
     let selectedEdge: string | null = null;
     let nodes: Node[] = [];
     let edges: Edge[] = [];
     let newEdge: any = null;
-    let insideInput: {nodeId: string, inputIndex: number, pos: {x: number, y: number}} | null = null;
+    let insideInput: { nodeId: string, inputIndex: number, pos: { x: number, y: number } } | null = null;
 
     let nodeRegister: Node;
     let modifyService: boolean = false;
+    let modifyServiceType: string = "";
+
     let modifyMenu: boolean = false;
     let advancedModify: boolean = false;
+    let subServices: { [key: string]: string }[] = [{}];
+
+    let services: { [key: string]: string } = {};
+
+    function updateNodes() {
+        nodes = [...nodes];
+    }
 
     function handleMouseDown(e: any) {
         selectedNode = null;
@@ -37,7 +50,7 @@
     function handleMouseUp(e: Event) {
         clickedPosition = {x: -1, y: -1};
         grabbingBoard = false;
-        
+
         if (newEdge !== null) {
             if (insideInput !== null) {
                 const startId = newEdge["nodeStartId"];
@@ -45,11 +58,11 @@
 
                 const nodeStart = nodes.find((node) => node.id === startId);
                 const nodeEnd = nodes.find((node) => node.id === endId);
-                
+
                 const boardWrapper = document.getElementById("boardWrapper");
                 if (nodeStart && nodeEnd && boardWrapper) {
                     const edgeId = `$edge_${nodeStart.id}_${newEdge.outputIndex}_${endId}_${insideInput.inputIndex}`;
-                    
+
                     for (let i = 0; nodeStart.outputEdgeIds[i]; i++) {
                         if (edgeId.slice(0, -1) === nodeStart.outputEdgeIds[i].slice(0, -1)) {
                             newEdge = null;
@@ -99,7 +112,7 @@
             let deltaY = e.y - clickedPosition.y;
 
             if (selectedNode) {
-                    modifyMenu = false;
+                modifyMenu = false;
                 const node = nodes.find((node) => node.id === selectedNode);
                 if (node) {
                     nodeRegister = node;
@@ -146,21 +159,21 @@
             }
         }
     }
-    
+
 
     function handleOnCLickAdd(numberInputs: number, numberOutputs: number, type: string) {
         const randomX = Math.random() * (window.innerWidth - 300) + 300;
         const randomY = Math.random() * (window.innerHeight - 300) + 300;
 
-        let nodePrev: {x: number, y: number} = {x: randomX, y: randomY};
-        let nodeCurr: {x: number, y: number} = {x: randomX, y: randomY};
+        let nodePrev: { x: number, y: number } = {x: randomX, y: randomY};
+        let nodeCurr: { x: number, y: number } = {x: randomX, y: randomY};
         let inputs: String[] = [];
         let outputs: String[] = [];
 
         nodes = [
             ...nodes,
             {
-                id: `node_${Math.random().toString(36).substring(7)}`,
+                id: `node_${nodes.length}`,
                 prevPosition: nodePrev,
                 currPosition: nodeCurr,
                 numberInputs: numberInputs,
@@ -203,6 +216,7 @@
 
         nodes = nodes.filter((node) => node.id !== selectedNode);
         selectedNode = null;
+        modifyMenu = false;
     }
 
     function handleOnMouseDownNode(id: string, e: MouseEvent) {
@@ -249,23 +263,23 @@
 
         if (boardWrapper) {
             let prevEdgeStart: { x: number; y: number } = ({
-                    x: (outputPositionX + boardWrapper.scrollLeft) / scale,
-                    y: (outputPositionY + boardWrapper.scrollTop) / scale,
-                });
+                x: (outputPositionX + boardWrapper.scrollLeft) / scale,
+                y: (outputPositionY + boardWrapper.scrollTop) / scale,
+            });
             let currEdgeStart: { x: number; y: number } = ({
-                    x: (outputPositionX + boardWrapper.scrollLeft) / scale,
-                    y: (outputPositionY + boardWrapper.scrollTop) / scale,
-                });
+                x: (outputPositionX + boardWrapper.scrollLeft) / scale,
+                y: (outputPositionY + boardWrapper.scrollTop) / scale,
+            });
             let prevEdgeEnd: { x: number; y: number } = ({
-                    x: (outputPositionX + boardWrapper.scrollLeft) / scale,
-                    y: (outputPositionY + boardWrapper.scrollTop) / scale,
-                });
+                x: (outputPositionX + boardWrapper.scrollLeft) / scale,
+                y: (outputPositionY + boardWrapper.scrollTop) / scale,
+            });
             let currEdgeEnd: { x: number; y: number } = ({
-                    x: (outputPositionX + boardWrapper.scrollLeft) / scale,
-                    y: (outputPositionY + boardWrapper.scrollTop) / scale,
-                });
-    
-            
+                x: (outputPositionX + boardWrapper.scrollLeft) / scale,
+                y: (outputPositionY + boardWrapper.scrollTop) / scale,
+            });
+
+
             newEdge = {
                 id: ``,
                 nodeStartId: nodeId,
@@ -315,8 +329,12 @@
     }
 
     function handleModifyNode() {
-        console.log(nodeRegister);
-        modifyService = true;
+        if (nodeRegister.service !== undefined) {
+            advancedModify = true;
+        } else {
+            modifyService = true;
+        }
+        modifyMenu = false;
     }
 
     onMount(() => {
@@ -331,108 +349,210 @@
                 board.style.marginLeft = `${(scale - 1) * 50}vw`;
             });
         }
+        if ($page.url.searchParams.get("FluxId")) {
+            getFlux(getCookie("token"), $page.url.searchParams.get("FluxId")).then((res) => {
+                nodes = res["nodes"];
+                edges = res["edges"];
+            })
+        }
     })
+
+    $: {
+        if (modifyService && Object.entries(services).length === 0) {
+            getServices(getCookie("token")).then((res) => {
+                services = res;
+            })
+        }
+        if (advancedModify && nodeRegister.service !== undefined && ((nodeRegister.subService === undefined && nodeRegister.subServiceId === undefined) || subServices[0]?.name === undefined)) {
+            getSubServices(getCookie("token"), nodeRegister.service, nodeRegister.type).then((res) => {
+                subServices = res;
+            })
+        }
+
+        if (advancedModify && nodeRegister.subServiceId !== undefined &&
+            (nodeRegister.inputsData === undefined || nodeRegister.inputDataFromSubServiceId !== nodeRegister.subServiceId)) {
+            getSubServiceMetadata(getCookie("token"), nodeRegister.subServiceId).then((res) => {
+                nodeRegister.inputDataFromSubServiceId = nodeRegister.subServiceId;
+                nodeRegister.inputsData = res["inputsData"];
+            })
+        }
+    }
+
 </script>
-  
+
 <div>
-    <div class="">
-        <Addbutton showDelete={selectedNode === null} onCLickAdd={handleOnCLickAdd} onClickDelete={handleOnClickDelete} />
-    </div>
-    <div class={`${modifyService ? "flex" : "hidden"} flex-col bg-gray rounded-[20px] absolute w-[60%] h-[80%] top-[60%] left-[50%] -translate-x-[50%] -translate-y-[55%] z-[21] p-10`}>
-        <div class="flex w-full justify-between items-center">
-            <div class="text-[3.125rem] font-medium text-customWhite">
-                {nodeRegister?.type}
-            </div>
-            <button on:click={() => {
+  <button class="absolute bottom-10 left-1/2 bg-red-600 p-4 rounded z-40"
+          on:click={() => {
+            const data =  {
+              "name": "test",
+              "description": "test",
+              "nodes": nodes,
+              "edges": edges
+            };
+            if ($page.url.searchParams.get("FluxId")) {
+              data["id"] = Number($page.url.searchParams.get("FluxId"));
+            }
+            console.log(data);
+            createFlux(getCookie("token"), data).then((res) => {
+              console.log(res);
+              $page.url.searchParams.set("FluxId", res["id"]);
+              goto(`?${$page.url.searchParams.toString()}`);
+            })
+            }}>
+    Save
+  </button>
+  <div class="">
+    <Addbutton showDelete={selectedNode === null} onCLickAdd={handleOnCLickAdd} onClickDelete={handleOnClickDelete}/>
+  </div>
+  <div
+    class={`${modifyService ? "flex" : "hidden"} flex-col bg-gray rounded-[20px] absolute w-[60%] h-[80%] top-[60%] left-[50%] -translate-x-[50%] -translate-y-[55%] z-[21] p-10`}>
+    <div class="flex w-full justify-between items-center">
+      <div class="text-[3.125rem] font-medium text-customWhite">
+        {nodeRegister?.type}
+      </div>
+      <button on:click={() => {
                 modifyService = false;
             }}>
-                <Close className="w-8 h-8" color="#F3F3F3"/>
-            </button>
-        </div>
-        <button on:click={() => {
-            modifyService = false;
-            modifyMenu = false;
-            advancedModify = true
-        }}>
-            Advanced modification
-        </button>
+        <Close className="w-8 h-8" color="#F3F3F3"/>
+      </button>
     </div>
-    {#if (advancedModify)}
-        <div class="fixed top-26 right-0 w-[30%] h-screen z-[100] bg-gray px-6 py-2">
-            <button on:click={() => {
-                advancedModify = false; 
-            }}>
-                <Close className="w-6 h-6" color="#F3F3F3"/>
-            </button>
-            <h1>ici</h1>
-        </div>
-    {/if}
-    {#if (modifyMenu)}
-        <div style="transform: translate(
+    <div class="flex flex-wrap">
+      {#if Object.entries(services).length !== 0}
+        {#each services[nodeRegister.type.toLowerCase()] as service}
+          <button on:click={() => {
+                    modifyService = false;
+                    advancedModify = true
+                    nodeRegister.service = service;
+                    nodeRegister.title = service;
+                    updateNodes();
+                  }} class="text-customWhite">
+            {service}
+          </button>
+        {/each}
+      {/if}
+    </div>
+  </div>
+  {#if (advancedModify)}
+    <div class="fixed top-26 right-0 w-[30%] h-screen z-[100] bg-gray px-6 py-2">
+      <button class="absolute" on:click={() => {
+                    advancedModify = false;
+                }}>
+        <Close className="w-6 h-6" color="#F3F3F3"/>
+      </button>
+      <h1
+        class="text-[2.1rem] font-SpaceGrotesk text-customWhite font-semibold w-full text-center">{nodeRegister.service}</h1>
+      <div>
+        <Select options={subServices.map((subService) => subService["name"])}
+                value={subServices.find((subService) => nodeRegister.subServiceId === subService["id"])?.name}
+                placeholder="Choisissez une action à éxecuter" on:change={(value) => {
+                  nodeRegister.subService = value.detail
+                  nodeRegister.subServiceId = subServices.find((subService) => subService["name"] === value.detail)?.id
+                }}/>
+      </div>
+      <div>
+        {#if nodeRegister?.inputsData}
+          {#each nodeRegister.inputsData as inputData}
+            <InputData bind:inputD={inputData}/>
+          {/each}
+        {/if}
+      </div>
+    </div>
+  {/if}
+  {#if (modifyMenu)}
+    <div style="transform: translate(
             {nodeRegister.currPosition.x}px, 
-            {nodeRegister.currPosition.y}px)" 
-            class={`rounded-[20px] cursor-pointer flex flex-col ${nodeRegister.type === "Action" ? "bg-gray text-customWhite" : "bg-primary text-gray"} box-border absolute left-[430px] -top-[8px] z-[20] w-[14rem] font-SpaceGrotesk p-5 gap-2`}>
-            <div class="flex w-full justify-between align-middle items-center">
-                <button on:click={handleModifyNode} class="text-[1.4rem] font-medium">
-                    Modifier
-                </button>
-                <Modify className="w-7 h-7" color={nodeRegister.type === "Action" ? "#F3F3F3" : "#373637"}/>
-            </div>
-            <div class="flex w-full justify-between align-middle items-center font-medium">
-                <button on:click={handleOnClickDelete} class="text-[1.4rem]">
-                    Supprimer
-                </button>
-                <Close className="w-6 h-6" color={nodeRegister.type === "Action" ? "#F3F3F3" : "#373637"}/>
-            </div>
-        </div>
-    {/if}
-    <div id="boardWrapper" class="fixed w-screen h-screen top-0 left-0 overflow-scroll">
-        <div class={`${grabbingBoard ? "boardDragging" : "board"}`} role="presentation" id="board" 
-            on:mousedown={(e) => {handleMouseDown(e)}}
-            on:mouseup={(e) => {handleMouseUp(e)}}
-            on:mousemove={(e) => {handleMouseMove(e)}}>
-            {#each nodes as node}
-                <NodeComponent 
-                    id={node.id} 
-                    type={node.type}
-                    pos={node.currPosition} 
-                    numberOfInputs={node.numberInputs} 
-                    numberOfOutputs={node.numberOutputs}
-                    selected={node.id === selectedNode}
-                    bind:modify={modifyMenu}
-                    title={node.title}
-                    img={node.img}
-                    onMouseDownNode={handleOnMouseDownNode} 
-                    onMouseDownOutput={handleOnMouseDownOutput}
-                    onMouseEnterInput={handleOnMouseEnterInput} 
-                    onMouseLeaveInput={handleOnMouseLeaveInput} />
-            {/each}
-            {#if (newEdge)} 
-                <EdgeComponent 
-                    selected={false} 
-                    isNew={true} 
-                    position={{
+            {nodeRegister.currPosition.y}px)"
+         class={`rounded-[20px] cursor-pointer flex flex-col ${nodeRegister.type === "Action" ? "bg-gray text-customWhite" : "bg-primary text-gray"} box-border absolute left-[430px] -top-[8px] z-[20] w-[14rem] font-SpaceGrotesk p-5 gap-2`}>
+      <div class="flex w-full justify-between align-middle items-center">
+        <button on:click={handleModifyNode} class="text-[1.4rem] font-medium flex justify-between w-full">
+          Modifier
+          <Modify className="w-7 h-7" color={nodeRegister.type === "Action" ? "#F3F3F3" : "#373637"}/>
+        </button>
+      </div>
+      <div class="flex w-full justify-between align-middle items-center font-medium">
+        <button on:click={handleOnClickDelete} class="text-[1.4rem] flex justify-between w-full">
+          Supprimer
+          <Close className="w-6 h-6" color={nodeRegister.type === "Action" ? "#F3F3F3" : "#373637"}/>
+        </button>
+      </div>
+    </div>
+  {/if}
+  <div id="boardWrapper" class="fixed w-screen h-screen top-0 left-0 overflow-scroll">
+    <div class={`${grabbingBoard ? "boardDragging" : "board"}`} role="presentation" id="board"
+         on:mousedown={(e) => {handleMouseDown(e)}}
+         on:mouseup={(e) => {handleMouseUp(e)}}
+         on:mousemove={(e) => {handleMouseMove(e)}}>
+      {#each nodes as node}
+        <NodeComponent
+          id={node.id}
+          type={node.type}
+          pos={node.currPosition}
+          numberOfInputs={node.numberInputs}
+          numberOfOutputs={node.numberOutputs}
+          selected={node.id === selectedNode}
+          bind:modify={modifyMenu}
+          title={node.title}
+          img={node.img}
+          onMouseDownNode={handleOnMouseDownNode}
+          onMouseDownOutput={handleOnMouseDownOutput}
+          onMouseEnterInput={handleOnMouseEnterInput}
+          onMouseLeaveInput={handleOnMouseLeaveInput}/>
+      {/each}
+      {#if (newEdge)}
+        <EdgeComponent
+          selected={false}
+          isNew={true}
+          position={{
                         x0: newEdge.currStartPos.x,
                         y0: newEdge.currStartPos.y,
                         x1: newEdge.currEndPos.x,
                         y1: newEdge.currEndPos.y
-                    }} 
-                    onMouseDownEdge={() => {}} 
-                    onClickDeleteEdge={() => {}} />
-            {/if}
-            {#each edges as edge}
-                <EdgeComponent 
-                    selected={selectedEdge === edge.id} 
-                    isNew={false} 
-                    position={{
+                    }}
+          onMouseDownEdge={() => {}}
+          onClickDeleteEdge={() => {}}/>
+      {/if}
+      {#each edges as edge}
+        <EdgeComponent
+          selected={selectedEdge === edge.id}
+          isNew={false}
+          position={{
                         x0: edge.currStartPos.x,
                         y0: edge.currStartPos.y,
                         x1: edge.currEndPos.x,
                         y1: edge.currEndPos.y
-                    }} 
-                    onMouseDownEdge={() => {handleOnMouseDownEdge(edge.id)}} 
-                    onClickDeleteEdge={() => {HandleOnDeleteEdge(edge.id)}} />
-            {/each}
-        </div>
+                    }}
+          onMouseDownEdge={() => {handleOnMouseDownEdge(edge.id)}}
+          onClickDeleteEdge={() => {HandleOnDeleteEdge(edge.id)}}/>
+      {/each}
     </div>
+  </div>
 </div>
+
+
+<!-- 
+for (let i = 0; i < services.length; i++) {
+    const service = services[i];
+    const randomX = Math.random() * (window.innerWidth - 300) + 300;
+    const randomY = Math.random() * (window.innerHeight - 300) + 300;
+
+    let nodePrev: {x: number, y: number} = {x: randomX, y: randomY};
+    let nodeCurr: {x: number, y: number} = {x: randomX, y: randomY};
+    let inputs: String[] = [];
+    let outputs: String[] = [];
+
+    nodes = [
+        ...nodes,
+        {
+            id: `node_${Math.random().toString(36).substring(7)}`,
+            prevPosition: nodePrev,
+            currPosition: nodeCurr,
+            numberInputs: service.inputs.length,
+            numberOutputs: service.outputs.length,
+            type: "Service",
+            inputEdgeIds: inputs,
+            outputEdgeIds: outputs,
+            title: service.name,
+            img: "test",
+        }
+    ];
+} -->

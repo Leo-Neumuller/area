@@ -14,6 +14,8 @@
     export let onMouseLeaveInput: (nodeId: string, inputIndex: Number) => void;
     export let modify: boolean;
     export let title: string;
+
+
     export let img: string;
     
     let refBinder: any = [];
@@ -48,6 +50,7 @@
     for (let i = 0; i < numberOfOutputs; i++) {
         refBinderOutput.push(null);
     }
+
 </script>
 
 <div role="presentation" class={`${selected ? "nodeSelected" : "node"} ${type}`} style="transform: translate({pos.x}px, {pos.y}px)" on:mousedown={(e) => {

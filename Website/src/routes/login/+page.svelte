@@ -1,14 +1,17 @@
 <script lang="ts">
   import Button from "../../components/Button/+button.svelte";
   import { goto } from "$app/navigation";
-  import { loginPost } from "../../api/+api";
+  import { loginPost } from "../../api/api";
   import Input from "../../components/Input/+input.svelte";
+  import { onMount } from 'svelte';
 
   let errorMsg: string;
   
-  if (document.cookie.includes("access_token")) {
-    goto("/flux-editor");
-  }
+  onMount(() => {
+    if (document.cookie.includes("access_token")) {
+      goto("/flux-editor");
+    }
+  });
 
   function handleSubmit(event: SubmitEvent) {
     const formData = new FormData(event.target as HTMLFormElement);
@@ -26,7 +29,7 @@
     loginPost(data)
     .then((res: Response) => res.json())
     .then((res) => {
-      document.cookie = `access_token=${res.access_token}; path=/`;
+      document.cookie = `token=${res.access_token}; path=/`;
       goto("/flux-editor");
     })
     .catch((err: Error) => {

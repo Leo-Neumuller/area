@@ -87,16 +87,16 @@ class DataConfigurationType(Enum):
     checkbox = "checkbox"
 
 
-class DataConfiguration(BaseModel):
+class inputData(BaseModel):
     id: str
     name: str
     inputType: DataConfigurationType
+    type: str
     required: bool = False
     data: List[str] = []
-    streamDependencies: str | None = None
 
 
-class StreamConfiguration(BaseModel):
+class outputData(BaseModel):
     id: str
     name: str
     type: str
@@ -107,10 +107,35 @@ class ServiceMetadata(BaseModel):
     name: str
     description: str
     type: ServiceType
-    function: Optional[Callable] = None
-    inputStreamConfiguration: List[StreamConfiguration] = []
-    inputDataConfiguration: List[DataConfiguration] = []
-    outputStreamConfiguration: List[StreamConfiguration] = []
+    function: Callable | None = None
+    inputsData: List[inputData] = []
+    outputsData: List[outputData] = []
+
+
+class ServiceMetadataSend(BaseModel):
+    id: str | None = None
+    name: str
+    description: str
+    type: ServiceType
+    inputsData: List[inputData] = []
+    outputsData: List[outputData] = []
+
+    @staticmethod
+    def convert(metadata: ServiceMetadata):
+        """
+        Convert metadata
+        :param metadata: Metadata
+        :return: Converted metadata
+        """
+        return ServiceMetadataSend(
+            id=metadata.id,
+            name=metadata.name,
+            description=metadata.description,
+            type=metadata.type,
+            inputsData=metadata.inputsData,
+            outputsData=metadata.outputsData
+        )
+
 
 
 class BaseService:

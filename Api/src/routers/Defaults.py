@@ -1,4 +1,7 @@
-from fastapi import status, APIRouter, Request
+import os
+
+from fastapi import status, APIRouter, Request, HTTPException
+from fastapi.responses import FileResponse
 
 from src.models.Services import ServiceType
 from src.services import services
@@ -55,3 +58,20 @@ async def about(request: Request):
         )
 
     )
+
+
+@DefaultsRouter.get("/client.apk",
+                    summary="Client apk",
+                    description="Client apk",
+                    response_description="Client",
+                    status_code=status.HTTP_200_OK,
+                    response_class=FileResponse)
+async def client(request: Request):
+    """
+    Client
+    :return: Client
+    """
+    if os.path.isfile("client.apk"):
+        return FileResponse("client.apk")
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found")

@@ -5,7 +5,7 @@ from typing import List, Dict, Callable
 import googleapiclient
 from sqlalchemy.orm import Session
 from src.models.Services import save_start_authorization, Service, ServiceType, BaseService, add_metadata, \
-    ServiceMetadata, DataConfiguration, DataConfigurationType, StreamConfiguration
+    ServiceMetadata, DataConfigurationType, inputData
 from src.models.User import UserMe
 from src.utils.Helper import warn
 from src.utils.Services import Google
@@ -73,53 +73,30 @@ class Gmail(BaseService):
         name="Create draft",
         description="Create draft",
         type=ServiceType.action,
-        inputStreamConfiguration=[
-            StreamConfiguration(
-                id="content",
-                name="Email content",
-                type="string",
-            ),
-            StreamConfiguration(
-                id="to",
-                name="To",
-                type="string",
-            ),
-            StreamConfiguration(
-                id="subject",
-                name="Subject",
-                type="string",
-            ),
-        ],
-        inputDataConfiguration=[
-            DataConfiguration(
+        inputsData=[
+            inputData(
                 id="content",
                 name="Email content",
                 inputType=DataConfigurationType.textMultiline,
+                type="string",
                 required=True,
-                streamDependencies="content"
             ),
-            DataConfiguration(
+            inputData(
                 id="to",
                 name="To",
                 inputType=DataConfigurationType.text,
+                type="string",
                 required=True,
-                streamDependencies="to"
             ),
-            DataConfiguration(
+            inputData(
                 id="subject",
                 name="Subject",
                 inputType=DataConfigurationType.text,
+                type="string",
                 required=True,
-                streamDependencies="subject"
             ),
         ],
-        outputStreamConfiguration=[
-            StreamConfiguration(
-                id="signal",
-                name="Signal",
-                type="Boolean"
-            )
-        ]
+        outputsData=[]
     ))
     def create_draft(self, data: dict):
         """
@@ -140,53 +117,30 @@ class Gmail(BaseService):
         name="Send email",
         description="Send Email",
         type=ServiceType.action,
-        inputStreamConfiguration=[
-            StreamConfiguration(
-                id="content",
-                name="Email content",
-                type="string",
-            ),
-            StreamConfiguration(
-                id="to",
-                name="To",
-                type="string",
-            ),
-            StreamConfiguration(
-                id="subject",
-                name="Subject",
-                type="string",
-            ),
-        ],
-        inputDataConfiguration=[
-            DataConfiguration(
+        inputsData=[
+            inputData(
                 id="content",
                 name="Email content",
                 inputType=DataConfigurationType.textMultiline,
+                type="string",
                 required=True,
-                streamDependencies="content"
             ),
-            DataConfiguration(
+            inputData(
                 id="to",
                 name="To",
                 inputType=DataConfigurationType.text,
+                type="string",
                 required=True,
-                streamDependencies="to"
             ),
-            DataConfiguration(
+            inputData(
                 id="subject",
                 name="Subject",
                 inputType=DataConfigurationType.text,
+                type="string",
                 required=True,
-                streamDependencies="subject"
             ),
         ],
-        outputStreamConfiguration=[
-            StreamConfiguration(
-                id="signal",
-                name="Signal",
-                type="Boolean"
-            )
-        ]
+        outputsData=[]
     ))
     def send_email(self, data: dict):
         """
