@@ -21,13 +21,15 @@ export const AREAComponent: React.FC<Props> = ({inEditor, onPress, data}) => {
     return (
         <View style={inEditor ? (data.type == "action" ? Styles.actionContainer : Styles.reactionContainer) : Styles.editorContainer}>
             <TouchableOpacity onPress={() => onPress(data)}>
-                <View style={Styles.contentContainer}>
+                <View style={inEditor ? Styles.editorContentContainer : Styles.contentContainer}>
                     <View style={[Styles.svgBackground, {backgroundColor: (data.type == 'action' ? Theme.colors.Primary : Theme.colors.Black)}]}>
                         <FluxSVG style={[{color: data.type == 'action' ? Theme.colors.Black : Theme.colors.Primary}, Styles.svgDefault]} />
                     </View>
-                    <Text style={[Theme.Title, {color: data.type ==  'action' ? Theme.colors.White : Theme.colors.Black, justifyContent: "center"}]}>
-                        {data.default ? (data.type == 'action' ? "Action" : "Reaction") : data.name!}
-                    </Text>
+                    <View style={{justifyContent: "center", width: "50%"}}>
+                        <Text style={[Theme.Title, inEditor ? Styles.textEditor : Styles.textDefault, {color: data.type ==  'action' || !inEditor ? Theme.colors.White : Theme.colors.Black}]}>
+                            {data.default ? (data.type == 'action' ? "Action" : "Reaction") : data.name!}
+                        </Text>
+                    </View>
                     {inEditor && <EditSVG style={[Styles.svgEdit, {
                         color: data.type == 'action' ? Theme.colors.White : Theme.colors.Black
                     }]}/>}
@@ -40,6 +42,13 @@ export const AREAComponent: React.FC<Props> = ({inEditor, onPress, data}) => {
 const styles = (Theme: ThemeTypeContext) => StyleSheet.create({
     svgDefault: {
         alignSelf: "center",
+    },
+    textEditor: {
+        justifyContent: "center",
+        textAlign: "center",
+    },
+    textDefault: {
+        textAlign: "center",
     },
     svgBackground: {
         height: "85%",
@@ -65,7 +74,15 @@ const styles = (Theme: ThemeTypeContext) => StyleSheet.create({
         height: 70,
         width: 300,
         backgroundColor: Theme.colors.Gray,
-        borderRadius: 20,
+        borderRadius: 20
+    },
+    editorContentContainer: {
+        height: "100%",
+        width: "100%",
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-around",
     },
     contentContainer: {
         height: "100%",
@@ -73,7 +90,6 @@ const styles = (Theme: ThemeTypeContext) => StyleSheet.create({
         display: "flex",
         flexDirection: "row",
         alignItems: "center",
-        justifyContent: "space-around",
     },
     svgEdit: {
         justifyContent: "flex-end",
