@@ -64,3 +64,19 @@ export async function servicesAREAGet (token: string, area: string, service: str
     }
     return res.json();
 }
+
+export async function serviceSchemaGet (token: string, serviceId: string) {
+    const res = await fetch(process.env.EXPO_PUBLIC_API_URL + "/services/metadata/" + serviceId, {
+        method: "GET",
+        headers: {
+            "accept" : "application/json",
+            "Content-Type" : "application/json",
+            "access-token" : token,
+        }
+    })
+    if (res.status !== 200) {
+        const error = await res.json();
+        throw new Error(error.detail);
+    }
+    return res.json();
+}
