@@ -23,6 +23,7 @@ export const BottomSheetComponent: React.FC<AddComponentProps> = React.forwardRe
   return (
       <BottomSheet
         index={-1}
+        enableContentPanningGesture={false}
         snapPoints={snapPoints}
         enablePanDownToClose={true}
         ref={(node) => {

@@ -1,15 +1,26 @@
-import {FlatList, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, View, VirtualizedList} from "react-native"
+import {
+    Button,
+    FlatList, Linking,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput, TouchableOpacity,
+    View,
+    VirtualizedList
+} from "react-native"
 import useThemedStyles from "../../../hooks/Theme/useThemedStyle";
 import useTheme from "../../../hooks/Theme/useTheme";
 import {ThemeTypeContext} from "../../../constants/Theme";
 import {AREAComponent} from "../AREAComponent";
 import React, {useEffect} from "react";
-import {servicesAREAGet, serviceSchemaGet, servicesGet} from "../../../api/api";
+import {authorizeUrlGet, servicesAREAGet, serviceSchemaGet, servicesGet} from "../../../api/api";
 import * as SecureStore from "expo-secure-store";
 import {IAREAComponent} from "../../../interfaces/IAREAComponent";
 import {IAREAServices} from "../../../interfaces/IAREAServices";
 import {Picker} from "@react-native-picker/picker";
 import {IServiceSchema} from "../../../interfaces/IServiceSchema";
+import ButtonComponents from "../../ButtonLogin";
 
 type AREABottomSheetProps = {
     currentArea?: IAREAComponent,
@@ -30,12 +41,18 @@ async function getServiceSchema(serviceId: string): Promise<IServiceSchema> {
     return await serviceSchemaGet(token as string, serviceId);
 }
 
+async function getAuthorizeUrlFromApi(serviceId: string): Promise<{ url: string }> {
+    const token = await SecureStore.getItemAsync("userToken");
+    return await authorizeUrlGet(token as string, serviceId);
+}
+
 const AREAParamBottomSheet: React.FC<{data: IAREAComponent, setAREAParamOpened: React.Dispatch<React.SetStateAction<boolean>>}> = ({data, setAREAParamOpened}) => {
     const Styles = useThemedStyles(styles);
     const Theme = useTheme();
     const [services, setServices] = React.useState<[IAREAServices]>([{"name": "", "id": "", "description": ""}]);
     const [selectedService, setSelectedService] = React.useState<string>("");
     const [schema, setSchema] = React.useState<IServiceSchema>();
+    const [authUrl, setAuthUrl] = React.useState<string>("");
 
     useEffect(() => {
         if (!data.default) {
@@ -63,7 +80,7 @@ const AREAParamBottomSheet: React.FC<{data: IAREAComponent, setAREAParamOpened: 
     }, [selectedService]);
 
     return (
-        <ScrollView style={[Styles.container]}>
+        <ScrollView style={[Styles.container]} persistentScrollbar={true}>
             <Text style={[Theme.Title, {color: Theme.colors.White, paddingLeft: 20}]}>
                 Application
             </Text>
@@ -72,7 +89,7 @@ const AREAParamBottomSheet: React.FC<{data: IAREAComponent, setAREAParamOpened: 
                     <AREAComponent data={data} inEditor={false} onPress={(data) => { setAREAParamOpened(false) }}/>
                 </View>
             </View>
-            <View style={[{paddingTop: 20, flex: 1}]}>
+            <View style={{flex: 1}}>
                 <Text style={[Theme.Title, {color: Theme.colors.White, paddingLeft: 20}]}>
                     {data?.type == "action" ? "Action" : "Reaction"}
                 </Text>
@@ -116,6 +133,53 @@ const AREAParamBottomSheet: React.FC<{data: IAREAComponent, setAREAParamOpened: 
                 <Text style={[Theme.Title, {color: Theme.colors.White, paddingLeft: 20}]}>
                     Connection
                 </Text>
+                <View style={{
+                    height: "40%",
+                    width: "90%",
+                    flex: 1,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    alignSelf: "center",
+
+                }}>
+                    <TouchableOpacity
+                        style={{
+                            width: "100%",
+                            height: "100%",
+                            backgroundColor: Theme.colors.Gray,
+                            justifyContent: "center",
+                            alignItems: "center",
+                            borderRadius: 20,
+                        }}
+                        onPress={() => {
+                            console.log(data.name)
+                            getAuthorizeUrlFromApi(data.name!)
+                                .then((res: any) => {
+                                    Linking.openURL(res.url)
+                                        .catch((res) => {
+                                            console.error(res);
+                                        })
+                                })
+                                .catch((err) => {
+                                    console.error(err);
+                                })
+                        }}
+                    >
+                        <Text style={[Theme.Subtitle, { color: Theme.colors.White }]}>
+                            Se connecter
+                        </Text>
+                    </TouchableOpacity>
+                </View>
+            </View>
+            <View style={{
+                height: "40%",
+                width: "100%",
+                flex: 1,
+                justifyContent: "center",
+                alignItems: "center",
+                paddingTop: 20
+            }}>
+                <ButtonComponents text={"Save"} wid={"80%"} hei={"100%"} bgColor={Theme.colors.Primary}/>
             </View>
         </ScrollView>
     )
@@ -179,7 +243,8 @@ export const AREABottomSheet: React.FC<AREABottomSheetProps> = ({currentArea}) =
 
 const styles = (Theme: ThemeTypeContext) => StyleSheet.create({
     container: {
-        flex: 1
+        flex: 1,
+        marginBottom: 20
     },
     contentContainer: {
       flex: 1,
@@ -201,9 +266,9 @@ const styles = (Theme: ThemeTypeContext) => StyleSheet.create({
         flexDirection: "column"
     },
     picker: {
-        // display: "flex",
+        flex: 1,
         width: "90%",
-        height: "50%",
+        height: "5%",
         backgroundColor: Theme.colors.Gray,
         borderRadius: 20,
         justifyContent: "center"
