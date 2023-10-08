@@ -42,7 +42,7 @@ class Google:
             os.path.join('secrets', f'{service}.json'),
             scopes=scopes
         )
-        flow.redirect_uri = f'{Env.REDIRECT_URI}/{service}/authorize'
+        flow.redirect_uri = f'{Env.REDIRECT_URI}/services/{service}/authorize'
         authorization_url, state = flow.authorization_url(
             access_type='offline',
             include_granted_scopes='true',
@@ -66,7 +66,7 @@ class Google:
             scopes=scopes,
             state=state,
         )
-        flow.redirect_uri = f'{Env.REDIRECT_URI}/{service}/authorize'
+        flow.redirect_uri = f'{Env.REDIRECT_URI}/services/{service}/authorize'
         try:
             flow.fetch_token(code=code)
         except Exception as e:

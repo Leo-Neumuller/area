@@ -37,7 +37,13 @@
     "react-native-svg": "^13.14.0",
     "react-native-svg-transformer": "^1.1.0",
     "react-native-tab-view": "^3.5.2",
+<<<<<<< HEAD
     "react-native-webview": "^13.6.0"
+=======
+    "react-native-vector-icons": "^10.0.0",
+    "react-native-webview": "^13.6.0",
+    "@react-native-picker/picker": "2.4.10"
+>>>>>>> 504180833846b597fb56b3269d0c2155f44da428
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

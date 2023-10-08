@@ -225,8 +225,9 @@ def check_if_service_exist(service_name: str, User: UserMe, db: Session):
     :param db: Session of database
     :return: True if service exist else False
     """
+
     return db.query(Service).filter(Service.name == service_name, Service.user_id == User.id,
-                                    not not Service.refresh).first() is not None
+                                    not not Service.refresh).first().refresh is not None
 
 
 def check_if_state_is_valid(service_name: str, state: str, email: str, db: Session):

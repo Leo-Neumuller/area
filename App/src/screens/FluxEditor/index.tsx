@@ -12,6 +12,7 @@ import BottomSheet from '@gorhom/bottom-sheet';
 import { BottomSheetComponent } from '../../components/BottomSheetComponent';
 import { ThemeTypeContext } from '../../constants/Theme';
 import { AREABottomSheet } from '../../components/Editor/AREABottomSheet';
+import IAREAComponent from "../../interfaces/IAREAComponent";
 
 type RootStackParamList = {
     FluxEditor: undefined;
@@ -62,7 +63,7 @@ export const FluxEditor: React.FC<{navigation: StackNavigationProp<RootStackPara
     const [currentArea, setCurrentArea] = useState<IAREAComponent>();
 
     useEffect(() => {
-        navigation.setOptions({ title: title, headerStyle: { backgroundColor: Theme.colors.Black }, headerTitle(props) { return <HeaderTitle props={props} setTitle={setTitle} /> }, headerTitleAlign: 'center' });
+        navigation.setOptions({ title: title, headerStyle: { backgroundColor: Theme.colors.Black }, headerTitle(props) { return <HeaderTitle props={props} setTitle={setTitle} /> }, headerTitleAlign: 'center', headerBackTitleVisible: false });
     }, [title]);
 
     const action: IAREAComponent = {
