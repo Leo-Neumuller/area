@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, status, Depends
 from sqlalchemy.orm import Session
 
 from src.middleware.User import MiddlewareUser
-from src.models.Flux import FluxCreateOrModify, create_or_modify_flux, FluxSend, Flux, get_flux_by_id
+from src.models.Flux import FluxCreateOrModify, create_or_modify_flux, FluxSend, Flux, get_flux_by_id, check_flux
 from src.models.User import UserMe
 from src.utils.Database import get_db
 from src.utils.Helper import DefaultErrorResponse
@@ -23,12 +23,16 @@ FluxRouters = APIRouter(
                   responses={**MiddlewareUser.responses(),
                              status.HTTP_400_BAD_REQUEST: {"description": "Bad Request",
                                                            **DefaultErrorResponse()}})
-async def create_flux(CreateFlux: FluxCreateOrModify, User: UserMe = Depends(MiddlewareUser.check),
+async def create_flux(CreateFlux: FluxCreateOrModify, verify: bool = False, User: UserMe = Depends(MiddlewareUser.check),
                       db: Session = Depends(get_db)):
     """
     Create flux
     :return: Flux
     """
+    if verify:
+        errors = check_flux(CreateFlux)
+        if len(errors) > 0:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=errors)
     try:
         flux = create_or_modify_flux(CreateFlux, User, db)
     except Flux.Exception.NotFoundException as e:

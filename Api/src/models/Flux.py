@@ -1,11 +1,16 @@
+from copy import copy
 from typing import List, Any, Optional
 
 from pydantic import BaseModel
 from sqlalchemy import String, Column, Integer, PickleType, ForeignKey, Boolean
 from sqlalchemy.orm import relationship, Session
 
+from src.models.Services import ServiceType
 from src.models.User import UserMe
+from src.services import services
 from src.utils.Database import Base, get_db
+
+from pprint import pprint
 
 
 class Flux(Base):
@@ -49,8 +54,8 @@ class FluxInputData(BaseModel):
 class FluxNode(BaseModel):
     """Flux Node Model"""
     id: str
-    numberInputs: Optional[int] = None
-    numberOutputs: Optional[int] = None
+    numberInputs: int | str
+    numberOutputs: int | str
     service: Optional[str] = None
     subService: Optional[str] = None
     subServiceId: Optional[str] = None
@@ -142,3 +147,145 @@ def create_or_modify_flux(FluxCorM: FluxCreateOrModify, User: UserMe, db: Sessio
     db.commit()
     db.refresh(flux)
     return flux
+
+
+class FluxError(BaseModel):
+    """Flux Error Model"""
+    id: str
+    relatedNodeIds: List[str] = []
+    relatedEdgeIds: List[str] = []
+    relatedInputDataIds: List[str] = []
+    error: str
+
+
+# TODO: add check for all input data type
+flux_check_input_data_type = {
+    "string": lambda x: x == "" and type(x) == str,
+}
+
+
+def check_loop_in_edges(edges: List[FluxEdge]) -> bool:
+    """
+    Check if there is a loop in edges
+    :param edges: Edges
+    :return: True if there is a loop
+    """
+    edges_dict_by_node = {}
+    for edge in edges:
+        if edge.nodeStartId not in edges_dict_by_node.keys():
+            edges_dict_by_node[edge.nodeStartId] = []
+        edges_dict_by_node[edge.nodeStartId].append(edge)
+
+    def dfs(node, path):
+        """
+        Depth first search
+        :param node: Node
+        :param path: Path
+        :return: Loop edges
+        """
+        if node in path:
+            loop_edges = set()
+            for i in range(len(path) - 1):
+                start_node = path[i]
+                end_node = path[i + 1]
+                for e in edges_dict_by_node[start_node]:
+                    if e.nodeEndId == end_node:
+                        loop_edges.add(e.id)
+                        break
+            start_node = path[-1]
+            end_node = path[0]
+            for e in edges_dict_by_node[start_node]:
+                if e.nodeEndId == end_node:
+                    loop_edges.add(e.id)
+                    break
+            return list(loop_edges)
+
+        if node in edges_dict_by_node:
+            for edge in edges_dict_by_node[node]:
+                new_path = path + [node]
+                result = dfs(edge.nodeEndId, new_path)
+                if result:
+                    return result
+
+        return None
+
+    for edge in edges:
+        loop = dfs(edge.nodeStartId, [])
+        if loop:
+            return loop
+
+
+def check_flux(CreateFlux: FluxCreateOrModify) -> List[FluxError]:
+    """
+    Check flux
+    :param CreateFlux: Flux
+    :return: Errors
+    """
+    Errors = []
+    if len(CreateFlux.nodes) < 2:
+        return [FluxError(id="global_flux_min_2_node", error="un flux doit avoir au moins 2 noeuds")]
+    nodes_id = []
+    for node in CreateFlux.nodes:
+        nodes_id.append(node.id)
+        if node.service is None or node.subService is None or node.subServiceId is None:
+            Errors.append(
+                FluxError(id="node_must_have_service", relatedNodeIds=[node.id],
+                          error="Le noeud doit avoir un service"))
+            continue
+        splitted_sub_service_id = node.subServiceId.split("_")
+        if len(splitted_sub_service_id) <= 3 or splitted_sub_service_id[0] not in services.keys() or \
+                splitted_sub_service_id[1] not in ["action", "reaction"] or node.subServiceId not in \
+                services[splitted_sub_service_id[0]]().get_interface()[ServiceType(splitted_sub_service_id[1])].keys():
+            Errors.append(
+                FluxError(id="node_service_not_found", relatedNodeIds=[node.id], error="Le noeud a un service érroné"))
+            continue
+        if node.numberInputs != "" and splitted_sub_service_id[1] == "action":
+            Errors.append(FluxError(id="node_service_action_with_inputs", relatedNodeIds=[node.id],
+                                    error="Un noeud action ne peut pas avoir d'entrée"))
+        if node.outputEdgeIds == [] and splitted_sub_service_id[1] == "action":
+            Errors.append(FluxError(id="node_service_action_without_output", relatedNodeIds=[node.id],
+                                    error="Un noeud action doit avoir au moins une sortie"))
+        interface = services[splitted_sub_service_id[0]]().get_interface()[ServiceType(splitted_sub_service_id[1])][
+            node.subServiceId]
+        interface_inputs_id = [inputData.id for inputData in interface.inputsData]
+        for inputData in node.inputsData:
+            if inputData.id not in interface_inputs_id:
+                Errors.append(FluxError(id="node_input_data_not_found", relatedNodeIds=[node.id],
+                                        relatedInputDataIds=[inputData.id],
+                                        error="Donnée d'entrée inconnue"))
+                continue
+            if not isinstance(inputData.value, dict):
+                if inputData.required and (
+                        inputData.value is None or flux_check_input_data_type[inputData.type](inputData.value)):
+                    Errors.append(FluxError(id="node_input_data_required", relatedNodeIds=[node.id],
+                                            relatedInputDataIds=[inputData.id],
+                                            error="Donnée d'entrée requise"))
+                    continue
+            else:
+                # TODO: check dict data is in another node output
+                pass
+            if inputData.inputType == "select" and inputData.value not in inputData.data:
+                Errors.append(FluxError(id="node_input_data_select_not_found", relatedNodeIds=[node.id],
+                                        relatedInputDataIds=[inputData.id],
+                                        error="Donnée d'entrée select inconnue"))
+                continue
+
+    nodes_alone_id = copy(nodes_id)
+    for edge in CreateFlux.edges:
+        if edge.nodeStartId not in nodes_id or edge.nodeEndId not in nodes_id:
+            Errors.append(
+                FluxError(id="edge_not_found_node", relatedEdgeIds=[edge.id], error="Lien avec noeud(s) inconnu(s)"))
+            continue
+        if edge.nodeStartId == edge.nodeEndId:
+            Errors.append(FluxError(id="edge_same_node", relatedEdgeIds=[edge.id], error="Lien avec le même noeud"))
+            continue
+        if edge.nodeStartId in nodes_alone_id:
+            nodes_alone_id.remove(edge.nodeStartId)
+        if edge.nodeEndId in nodes_alone_id:
+            nodes_alone_id.remove(edge.nodeEndId)
+    if len(nodes_alone_id) > 0:
+        Errors.append(FluxError(id="node_without_edge", relatedNodeIds=nodes_alone_id, error="Noeud(s) seul(s)"))
+    loop_edges_ids = check_loop_in_edges(CreateFlux.edges)
+    if loop_edges_ids and len(loop_edges_ids) > 0:
+        Errors.append(FluxError(id="loop_in_edges", relatedEdgeIds=loop_edges_ids, error="Boucle(s) dans le flux"))
+    return Errors
