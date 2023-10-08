@@ -116,6 +116,21 @@ async def authorize(service: str, state: str, code: str, scope: str, error: str 
     return {"service": service}
 
 
+@ServicesRouter.get("/{service}/is_connected",
+                    summary="Is connected",
+                    description="Is connected",
+                    response_description="Is connected",
+                    status_code=200)
+async def is_connected(service: str, User: UserMe = Depends(MiddlewareUser.check), db=Depends(get_db)):
+    """
+    Is connected
+    :return: Is connected
+    """
+    if service not in services:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Service not found")
+    return {"is_connected": check_if_service_exist(service, User, db)}
+
+
 @ServicesRouter.get("/{service}/{serviceType}",
                     summary="Get all actions or reactions",
                     description="Get all actions or reactions",

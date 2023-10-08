@@ -18,6 +18,7 @@ class Flux(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
     active = Column(Boolean, default=False)
+    checked = Column(Boolean, default=False)
     description = Column(String)
     frontEndData = Column(PickleType)
 
@@ -101,54 +102,6 @@ class FluxSend(BaseModel):
     id: int
 
 
-def get_flux_by_id(fluxId: int, User: UserMe, db: Session):
-    """
-    Get flux by id
-    :param fluxId: Flux id
-    :param User: User
-    :param db: Session of database
-    :return: Flux
-    """
-    flux = db.query(Flux).filter(Flux.id == fluxId, Flux.user_id == User.id).first()
-    if flux is None:
-        raise Flux.Exception.NotFoundException("Flux not found")
-    return flux
-
-
-def create_or_modify_flux(FluxCorM: FluxCreateOrModify, User: UserMe, db: Session):
-    """
-    Create or modify flux
-    :param FluxCorM: Flux
-    :param User: User
-    :param db: Session of database
-    :return: Flux
-    """
-    if FluxCorM.id is not None:
-        flux = get_flux_by_id(FluxCorM.id, User, db)
-        flux.name = FluxCorM.name
-        flux.description = FluxCorM.description
-        flux.frontEndData = {
-            "nodes": list(FluxCorM.nodes),
-            "edges": list(FluxCorM.edges)
-        }
-        db.commit()
-        db.refresh(flux)
-        return flux
-    flux = Flux(
-        name=FluxCorM.name,
-        description=FluxCorM.description,
-        frontEndData={
-            "nodes": list(FluxCorM.nodes),
-            "edges": list(FluxCorM.edges)
-        },
-        user_id=User.id
-    )
-    db.add(flux)
-    db.commit()
-    db.refresh(flux)
-    return flux
-
-
 class FluxError(BaseModel):
     """Flux Error Model"""
     id: str
@@ -156,6 +109,14 @@ class FluxError(BaseModel):
     relatedEdgeIds: List[str] = []
     relatedInputDataIds: List[str] = []
     error: str
+
+
+class FluxBasicData(BaseModel):
+    """Flux Basic Data Model"""
+    id: int
+    name: str
+    description: str
+    active: bool
 
 
 # TODO: add check for all input data type
@@ -289,3 +250,71 @@ def check_flux(CreateFlux: FluxCreateOrModify) -> List[FluxError]:
     if loop_edges_ids and len(loop_edges_ids) > 0:
         Errors.append(FluxError(id="loop_in_edges", relatedEdgeIds=loop_edges_ids, error="Boucle(s) dans le flux"))
     return Errors
+
+
+def get_flux_by_id(fluxId: int, User: UserMe, db: Session):
+    """
+    Get flux by id
+    :param fluxId: Flux id
+    :param User: User
+    :param db: Session of database
+    :return: Flux
+    """
+    flux = db.query(Flux).filter(Flux.id == fluxId, Flux.user_id == User.id).first()
+    if flux is None:
+        raise Flux.Exception.NotFoundException("Flux not found")
+    return flux
+
+
+def create_or_modify_flux(FluxCorM: FluxCreateOrModify, User: UserMe, db: Session):
+    """
+    Create or modify flux
+    :param FluxCorM: Flux
+    :param User: User
+    :param db: Session of database
+    :return: Flux
+    """
+    if FluxCorM.id is not None:
+        flux = get_flux_by_id(FluxCorM.id, User, db)
+        flux.name = FluxCorM.name
+        flux.description = FluxCorM.description
+        flux.frontEndData = {
+            "nodes": list(FluxCorM.nodes),
+            "edges": list(FluxCorM.edges)
+        }
+        flux.checked = False
+        db.commit()
+        db.refresh(flux)
+        return flux
+    flux = Flux(
+        name=FluxCorM.name,
+        description=FluxCorM.description,
+        frontEndData={
+            "nodes": list(FluxCorM.nodes),
+            "edges": list(FluxCorM.edges)
+        },
+        user_id=User.id
+    )
+    db.add(flux)
+    db.commit()
+    db.refresh(flux)
+    return flux
+
+
+def get_all_fluxs(User: UserMe, db: Session) -> List[FluxBasicData]:
+    """
+    Get all fluxs
+    :param User: User
+    :param db: Session of database
+    :return: Fluxs
+    """
+    fluxs = db.query(Flux).filter(Flux.user_id == User.id).all()
+    fluxs_basic_data = []
+    for flux in fluxs:
+        fluxs_basic_data.append(FluxBasicData(
+            id=flux.id,
+            name=flux.name,
+            description=flux.description,
+            active=flux.active
+        ))
+    return fluxs_basic_data

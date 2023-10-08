@@ -1,8 +1,11 @@
+from typing import List
+
 from fastapi import APIRouter, HTTPException, status, Depends
 from sqlalchemy.orm import Session
 
 from src.middleware.User import MiddlewareUser
-from src.models.Flux import FluxCreateOrModify, create_or_modify_flux, FluxSend, Flux, get_flux_by_id, check_flux
+from src.models.Flux import FluxCreateOrModify, create_or_modify_flux, FluxSend, Flux, get_flux_by_id, check_flux, \
+    get_all_fluxs, FluxBasicData
 from src.models.User import UserMe
 from src.utils.Database import get_db
 from src.utils.Helper import DefaultErrorResponse
@@ -23,7 +26,8 @@ FluxRouters = APIRouter(
                   responses={**MiddlewareUser.responses(),
                              status.HTTP_400_BAD_REQUEST: {"description": "Bad Request",
                                                            **DefaultErrorResponse()}})
-async def create_flux(CreateFlux: FluxCreateOrModify, verify: bool = False, User: UserMe = Depends(MiddlewareUser.check),
+async def create_flux(CreateFlux: FluxCreateOrModify, verify: bool = False,
+                      User: UserMe = Depends(MiddlewareUser.check),
                       db: Session = Depends(get_db)):
     """
     Create flux
@@ -38,6 +42,23 @@ async def create_flux(CreateFlux: FluxCreateOrModify, verify: bool = False, User
     except Flux.Exception.NotFoundException as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     return FluxSend(id=flux.id)
+
+
+@FluxRouters.get("/fluxs",
+                 summary="Get all fluxs",
+                 description="Get all fluxs",
+                 response_description="List of fluxs",
+                 response_model=List[FluxBasicData],
+                 status_code=status.HTTP_200_OK,
+                 dependencies=[Depends(MiddlewareUser.check)],
+                 responses={**MiddlewareUser.responses()}
+                 )
+async def get_fluxs(User: UserMe = Depends(MiddlewareUser.check), db: Session = Depends(get_db)):
+    """
+    Get fluxs
+    :return: Fluxs
+    """
+    return get_all_fluxs(User, db)
 
 
 @FluxRouters.get("/{fluxId}",
