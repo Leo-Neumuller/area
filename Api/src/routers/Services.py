@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List
 
 from fastapi import APIRouter, HTTPException, status, Depends
@@ -115,6 +116,21 @@ async def authorize(service: str, state: str, code: str, scope: str, error: str 
     return {"service": service}
 
 
+@ServicesRouter.get("/{service}/is_connected",
+                    summary="Is connected",
+                    description="Is connected",
+                    response_description="Is connected",
+                    status_code=200)
+async def is_connected(service: str, User: UserMe = Depends(MiddlewareUser.check), db=Depends(get_db)):
+    """
+    Is connected
+    :return: Is connected
+    """
+    if service not in services:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Service not found")
+    return {"is_connected": check_if_service_exist(service, User, db)}
+
+
 @ServicesRouter.get("/{service}/{serviceType}",
                     summary="Get all actions or reactions",
                     description="Get all actions or reactions",
@@ -141,3 +157,22 @@ async def get_actions_or_reactions(service: str, serviceType: ServiceType):
         name=interface[serviceType][action].name,
         description=interface[serviceType][action].description,
     ) for action in interface[serviceType].keys()]
+
+
+@ServicesRouter.post("/test",
+                     summary="Test action or reaction",
+                     description="Test action or reaction",
+                     response_description="Test action or reaction",
+                     status_code=status.HTTP_200_OK,
+                     dependencies=[Depends(MiddlewareUser.check)],
+                     responses={**MiddlewareUser.responses(),
+                                status.HTTP_404_NOT_FOUND: {"description": "Service not found",
+                                                            **DefaultErrorResponse()}})
+async def test_action_or_reaction(User: UserMe = Depends(MiddlewareUser.check), db=Depends(get_db)):
+    """
+    Test action or reaction
+    :return: Test action or reaction
+    """
+    time = 1696630169
+    services["Gmail"](User, db).new_email_from_email({"time": time}, {"email": "area.shcb@gmail.com"})
+    return {"test": "test"}

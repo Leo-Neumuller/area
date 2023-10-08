@@ -68,7 +68,7 @@ async def loginUser(UserLogin: UserLogin, db: Session = Depends(get_db), respons
         jwt = create_jwt_from_user(loginUser)
     except JWTException as e:  # pragma: no cover
         warn(str(e))
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Issue when creating authorization token")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Erreur lors de la création du token")
     response.headers["Authorization"] = jwt
     return UserToken(access_token=jwt)
 
