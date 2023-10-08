@@ -4,6 +4,9 @@ import AppSvg from "../../../assets/tdesign_app.svg"
 import ProfileSvg from "../../../assets/iconamoon_profile-fill.svg"
 import { View, Text } from "react-native";
 
+import {Profile} from "../../screens/Profile"
+import React from "react";
+
 export const Tmp: React.FC = () => {
     return(
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center'}}>
@@ -19,8 +22,8 @@ export const Tmp: React.FC = () => {
       </View>
     )
 }
-export const bottomBarList: { name: string, navigationComponent: React.ComponentType, iconSVG: () => React.ReactNode }[]
+export const bottomBarList: { name: string, navigationComponent: React.FC<any>, iconSVG: () => React.ReactNode }[]
 = [{name: "Accueil", navigationComponent: Tmp, iconSVG: DashboardSvg},
   {name: "Flux", navigationComponent: Tmp2, iconSVG: FluxSvg},
   {name: "App", navigationComponent: Tmp, iconSVG: AppSvg},
-  {name: "Profile", navigationComponent: Tmp2, iconSVG: ProfileSvg }];
+  {name: "Profile", navigationComponent: Profile, iconSVG: ProfileSvg }];

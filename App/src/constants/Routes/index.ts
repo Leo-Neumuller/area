@@ -20,7 +20,7 @@ const Routes = [
     {
         name: "HomeLogin",
         component: HomeLogin
-    }
+    },
 ]
 
 export default Routes
