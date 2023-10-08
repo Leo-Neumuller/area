@@ -29,16 +29,21 @@
         "checkbox": "p-2 border-2 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full",
     }
 
+    const type = {type: typeInput[inputD.inputType]}
+
 </script>
 
 <div>
   <h1 class="text-customWhite text-[1.2vw]">{inputD.name}</h1>
   {#if inputD.inputType === "textMultiline"}
-    <textarea class={classInput[inputD.inputType]} on:change={changeInput[inputD.inputType]} rows="5"/>
+    <textarea class={classInput[inputD.inputType]} on:change={changeInput[inputD.inputType]} rows="5" bind:value={inputD.value} />
   {:else if inputD.inputType === "select"}
-    <Select on:change={changeInput[inputD.inputType]} options={inputD.data}/>
+    <Select on:change={changeInput[inputD.inputType]} options={inputD.data} bind:value={inputD.value} />
   {:else}
-    <input class={classInput[inputD.inputType]} type={typeInput[inputD.inputType]} on:change={changeInput[inputD.inputType]}/>
+    <!-- {...type} is hack to bypass error from svelte
+        because type can't be dynamic with a bind:value
+    -->
+    <input class={classInput[inputD.inputType]} {...type} on:change={changeInput[inputD.inputType]} bind:value={inputD.value} />
   {/if}
   <!-- TODO add a bottom bar like search bar to make like zappier-->
 </div>
