@@ -31,7 +31,10 @@
 
     let modifyMenu: boolean = false;
     let advancedModify: boolean = false;
-    let subServices: { [key: string]: string }[] = [{}];
+    let subServices: {"data" : { [key: string]: string }[], "nodeId" : string | undefined} = {
+        "data": [{}],
+        "nodeId": undefined,
+    };
 
     let services: { [key: string]: string } = {};
 
@@ -173,7 +176,7 @@
         nodes = [
             ...nodes,
             {
-                id: `node_${nodes.length}`,
+                id: `node_${Date.now()}-${Math.random().toString(36).substring(7)}`,
                 prevPosition: nodePrev,
                 currPosition: nodeCurr,
                 numberInputs: numberInputs,
@@ -329,7 +332,7 @@
     }
 
     function handleModifyNode() {
-        if (nodeRegister.service !== undefined) {
+        if (nodeRegister.service != null) {
             advancedModify = true;
         } else {
             modifyService = true;
@@ -363,11 +366,16 @@
                 services = res;
             })
         }
-        if (advancedModify && nodeRegister.service !== undefined && ((nodeRegister.subService === undefined && nodeRegister.subServiceId === undefined) || subServices[0]?.name === undefined)) {
+
+        if (advancedModify && nodeRegister.service != null && ((nodeRegister.subService === undefined && nodeRegister.subServiceId === undefined) || subServices["nodeId"] !== nodeRegister.id)) {
             getSubServices(getCookie("token"), nodeRegister.service, nodeRegister.type).then((res) => {
-                subServices = res;
+                subServices = {
+                    "data": res,
+                    "nodeId": nodeRegister.id,
+                }
             })
         }
+        console.log(subServices);
 
         if (advancedModify && nodeRegister.subServiceId !== undefined &&
             (nodeRegister.inputsData === undefined || nodeRegister.inputDataFromSubServiceId !== nodeRegister.subServiceId)) {
@@ -392,7 +400,6 @@
             if ($page.url.searchParams.get("FluxId")) {
               data["id"] = Number($page.url.searchParams.get("FluxId"));
             }
-            console.log(data);
             createFlux(getCookie("token"), data).then((res) => {
               console.log(res);
               $page.url.searchParams.set("FluxId", res["id"]);
@@ -442,11 +449,11 @@
       <h1
         class="text-[2.1rem] font-SpaceGrotesk text-customWhite font-semibold w-full text-center">{nodeRegister.service}</h1>
       <div>
-        <Select options={subServices.map((subService) => subService["name"])}
-                value={subServices.find((subService) => nodeRegister.subServiceId === subService["id"])?.name}
+        <Select options={subServices["data"].map((subService) => subService["name"])}
+                value={subServices["data"].find((subService) => nodeRegister.subServiceId === subService["id"])?.name}
                 placeholder="Choisissez une action à éxecuter" on:change={(value) => {
                   nodeRegister.subService = value.detail
-                  nodeRegister.subServiceId = subServices.find((subService) => subService["name"] === value.detail)?.id
+                  nodeRegister.subServiceId = subServices["data"].find((subService) => subService["name"] === value.detail)?.id
                 }}/>
       </div>
       <div>

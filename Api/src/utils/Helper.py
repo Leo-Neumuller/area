@@ -26,3 +26,6 @@ def DefaultErrorResponse() -> dict:
     :return: Error response
     """
     return {"content": {"application/json": {"example": {"detail": "string"}}}}
+
+
+
