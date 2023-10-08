@@ -114,7 +114,41 @@ export async function createFlux(cookie: string, flux: CreateFlux) {
     return res.json();
 }
 
-export async function getFlux(cookie: string, fluxId) {
+export async function getOauthLink(cookie: string, service: string) {
+    const res = await fetch(import.meta.env.VITE_API_URL + `/services/` + service + "/authorize_url", {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'access-token': cookie,
+            'service': service
+        },
+    })
+    if (res.status !== 200) {
+        let err = await res.json();
+        console.log(err);
+        throw new Error(err.detail);
+    }
+    return res.json();
+}
+
+export async function checkConnected(cookie: string, service: string) {
+    const res = await fetch(import.meta.env.VITE_API_URL + `/services/` + service + "/is_connected", {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'access-token': cookie,
+            'service': service
+        },
+    })
+    if (res.status !== 200) {
+        let err = await res.json();
+        console.log(err);
+        throw new Error(err.detail);
+    }
+    return res.json();
+}
+
+export async function getFlux(cookie: string, fluxId: any) {
     const res = await fetch(import.meta.env.VITE_API_URL + `/flux/${fluxId}`, {
         method: 'GET',
         headers: {

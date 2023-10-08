@@ -9,6 +9,7 @@ from src.models.Services import save_start_authorization, check_if_service_exist
 from src.models.User import UserMe
 from src.services import services
 from src.utils.Database import get_db
+from fastapi.responses import RedirectResponse
 from src.utils.Helper import DefaultErrorResponse
 
 ServicesRouter = APIRouter(
@@ -113,7 +114,7 @@ async def authorize(service: str, state: str, code: str, scope: str, error: str 
         services[service].authorize(state, code, scope.split(), db)
     except Service.Exception.InvalidGrant as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid grant")
-    return {"service": service}
+    return RedirectResponse(url=f"http://localhost:5173/redirected")
 
 
 @ServicesRouter.get("/{service}/is_connected",
