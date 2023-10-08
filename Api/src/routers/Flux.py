@@ -62,4 +62,3 @@ async def get_flux(fluxId: int, User: UserMe = Depends(MiddlewareUser.check), db
         nodes=flux.frontEndData["nodes"],
         edges=flux.frontEndData["edges"]
     )
-

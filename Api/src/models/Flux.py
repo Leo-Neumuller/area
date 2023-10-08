@@ -49,8 +49,8 @@ class FluxInputData(BaseModel):
 class FluxNode(BaseModel):
     """Flux Node Model"""
     id: str
-    numberInputs: int
-    numberOutputs: int
+    numberInputs: Optional[int] = None
+    numberOutputs: Optional[int] = None
     service: Optional[str] = None
     subService: Optional[str] = None
     subServiceId: Optional[str] = None
