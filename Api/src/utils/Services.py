@@ -96,3 +96,19 @@ class Google:
             {"refresh": Google.credentials_to_dict(credentials)})
         db.commit()
         return googleapiclient.discovery.build(service.lower(), version, credentials=credentials)
+
+    @staticmethod
+    def get_headers_from_message(baseData: dict, toFill: dict) -> dict:
+        """
+        Get headers from message
+        :param baseData: Base data
+        :param toFill: Dict to fill
+        :return: Headers
+        """
+        if "headers" not in baseData:
+            return toFill
+        for header in baseData["headers"]:
+            for key in toFill.keys():
+                if key == header["name"]:
+                    toFill[key] = header["value"]
+        return toFill

@@ -1,21 +1,28 @@
-import {StackNavigationProp} from '@react-navigation/stack';
-import React, {useEffect, useState, useRef} from 'react';
-import {Text, View, TextInput, TouchableOpacity, StyleSheet} from 'react-native';
-import {HeaderTitleProps} from '@react-navigation/elements/src/types'
+import { StackNavigationProp } from '@react-navigation/stack';
+import React, { useEffect, useState, useRef } from 'react';
+import { Text, View, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { HeaderTitleProps } from '@react-navigation/elements/src/types'
 import EditSVG from "../../../assets/pepicons-pop_pen.svg";
-import {AddComponent} from '../../components/Editor/AddComponent';
-import {ScrollView} from 'react-native';
+import { ScrollView } from 'react-native';
 import AddSVG from "../../../assets/AddComponent.svg";
+import useThemedStyles from '../../hooks/Theme/useThemedStyle';
+import useTheme from '../../hooks/Theme/useTheme';
+import {AREAComponent} from "../../components/Editor/AREAComponent";
+import BottomSheet from '@gorhom/bottom-sheet';
+import { BottomSheetComponent } from '../../components/BottomSheetComponent';
+import { ThemeTypeContext } from '../../constants/Theme';
+import { AREABottomSheet } from '../../components/Editor/AREABottomSheet';
 
 type RootStackParamList = {
     FluxEditor: undefined;
     Details: { itemId: number };
 };
 
-const HeaderTitle: React.FC<{ props: HeaderTitleProps, setTitle: React.Dispatch<React.SetStateAction<string>> }> = ({props, setTitle}) => {
+const HeaderTitle: React.FC<{props: HeaderTitleProps, setTitle: React.Dispatch<React.SetStateAction<string>> }> = ({ props, setTitle }) => {
     const refInput: React.LegacyRef<TextInput> = React.useRef(null)
     const [editable, setEditable] = useState<boolean>(false);
 
+    const Theme = useTheme();
     useEffect(() => {
         if (editable) {
             refInput.current?.focus()
@@ -28,62 +35,76 @@ const HeaderTitle: React.FC<{ props: HeaderTitleProps, setTitle: React.Dispatch<
                 <TextInput
                     editable={editable}
                     ref={refInput}
-                    style={{display: "flex", flexDirection: "column", color: '#f3f3f3', fontSize: 30, fontFamily: 'space-grotesk', maxWidth: 200}}
+                    style={[Theme.Title, {color: Theme.colors.White, display: "flex", flexDirection: "column", maxWidth: 200}]}
                     onChangeText={setTitle}
-                    onEndEditing={() => {
-                        setEditable(false)
-                    }}
+                    onEndEditing={() => { setEditable(false) }}
                 >
-                    {props.children}
+                        {props.children}
                 </TextInput>
             </View>
             <View>
-                <TouchableOpacity onPress={() => {
-                    setEditable(true)
-                }}>
-                    <EditSVG/>
+                <TouchableOpacity onPress={() => { setEditable(true) }}>
+                    <EditSVG style={{color: Theme.colors.White}} />
                 </TouchableOpacity>
             </View>
         </View>
     )
 }
 
-export const FluxEditor: React.FC<{ navigation: StackNavigationProp<RootStackParamList, 'FluxEditor'> }> = ({navigation}) => {
+export const FluxEditor: React.FC<{navigation: StackNavigationProp<RootStackParamList, 'FluxEditor'>}> = ({ navigation }) => {
     const [title, setTitle] = useState<string>("Sans nom");
-    const [bottomSheetOpened, setBottomSheetOpened] = useState<boolean>(true);
-
+    const [bottomSheetOpened, setBottomSheetOpened] = useState<boolean>(false);
+    const [areaType, setAreaType] = useState<"action" | "reaction">("action");
+    const [areaData, setAreaData] = useState<{}>({});
+    const bottomSheetRef = useRef<BottomSheet>(null);
+    const Styles = useThemedStyles(styles);
+    const Theme = useTheme();
+    const [currentArea, setCurrentArea] = useState<IAREAComponent>();
 
     useEffect(() => {
-        navigation.setOptions({
-            title: title, headerStyle: {backgroundColor: '#373637'}, headerTitle(props) {
-                return <HeaderTitle props={props} setTitle={setTitle}/>
-            }, headerTitleAlign: 'center'
-        });
+        navigation.setOptions({ title: title, headerStyle: { backgroundColor: Theme.colors.Black }, headerTitle(props) { return <HeaderTitle props={props} setTitle={setTitle} /> }, headerTitleAlign: 'center' });
     }, [title]);
+
+    const action: IAREAComponent = {
+        default: true,
+        type: "action",
+    }
+
+    const reaction: IAREAComponent = {
+        default: true,
+        type: "reaction",
+    }
 
     return (
         <View style={{width: "100%", height: "100%"}}>
-            <View style={bottomSheetOpened ? styles.containerUnfocused : styles.container} onTouchStart={() => {
-                setBottomSheetOpened(false)
-            }}>
-                <Text>editor</Text>
-                <TouchableOpacity onPress={() => {
-                    setBottomSheetOpened(true)
-                }}>
-                    <AddSVG/>
-                </TouchableOpacity>
-            </View>
-            <AddComponent opened={bottomSheetOpened} setOpened={setBottomSheetOpened}/>
+            <BottomSheetComponent ref={bottomSheetRef} setOpened={setBottomSheetOpened} opened={bottomSheetOpened} content={<AREABottomSheet currentArea={currentArea} />}>
+                <View style={Styles.container}>
+                    <AREAComponent data={action} inEditor={true} onPress={(data) => {
+                        bottomSheetRef.current?.expand();
+                        setBottomSheetOpened(true);
+                        setCurrentArea(data);
+                    }} />
+                    <View style={Styles.line} />
+                    <AREAComponent data={reaction} inEditor={true} onPress={(data) => {
+                        bottomSheetRef.current?.expand();
+                        setBottomSheetOpened(true);
+                        setCurrentArea(data);
+                    }} />
+                </View>
+            </BottomSheetComponent>
         </View>
     )
 }
 
-const styles = StyleSheet.create({
-    containerUnfocused: {
-        flex: 1,
-        backgroundColor: 'grey',
-    },
+const styles = (Theme: ThemeTypeContext) => StyleSheet.create({
     container: {
         flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+      },
+    line: {
+        width: 1,
+        height: 50,
+        backgroundColor: Theme.colors.Black,
     },
 });

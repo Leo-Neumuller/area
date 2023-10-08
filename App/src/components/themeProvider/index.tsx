@@ -1,7 +1,9 @@
 import React, {useState} from 'react';
 import ConstantTheme, {ThemeName} from "../../constants/Theme";
 export const ThemeContext = React.createContext({
+    ...ConstantTheme["Light"],
     Default: ConstantTheme["Default"],
+    setTheme: (theme: ThemeName) => {}
 });
 
 type Props = {

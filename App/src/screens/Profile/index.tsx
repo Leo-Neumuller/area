@@ -1,15 +1,15 @@
 import {Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {StackNavigationProp} from "@react-navigation/stack";
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import HomeLogin from "../LoginScreens/HomeLogin"
 import useThemedStyles from "../../hooks/Theme/useThemedStyle";
 import useTheme from "../../hooks/Theme/useTheme";
-import {white} from "react-native-paper/lib/typescript/styles/themes/v2/colors";
 import ButtonComponents from "../../components/ButtonLogin";
 import * as SecureStore from "expo-secure-store";
-import {loadUserData} from "../../api/api";
-
-
+import {loadUserData, servicesGet} from "../../api/api";
+import {createOnShouldStartLoadWithRequest} from "react-native-webview/lib/WebViewShared";
+import {RFValue} from "react-native-responsive-fontsize";
+import {ThemeTypeContext} from "../../constants/Theme";
 
 
 type RootStackParamList = {
@@ -24,10 +24,16 @@ type Props = {
 export const Profile: React.FC<Props> = ({navigation}) => {
     const Styles = useThemedStyles(styles);
     const Theme = useTheme();
+    const token = SecureStore.getItemAsync("userToken");
+    const [userData, setUserData] = useState({
+        email: "",
+        name: "",
+        surname: ""
+    })
 
     useEffect(() => {
         loadUserData().then((res) => {
-            console.log(res);
+            setUserData(res);
         });
     }, []);
 
@@ -44,7 +50,8 @@ export const Profile: React.FC<Props> = ({navigation}) => {
                 }}>
                     <Text style={{
                         ...Theme.Title,
-                        color: Theme.colors.Black
+                        color: Theme.colors.Black,
+                        fontWeight: "bold"
                     }}>
                         Informations
                     </Text>
@@ -81,9 +88,10 @@ export const Profile: React.FC<Props> = ({navigation}) => {
                             }}>
                                 <Text style={{
                                     ...Theme.Subtitle,
+                                    color: Theme.colors.White,
                                     marginLeft: "5%"
                                 }}>
-                                    *prenom*
+                                    {userData.name}
                                 </Text>
                             </View>
                         </View>
@@ -105,9 +113,10 @@ export const Profile: React.FC<Props> = ({navigation}) => {
                             }}>
                                 <Text style={{
                                     ...Theme.Subtitle,
+                                    color: Theme.colors.White,
                                     marginLeft: "5%"
                                 }}>
-                                    *Nom*
+                                    {userData.surname}
                                 </Text>
                             </View>
                         </View>
@@ -125,13 +134,17 @@ export const Profile: React.FC<Props> = ({navigation}) => {
                             <View style={{
                                 height: "50%",
                                 backgroundColor: "#D9D9D91A",
-                                borderRadius: 10
+                                borderRadius: 10,
                             }}>
                                 <Text style={{
                                     ...Theme.Subtitle,
-                                    marginLeft: "5%"
+                                    color: Theme.colors.White,
+                                    fontSize: RFValue(20),
+                                    marginLeft: "5%",
+                                    marginTop: "2%"
+
                                 }}>
-                                    *Email*
+                                    {userData.email}
                                 </Text>
                             </View>
                         </View>
@@ -169,4 +182,4 @@ export const Profile: React.FC<Props> = ({navigation}) => {
     )
 }
 
-const styles = Theme => StyleSheet.create({})
+const styles = (Theme: ThemeTypeContext) => StyleSheet.create({})

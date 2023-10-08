@@ -7,20 +7,32 @@ import {FluxEditor} from "../../screens/FluxEditor";
 const Routes = [
     {
         name: "Login",
-        component: Login
+        component: Login,
+        options: {
+            headerShown: false
+        }
     },
     {
         name: "FluxEditor",
-        component: FluxEditor
+        component: FluxEditor,
+        options: {
+            headerShown: true
+        }
     },
     {
         name: "Signup",
-        component: Signup
+        component: Signup,
+        options: {
+            headerShown: false
+        }
     },
     {
         name: "HomeLogin",
-        component: HomeLogin
-    },
+        component: HomeLogin,
+        options: {
+            headerShown: false
+        }
+    }
 ]
 
 export default Routes

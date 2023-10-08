@@ -13,6 +13,9 @@ import {NavigationContainer} from '@react-navigation/native';
 import { Routes } from '../../screens/Routes';
 import jwt_decode from "jwt-decode";
 import * as SecureStore from 'expo-secure-store';
+import useTheme from "../../hooks/Theme/useTheme";
+import {ThemeTypeContext} from "../../constants/Theme";
+import useThemedStyles from "../../hooks/Theme/useThemedStyle";
 
 
 
@@ -22,13 +25,14 @@ import * as SecureStore from 'expo-secure-store';
 SplashScreen.preventAutoHideAsync();
 
 export default function Main() {
-
+    const Theme = useTheme();
+    const Styles = useThemedStyles(styles);
     const [isLogged, setIsLogged] = useState<boolean | null>(null);
 
     async function checkLogged() {
         const jwt = await SecureStore.getItemAsync("userToken")
         try {
-            const data = jwt_decode(jwt);
+            const data: {[key: string]: any} = jwt_decode(jwt!);
             if (data.exp * 1000 < Date.now()) {
                 await SecureStore.setItemAsync("userToken", "");
                 setIsLogged(false);
@@ -53,16 +57,18 @@ export default function Main() {
     if (!fontsLoaded) {
         return null;
     }
+
     return (
-        <SafeAreaView style={style.container} onLayout={onLayoutRootView}>
+        <SafeAreaView style={Styles.container} onLayout={onLayoutRootView}>
             <Routes isLogged={isLogged}/>
         </SafeAreaView>
     );
 }
 
-const style = StyleSheet.create({
+const styles = (Theme: ThemeTypeContext) => StyleSheet.create({
     container: {
         flex: 1,
         paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
+        backgroundColor: Theme.colors.Black
     }
 })

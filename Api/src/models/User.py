@@ -19,6 +19,7 @@ class User(Base):
     surname = Column(String)
     name = Column(String)
 
+    flux = relationship("Flux", back_populates="user")
     services = relationship("Service", back_populates="user")
 
     class Exception(Exception):

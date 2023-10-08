@@ -2,29 +2,20 @@ import {
     StyleSheet,
     Text,
     View,
-    Button,
     Dimensions,
-    SafeAreaView,
     TextInput,
-    Image, ImageBackground,
     ScrollView, TouchableOpacity
 } from "react-native";
 import {StatusBar} from "expo-status-bar";
-import {Theme} from "../../../components/themeProvider"
 import useThemedStyles from "../../../hooks/Theme/useThemedStyle";
 import ButtonCompenents from "../../../components/ButtonLogin"
 import useTheme from "../../../hooks/Theme/useTheme";
-import {BlurView} from 'expo-blur';
-import absoluteFill = StyleSheet.absoluteFill;
 import {RFValue} from "react-native-responsive-fontsize";
-
-import Signup from "../Signup";
-import HomeLogin from "../HomeLogin";
-
 import React, {useState} from "react";
 import * as SecureStore from "expo-secure-store";
 
 import {loginPost} from "../../../api/api";
+import {ThemeTypeContext} from "../../../constants/Theme";
 
 
 export default function Login({navigation}) {
@@ -148,7 +139,7 @@ export default function Login({navigation}) {
                                     textColor={Theme.colors.Black}
                                     onPress={() => {
                                         loginPost(data).then((res) => {
-                                            SecureStore.setItemAsync('userToken', res.access_token).then(() =>
+                                            SecureStore.setItemAsync('userToken', res["access_token"]).then(() =>
                                                 navigation.push("BottomBar"))
                                         }).catch((err) => {
                                             setError(err.toString());
@@ -187,7 +178,7 @@ export default function Login({navigation}) {
     )
 }
 
-const styles = Theme => StyleSheet.create({
+const styles = (Theme: ThemeTypeContext) => StyleSheet.create({
     Text: {
         color: Theme.colors.Primary
     },
