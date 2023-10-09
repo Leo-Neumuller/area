@@ -97,8 +97,8 @@ interface CreateFlux {
     edges: Edge[];
 }
 
-export async function createFlux(cookie: string, flux: CreateFlux) {
-    const res = await fetch(import.meta.env.VITE_API_URL + `/flux`, {
+export async function createFlux(cookie: string, flux: CreateFlux, verify: boolean = false) {
+    const res = await fetch(import.meta.env.VITE_API_URL + `/flux?verify=${verify}`, {
         method: 'POST',
         body: JSON.stringify(flux),
         headers: {

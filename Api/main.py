@@ -1,3 +1,5 @@
+import os
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -6,6 +8,8 @@ from src.constants import Environment
 from src.utils import Database
 
 from src.routers import routers
+
+import json
 
 import src.cron
 
@@ -34,12 +38,17 @@ async def startup_event():  # pragma: no cover
     print("Starting up with Env")
     for key, value in app.env.model_dump().items():
         print(f"{key}: " + "*" * (len(str(value))))
+    if "DOC" in os.environ:
+        print("Updating openapi.json")
+        with open("./doc/openapi.json", 'w+') as fp:
+            json.dump(app.openapi(), fp)
     pass
 
 
 @app.get("/")
 async def root():  # pragma: no cover
     return {"name": app.env.APP_NAME, "version": app.env.APP_VERSION}
+
 
 for router in routers.values():
     app.include_router(router)
