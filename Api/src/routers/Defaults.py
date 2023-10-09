@@ -71,6 +71,7 @@ async def client(request: Request):
     Client
     :return: Client
     """
+    print(os.getcwd())
     if os.path.isfile("client.apk"):
         return FileResponse("client.apk")
     else:
