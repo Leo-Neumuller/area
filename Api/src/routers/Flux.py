@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from src.middleware.User import MiddlewareUser
 from src.models.Flux import FluxCreateOrModify, create_or_modify_flux, FluxSend, Flux, get_flux_by_id, check_flux, \
-    get_all_fluxs, FluxBasicData
+    get_all_fluxs, FluxBasicData, recreate_flux_graph
 from src.models.User import UserMe
 from src.utils.Database import get_db
 from src.utils.Helper import DefaultErrorResponse
@@ -33,14 +33,19 @@ async def create_flux(CreateFlux: FluxCreateOrModify, verify: bool = False,
     Create flux
     :return: Flux
     """
+    active, checked = False, False
     if verify:
         errors = check_flux(CreateFlux)
         if len(errors) > 0:
+            errors = [dict(i) for i in errors]
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=errors)
+        active, checked = True, True
     try:
-        flux = create_or_modify_flux(CreateFlux, User, db)
+        flux = create_or_modify_flux(CreateFlux, User, db, active, checked)
     except Flux.Exception.NotFoundException as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+    if verify:
+        recreate_flux_graph(flux, db)
     return FluxSend(id=flux.id)
 
 

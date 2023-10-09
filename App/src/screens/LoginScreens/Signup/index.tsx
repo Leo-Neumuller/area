@@ -197,7 +197,7 @@ export default function Signup({navigation}) {
                                         onPress={() => {
                                             signupPost(data).then((res) => {
                                                 SecureStore.setItemAsync('userToken', res.access_token).then(() =>
-                                                navigation.push("Login"))
+                                                navigation.push("BottomBar"))
                                             }).catch((err) => {
                                                 setError(err.toString());
                                             })

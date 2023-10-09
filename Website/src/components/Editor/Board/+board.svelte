@@ -1,565 +1,671 @@
 <script lang="ts">
-    import "./style.css";
-    import {onMount} from "svelte";
-    import {page} from "$app/stores";
-    import {goto} from "$app/navigation";
-    import Addbutton from "../AddButton/+addbutton.svelte";
-    import NodeComponent from "../Nodes/+nodes.svelte";
-    import EdgeComponent from "../Edges/+edges.svelte";
-    import type Node from "./NodeInterface";
-    import type Edge from "./EdgeInterface";
-    import Close from "../../SVGs/+Close";
-    import Modify from "../../SVGs/+Modify.svelte";
-    import {createFlux, getFlux, getServices, getSubServiceMetadata, getSubServices} from "../../../api/api";
-    import {getCookie} from "../../../api/helpers";
-    import Select from "../../Select/+select.svelte";
-    import InputData from "../InputData/+InputData.svelte"
+	import "./style.css";
+	import {onMount} from "svelte";
+	import {page} from "$app/stores";
+	import {goto} from "$app/navigation";
+	import Addbutton from "../AddButton/+addbutton.svelte";
+	import NodeComponent from "../Nodes/+nodes.svelte";
+	import EdgeComponent from "../Edges/+edges.svelte";
+	import type Node from "./NodeInterface";
+	import type Edge from "./EdgeInterface";
+	import Close from "../../SVGs/+Close";
+	import Modify from "../../SVGs/+Modify.svelte";
+	import {createFlux, getFlux, getServices, getSubServiceMetadata, getSubServices, getOauthLink, checkConnected} from "../../../api/api";
+	import {getCookie} from "../../../api/helpers";
+	import Select from "../../Select/+select.svelte";
+	import InputData from "../InputData/+InputData.svelte"
 
-    let grabbingBoard: boolean = false;
-    let scale: number = 1;
-    let clickedPosition: { x: number, y: number } = {x: 0, y: 0};
-    let selectedNode: string | null = null;
-    let selectedEdge: string | null = null;
-    let nodes: Node[] = [];
-    let edges: Edge[] = [];
-    let newEdge: any = null;
-    let insideInput: { nodeId: string, inputIndex: number, pos: { x: number, y: number } } | null = null;
+	import Validate from "../../SVGs/+Validate.svelte";
+	import Profile from "../../SVGs/Profile.svelte";
+  import TextInput from "../../TextInput/+TextInput.svelte";
 
-    let nodeRegister: Node;
-    let modifyService: boolean = false;
-    let modifyServiceType: string = "";
+	let grabbingBoard: boolean = false;
+	let scale: number = 1;
+	let clickedPosition: { x: number, y: number } = {x: 0, y: 0};
+	let selectedNode: string | null = null;
+	let selectedEdge: string | null = null;
+	let nodes: Node[] = [];
+	let edges: Edge[] = [];
+	let newEdge: any = null;
+	let insideInput: { nodeId: string, inputIndex: number, pos: { x: number, y: number } } | null = null;
 
-    let modifyMenu: boolean = false;
-    let advancedModify: boolean = false;
-    let subServices: {"data" : { [key: string]: string }[], "nodeId" : string | undefined} = {
-        "data": [{}],
-        "nodeId": undefined,
-    };
+	let nodeRegister: Node;
+	let modifyService: boolean = false;
+	let modifyServiceType: string = "";
 
-    let services: { [key: string]: string } = {};
+	let modifyMenu: boolean = false;
+	let advancedModify: boolean = false;
+	let saveMenu: boolean = false;
+	let subServices: {"data" : { [key: string]: string }[], "nodeId" : string | undefined} = {
+		"data": [{}],
+		"nodeId": undefined,
+	};
 
-    function updateNodes() {
-        nodes = [...nodes];
-    }
+	let services: { [key: string]: string } = {};
+	let ConnectedServices: { [key: string]: {[key: string] : boolean} } = {};
+	let name: string = "";
+	let descr: string = "";
 
-    function handleMouseDown(e: any) {
-        selectedNode = null;
-        selectedEdge = null;
-        modifyMenu = false;
-        grabbingBoard = true;
-        clickedPosition = {x: e.x, y: e.y};
-    }
+	function updateNodes() {
+		nodes = [...nodes];
+	}
 
-    function handleMouseUp(e: Event) {
-        clickedPosition = {x: -1, y: -1};
-        grabbingBoard = false;
+	function handleMouseDown(e: any) {
+		selectedNode = null;
+		selectedEdge = null;
+		modifyMenu = false;
+		grabbingBoard = true;
+		clickedPosition = {x: e.x, y: e.y};
+	}
 
-        if (newEdge !== null) {
-            if (insideInput !== null) {
-                const startId = newEdge["nodeStartId"];
-                const endId = insideInput.nodeId;
+	function handleMouseUp(e: Event) {
+		clickedPosition = {x: -1, y: -1};
+		grabbingBoard = false;
 
-                const nodeStart = nodes.find((node) => node.id === startId);
-                const nodeEnd = nodes.find((node) => node.id === endId);
+		if (newEdge !== null) {
+			if (insideInput !== null) {
+				const startId = newEdge["nodeStartId"];
+				const endId = insideInput.nodeId;
 
-                const boardWrapper = document.getElementById("boardWrapper");
-                if (nodeStart && nodeEnd && boardWrapper) {
-                    const edgeId = `$edge_${nodeStart.id}_${newEdge.outputIndex}_${endId}_${insideInput.inputIndex}`;
+				const nodeStart = nodes.find((node) => node.id === startId);
+				const nodeEnd = nodes.find((node) => node.id === endId);
 
-                    for (let i = 0; nodeStart.outputEdgeIds[i]; i++) {
-                        if (edgeId.slice(0, -1) === nodeStart.outputEdgeIds[i].slice(0, -1)) {
-                            newEdge = null;
-                            return;
-                        }
-                    }
-                    if (nodeStart.outputEdgeIds.includes(edgeId) || nodeEnd.inputEdgeIds.includes(edgeId)) {
-                        newEdge = null;
-                        return;
-                    }
+				const boardWrapper = document.getElementById("boardWrapper");
+				if (nodeStart && nodeEnd && boardWrapper) {
+					const edgeId = `$edge_${nodeStart.id}_${newEdge.outputIndex}_${endId}_${insideInput.inputIndex}`;
 
-                    nodeStart.outputEdgeIds = [...nodeStart.outputEdgeIds, edgeId];
-                    nodeEnd.inputEdgeIds = [...nodeEnd.inputEdgeIds, edgeId];
+					for (let i = 0; nodeStart.outputEdgeIds[i]; i++) {
+						if (edgeId.slice(0, -1) === nodeStart.outputEdgeIds[i].slice(0, -1)) {
+							newEdge = null;
+							return;
+						}
+					}
+					if (nodeStart.outputEdgeIds.includes(edgeId) || nodeEnd.inputEdgeIds.includes(edgeId)) {
+						newEdge = null;
+						return;
+					}
 
-                    newEdge.prevStartPos = {
-                        x: (newEdge.currStartPos.x + boardWrapper.scrollLeft) / scale,
-                        y: (newEdge.currStartPos.y + boardWrapper.scrollTop) / scale,
-                    }
+					nodeStart.outputEdgeIds = [...nodeStart.outputEdgeIds, edgeId];
+					nodeEnd.inputEdgeIds = [...nodeEnd.inputEdgeIds, edgeId];
 
-                    newEdge.prevEndPos = {
-                        x: (insideInput.pos.x + boardWrapper.scrollLeft) / scale,
-                        y: (insideInput.pos.y + boardWrapper.scrollTop) / scale,
-                    }
+					newEdge.prevStartPos = {
+						x: (newEdge.currStartPos.x + boardWrapper.scrollLeft) / scale,
+						y: (newEdge.currStartPos.y + boardWrapper.scrollTop) / scale,
+					}
 
-                    newEdge.currEndPos = {
-                        x: (insideInput.pos.x + boardWrapper.scrollLeft) / scale,
-                        y: (insideInput.pos.y + boardWrapper.scrollTop) / scale,
-                    }
+					newEdge.prevEndPos = {
+						x: (insideInput.pos.x + boardWrapper.scrollLeft) / scale,
+						y: (insideInput.pos.y + boardWrapper.scrollTop) / scale,
+					}
 
-                    edges = [...edges, {
-                        ...newEdge,
-                        id: edgeId,
-                        nodeEndId: nodeEnd.id,
-                        nodeEndInputIndex: insideInput.inputIndex,
-                    }]
-                    newEdge = null;
-                }
-            } else {
-                newEdge = null;
-            }
-        }
-    }
+					newEdge.currEndPos = {
+						x: (insideInput.pos.x + boardWrapper.scrollLeft) / scale,
+						y: (insideInput.pos.y + boardWrapper.scrollTop) / scale,
+					}
 
-    function handleMouseMove(e: any) {
-        if (clickedPosition.x !== -1 && clickedPosition.y !== -1) {
-            let deltaX = e.x - clickedPosition.x;
-            let deltaY = e.y - clickedPosition.y;
+					edges = [...edges, {
+						...newEdge,
+						id: edgeId,
+						nodeEndId: nodeEnd.id,
+						nodeEndInputIndex: insideInput.inputIndex,
+					}]
+					newEdge = null;
+				}
+			} else {
+				newEdge = null;
+			}
+		}
+	}
 
-            if (selectedNode) {
-                modifyMenu = false;
-                const node = nodes.find((node) => node.id === selectedNode);
-                if (node) {
-                    nodeRegister = node;
-                    node.currPosition = {x: (node.currPosition.x + deltaX) * scale, y: (node.currPosition.y + deltaY) * scale};
-                    clickedPosition = {x: e.x, y: e.y};
-                    for (let i = 0; i < node.inputEdgeIds.length; i++) {
-                        const edge = edges.find((edge) => edge.id === node.inputEdgeIds[i]);
-                        if (edge) {
-                            edge.currEndPos = {
-                                x: (edge.currEndPos.x + deltaX) * scale,
-                                y: (edge.currEndPos.y + deltaY) * scale,
-                            }
-                        }
-                    }
+	function handleMouseMove(e: any) {
+		if (clickedPosition.x !== -1 && clickedPosition.y !== -1) {
+			let deltaX = e.x - clickedPosition.x;
+			let deltaY = e.y - clickedPosition.y;
 
-                    for (let i = 0; i < node.outputEdgeIds.length; i++) {
-                        const edge = edges.find((edge) => edge.id === node.outputEdgeIds[i]);
-                        if (edge) {
-                            edge.currStartPos = {
-                                x: (edge.currStartPos.x + deltaX) * scale,
-                                y: (edge.currStartPos.y + deltaY) * scale,
-                            }
-                        }
-                    }
-                    nodes = [...nodes];
-                    edges = [...edges];
-                }
-            } else {
-                const boardWrapper = document.getElementById("boardWrapper");
-                if (boardWrapper) {
-                    boardWrapper.scrollBy(-deltaX, -deltaY);
-                    clickedPosition = {x: e.x, y: e.y};
-                }
-            }
-        }
+			if (selectedNode) {
+				modifyMenu = false;
+				const node = nodes.find((node) => node.id === selectedNode);
+				if (node) {
+					nodeRegister = node;
+					node.currPosition = {x: (node.currPosition.x + deltaX) * scale, y: (node.currPosition.y + deltaY) * scale};
+					clickedPosition = {x: e.x, y: e.y};
+					for (let i = 0; i < node.inputEdgeIds.length; i++) {
+						const edge = edges.find((edge) => edge.id === node.inputEdgeIds[i]);
+						if (edge) {
+							edge.currEndPos = {
+								x: (edge.currEndPos.x + deltaX) * scale,
+								y: (edge.currEndPos.y + deltaY) * scale,
+							}
+						}
+					}
 
-        if (newEdge) {
-            const boardWrapper = document.getElementById("boardWrapper");
-            if (boardWrapper) {
-                newEdge.currEndPos = {
-                    x: (e.x + boardWrapper.scrollLeft) / scale,
-                    y: (e.y + boardWrapper.scrollTop) / scale,
-                }
-            }
-        }
-    }
+					for (let i = 0; i < node.outputEdgeIds.length; i++) {
+						const edge = edges.find((edge) => edge.id === node.outputEdgeIds[i]);
+						if (edge) {
+							edge.currStartPos = {
+								x: (edge.currStartPos.x + deltaX) * scale,
+								y: (edge.currStartPos.y + deltaY) * scale,
+							}
+						}
+					}
+					nodes = [...nodes];
+					edges = [...edges];
+				}
+			} else {
+				const boardWrapper = document.getElementById("boardWrapper");
+				if (boardWrapper) {
+					boardWrapper.scrollBy(-deltaX, -deltaY);
+					clickedPosition = {x: e.x, y: e.y};
+				}
+			}
+		}
 
-
-    function handleOnCLickAdd(numberInputs: number, numberOutputs: number, type: string) {
-        const randomX = Math.random() * (window.innerWidth - 300) + 300;
-        const randomY = Math.random() * (window.innerHeight - 300) + 300;
-
-        let nodePrev: { x: number, y: number } = {x: randomX, y: randomY};
-        let nodeCurr: { x: number, y: number } = {x: randomX, y: randomY};
-        let inputs: String[] = [];
-        let outputs: String[] = [];
-
-        nodes = [
-            ...nodes,
-            {
-                id: `node_${Date.now()}-${Math.random().toString(36).substring(7)}`,
-                prevPosition: nodePrev,
-                currPosition: nodeCurr,
-                numberInputs: numberInputs,
-                numberOutputs: numberOutputs,
-                type: type,
-                inputEdgeIds: inputs,
-                outputEdgeIds: outputs,
-                title: type,
-                img: "test",
-            }
-        ];
-    }
-
-    function handleOnClickDelete() {
-        const node = nodes.find((node) => node.id === selectedNode);
-        if (!node) {
-            selectedNode = null;
-            return;
-        }
-
-        const inputs = node.inputEdgeIds;
-        const outputs = node.outputEdgeIds;
-
-        const allEdges = [...inputs, ...outputs];
-        const uniqueEdges = [...new Set(allEdges)];
-
-        for (let i = 0; i < uniqueEdges.length; i++) {
-            const edgeId = uniqueEdges[i];
-            const edge = edges.find((edge) => edge.id === edgeId);
-            if (edge) {
-                const nodeStart = nodes.find((node) => node.id === edge.nodeStartId);
-                const nodeEnd = nodes.find((node) => node.id === edge.nodeEndId);
-                if (nodeStart && nodeEnd) {
-                    nodeStart.outputEdgeIds = nodeStart.outputEdgeIds.filter((edgeId) => edgeId !== edge.id);
-                    nodeEnd.inputEdgeIds = nodeEnd.inputEdgeIds.filter((edgeId) => edgeId !== edge.id);
-                }
-                edges = edges.filter((edge) => edge.id !== edgeId);
-            }
-        }
-
-        nodes = nodes.filter((node) => node.id !== selectedNode);
-        selectedNode = null;
-        modifyMenu = false;
-    }
-
-    function handleOnMouseDownNode(id: string, e: MouseEvent) {
-        selectedEdge = null;
-        selectedNode = id;
-        clickedPosition = {x: e.x, y: e.y};
-        const node = nodes.find((node) => node.id === id);
-        if (node) {
-            nodeRegister = node;
-            const x = node.currPosition.x * scale;
-            const y = node.currPosition.y * scale;
-            node.prevPosition = {x: x, y: y};
-
-            for (let i = 0; i < node.inputEdgeIds.length; i++) {
-                const edgeId = node.inputEdgeIds[i];
-                const edge = edges.find((edge) => edge.id === edgeId);
-                if (edge) {
-                    edge.prevEndPos = {
-                        x: edge.currEndPos.x * scale,
-                        y: edge.currEndPos.y * scale,
-                    }
-                    edges = [...edges];
-                }
-            }
-
-            for (let i = 0; i < node.outputEdgeIds.length; i++) {
-                const edgeId = node.outputEdgeIds[i];
-                const edge = edges.find((edge) => edge.id === edgeId);
-                if (edge) {
-                    edge.prevStartPos = {
-                        x: edge.currStartPos.x * scale,
-                        y: edge.currStartPos.y * scale,
-                    }
-                    edges = [...edges];
-                }
-            }
-        }
-    }
-
-    function handleOnMouseDownOutput(outputPositionX: number, outputPositionY: number, nodeId: string, outputIndex: number) {
-        selectedNode = null;
-
-        const boardWrapper = document.getElementById("boardWrapper");
-
-        if (boardWrapper) {
-            let prevEdgeStart: { x: number; y: number } = ({
-                x: (outputPositionX + boardWrapper.scrollLeft) / scale,
-                y: (outputPositionY + boardWrapper.scrollTop) / scale,
-            });
-            let currEdgeStart: { x: number; y: number } = ({
-                x: (outputPositionX + boardWrapper.scrollLeft) / scale,
-                y: (outputPositionY + boardWrapper.scrollTop) / scale,
-            });
-            let prevEdgeEnd: { x: number; y: number } = ({
-                x: (outputPositionX + boardWrapper.scrollLeft) / scale,
-                y: (outputPositionY + boardWrapper.scrollTop) / scale,
-            });
-            let currEdgeEnd: { x: number; y: number } = ({
-                x: (outputPositionX + boardWrapper.scrollLeft) / scale,
-                y: (outputPositionY + boardWrapper.scrollTop) / scale,
-            });
+		if (newEdge) {
+			const boardWrapper = document.getElementById("boardWrapper");
+			if (boardWrapper) {
+				newEdge.currEndPos = {
+					x: (e.x + boardWrapper.scrollLeft) / scale,
+					y: (e.y + boardWrapper.scrollTop) / scale,
+				}
+			}
+		}
+	}
 
 
-            newEdge = {
-                id: ``,
-                nodeStartId: nodeId,
-                outputIndex: outputIndex,
-                nodeEndId: ``,
-                inputIndex: -1,
-                prevStartPos: prevEdgeStart,
-                currStartPos: currEdgeStart,
-                prevEndPos: prevEdgeEnd,
-                currEndPos: currEdgeEnd,
-            }
-        }
-    }
+	function handleOnCLickAdd(numberInputs: number, numberOutputs: number, type: string) {
+		const randomX = Math.random() * (window.innerWidth - 300) + 300;
+		const randomY = Math.random() * (window.innerHeight - 300) + 300;
 
-    function handleOnMouseEnterInput(inputPositionX: number, inputPositionY: number, nodeId: string, inputIndex: number) {
-        insideInput = {
-            nodeId: nodeId,
-            inputIndex: inputIndex,
-            pos: {
-                x: inputPositionX,
-                y: inputPositionY,
-            }
-        }
-    }
+		let nodePrev: { x: number, y: number } = {x: randomX, y: randomY};
+		let nodeCurr: { x: number, y: number } = {x: randomX, y: randomY};
+		let inputs: String[] = [];
+		let outputs: String[] = [];
 
-    function handleOnMouseLeaveInput(nodeId: string, inputIndex: Number) {
-        if (insideInput?.nodeId === nodeId && insideInput?.inputIndex === inputIndex) {
-            insideInput = null;
-        }
-    }
+		nodes = [
+			...nodes,
+			{
+				id: `node_${Date.now()}-${Math.random().toString(36).substring(7)}`,
+				prevPosition: nodePrev,
+				currPosition: nodeCurr,
+				numberInputs: numberInputs,
+				numberOutputs: numberOutputs,
+				type: type,
+				inputEdgeIds: inputs,
+				outputEdgeIds: outputs,
+				title: type,
+				img: "test",
+			}
+		];
+	}
 
-    function handleOnMouseDownEdge(id: string) {
-        selectedEdge = id;
-    }
+	function handleOnClickDelete() {
+		const node = nodes.find((node) => node.id === selectedNode);
+		if (!node) {
+			selectedNode = null;
+			return;
+		}
 
-    function HandleOnDeleteEdge(id: string) {
-        const edge = edges.find((edge) => edge.id === id);
-        if (edge) {
-            const nodeStart = nodes.find((node) => node.id === edge.nodeStartId);
-            const nodeEnd = nodes.find((node) => node.id === edge.nodeEndId);
-            if (nodeStart && nodeEnd) {
-                nodeStart.outputEdgeIds = nodeStart.outputEdgeIds.filter((edgeId) => edgeId !== id);
-                nodeEnd.inputEdgeIds = nodeEnd.inputEdgeIds.filter((edgeId) => edgeId !== id);
-            }
-            edges = edges.filter((edge) => edge.id !== id);
-        }
-    }
+		const inputs = node.inputEdgeIds;
+		const outputs = node.outputEdgeIds;
 
-    function handleModifyNode() {
-        if (nodeRegister.service != null) {
-            advancedModify = true;
-        } else {
-            modifyService = true;
-        }
-        modifyMenu = false;
-    }
+		const allEdges = [...inputs, ...outputs];
+		const uniqueEdges = [...new Set(allEdges)];
 
-    onMount(() => {
-        const board = document.getElementById("board");
-        if (board) {
-            board.addEventListener("wheel", (e) => {
-                scale = scale + e.deltaY * -0.0005;
-                scale = Math.min(Math.max(1, scale), 2);
+		for (let i = 0; i < uniqueEdges.length; i++) {
+			const edgeId = uniqueEdges[i];
+			const edge = edges.find((edge) => edge.id === edgeId);
+			if (edge) {
+				const nodeStart = nodes.find((node) => node.id === edge.nodeStartId);
+				const nodeEnd = nodes.find((node) => node.id === edge.nodeEndId);
+				if (nodeStart && nodeEnd) {
+					nodeStart.outputEdgeIds = nodeStart.outputEdgeIds.filter((edgeId) => edgeId !== edge.id);
+					nodeEnd.inputEdgeIds = nodeEnd.inputEdgeIds.filter((edgeId) => edgeId !== edge.id);
+				}
+				edges = edges.filter((edge) => edge.id !== edgeId);
+			}
+		}
 
-                board.style.transform = `scale(${scale})`;
-                board.style.marginTop = `${(scale - 1) * 50}vh`;
-                board.style.marginLeft = `${(scale - 1) * 50}vw`;
-            });
-        }
-        if ($page.url.searchParams.get("FluxId")) {
-            getFlux(getCookie("token"), $page.url.searchParams.get("FluxId")).then((res) => {
-                nodes = res["nodes"];
-                edges = res["edges"];
-            })
-        }
-    })
+		nodes = nodes.filter((node) => node.id !== selectedNode);
+		selectedNode = null;
+		modifyMenu = false;
+	}
 
-    $: {
-        if (modifyService && Object.entries(services).length === 0) {
-            getServices(getCookie("token")).then((res) => {
-                services = res;
-            })
-        }
+	function handleOnMouseDownNode(id: string, e: MouseEvent) {
+		selectedEdge = null;
+		selectedNode = id;
+		clickedPosition = {x: e.x, y: e.y};
+		const node = nodes.find((node) => node.id === id);
+		if (node) {
+			nodeRegister = node;
+			const x = node.currPosition.x * scale;
+			const y = node.currPosition.y * scale;
+			node.prevPosition = {x: x, y: y};
 
-        if (advancedModify && nodeRegister.service != null && ((nodeRegister.subService === undefined && nodeRegister.subServiceId === undefined) || subServices["nodeId"] !== nodeRegister.id)) {
-            getSubServices(getCookie("token"), nodeRegister.service, nodeRegister.type).then((res) => {
-                subServices = {
-                    "data": res,
-                    "nodeId": nodeRegister.id,
-                }
-            })
-        }
-        console.log(subServices);
+			for (let i = 0; i < node.inputEdgeIds.length; i++) {
+				const edgeId = node.inputEdgeIds[i];
+				const edge = edges.find((edge) => edge.id === edgeId);
+				if (edge) {
+					edge.prevEndPos = {
+						x: edge.currEndPos.x * scale,
+						y: edge.currEndPos.y * scale,
+					}
+					edges = [...edges];
+				}
+			}
 
-        if (advancedModify && nodeRegister.subServiceId !== undefined &&
-            (nodeRegister.inputsData === undefined || nodeRegister.inputDataFromSubServiceId !== nodeRegister.subServiceId)) {
-            getSubServiceMetadata(getCookie("token"), nodeRegister.subServiceId).then((res) => {
-                nodeRegister.inputDataFromSubServiceId = nodeRegister.subServiceId;
-                nodeRegister.inputsData = res["inputsData"];
-            })
-        }
-    }
+			for (let i = 0; i < node.outputEdgeIds.length; i++) {
+				const edgeId = node.outputEdgeIds[i];
+				const edge = edges.find((edge) => edge.id === edgeId);
+				if (edge) {
+					edge.prevStartPos = {
+						x: edge.currStartPos.x * scale,
+						y: edge.currStartPos.y * scale,
+					}
+					edges = [...edges];
+				}
+			}
+		}
+	}
+
+	function handleOnMouseDownOutput(outputPositionX: number, outputPositionY: number, nodeId: string, outputIndex: number) {
+		selectedNode = null;
+
+		const boardWrapper = document.getElementById("boardWrapper");
+
+		if (boardWrapper) {
+			let prevEdgeStart: { x: number; y: number } = ({
+				x: (outputPositionX + boardWrapper.scrollLeft) / scale,
+				y: (outputPositionY + boardWrapper.scrollTop) / scale,
+			});
+			let currEdgeStart: { x: number; y: number } = ({
+				x: (outputPositionX + boardWrapper.scrollLeft) / scale,
+				y: (outputPositionY + boardWrapper.scrollTop) / scale,
+			});
+			let prevEdgeEnd: { x: number; y: number } = ({
+				x: (outputPositionX + boardWrapper.scrollLeft) / scale,
+				y: (outputPositionY + boardWrapper.scrollTop) / scale,
+			});
+			let currEdgeEnd: { x: number; y: number } = ({
+				x: (outputPositionX + boardWrapper.scrollLeft) / scale,
+				y: (outputPositionY + boardWrapper.scrollTop) / scale,
+			});
+
+
+			newEdge = {
+				id: ``,
+				nodeStartId: nodeId,
+				outputIndex: outputIndex,
+				nodeEndId: ``,
+				inputIndex: -1,
+				prevStartPos: prevEdgeStart,
+				currStartPos: currEdgeStart,
+				prevEndPos: prevEdgeEnd,
+				currEndPos: currEdgeEnd,
+			}
+		}
+	}
+
+	function handleOnMouseEnterInput(inputPositionX: number, inputPositionY: number, nodeId: string, inputIndex: number) {
+		insideInput = {
+			nodeId: nodeId,
+			inputIndex: inputIndex,
+			pos: {
+				x: inputPositionX,
+				y: inputPositionY,
+			}
+		}
+	}
+
+	function handleOnMouseLeaveInput(nodeId: string, inputIndex: Number) {
+		if (insideInput?.nodeId === nodeId && insideInput?.inputIndex === inputIndex) {
+			insideInput = null;
+		}
+	}
+
+	function handleOnMouseDownEdge(id: string) {
+		selectedEdge = id;
+	}
+
+	function HandleOnDeleteEdge(id: string) {
+		const edge = edges.find((edge) => edge.id === id);
+		if (edge) {
+			const nodeStart = nodes.find((node) => node.id === edge.nodeStartId);
+			const nodeEnd = nodes.find((node) => node.id === edge.nodeEndId);
+			if (nodeStart && nodeEnd) {
+				nodeStart.outputEdgeIds = nodeStart.outputEdgeIds.filter((edgeId) => edgeId !== id);
+				nodeEnd.inputEdgeIds = nodeEnd.inputEdgeIds.filter((edgeId) => edgeId !== id);
+			}
+			edges = edges.filter((edge) => edge.id !== id);
+		}
+	}
+
+	function handleModifyNode() {
+		if (nodeRegister.service != null) {
+			advancedModify = true;
+		} else {
+			modifyService = true;
+		}
+		modifyMenu = false;
+	}
+
+	onMount(() => {
+		const board = document.getElementById("board");
+		if (board) {
+			board.addEventListener("wheel", (e) => {
+				scale = scale + e.deltaY * -0.0005;
+				scale = Math.min(Math.max(1, scale), 2);
+
+				board.style.transform = `scale(${scale})`;
+				board.style.marginTop = `${(scale - 1) * 50}vh`;
+				board.style.marginLeft = `${(scale - 1) * 50}vw`;
+			});
+		}
+		if ($page.url.searchParams.get("FluxId")) {
+			getFlux(getCookie("token"), $page.url.searchParams.get("FluxId")).then((res) => {
+				nodes = res["nodes"];
+				edges = res["edges"];
+			})
+		}
+	})
+
+	$: {
+		if (modifyService && Object.entries(services).length === 0) {
+			getServices(getCookie("token")).then((res) => {
+				services = res;
+				res["action"].forEach((action: any) => {
+					checkConnected(getCookie("token"), action).then((res) => {
+						ConnectedServices = {
+							...ConnectedServices,
+							'Action' : {
+								...ConnectedServices['action'],
+								[action]: res["is_connected"],
+							}
+						};
+					})
+				})
+				res["reaction"].forEach((reaction: any) => {
+					checkConnected(getCookie("token"), reaction).then((res) => {
+						ConnectedServices = {
+							...ConnectedServices,
+							'Reaction' : {
+								...ConnectedServices['reaction'],
+								[reaction]: res["is_connected"],
+							}
+						};
+					})
+				})
+			})
+		}
+
+		if (advancedModify && nodeRegister.service != null && ((nodeRegister.subService === undefined && nodeRegister.subServiceId === undefined) || subServices["nodeId"] !== nodeRegister.id)) {
+			getSubServices(getCookie("token"), nodeRegister.service, nodeRegister.type).then((res) => {
+				subServices = {
+					"data": res,
+					"nodeId": nodeRegister.id,
+				}
+			})
+		}
+
+
+		if (advancedModify && nodeRegister.subServiceId !== undefined &&
+			(nodeRegister.inputsData === undefined || nodeRegister.inputDataFromSubServiceId !== nodeRegister.subServiceId)) {
+			getSubServiceMetadata(getCookie("token"), nodeRegister.subServiceId).then((res) => {
+				nodeRegister.inputDataFromSubServiceId = nodeRegister.subServiceId;
+				nodeRegister.inputsData = res["inputsData"];
+			})
+		}
+	}
 
 </script>
 
 <div>
-  <button class="absolute bottom-10 left-1/2 bg-red-600 p-4 rounded z-40"
-          on:click={() => {
-            const data =  {
-              "name": "test",
-              "description": "test",
-              "nodes": nodes,
-              "edges": edges
-            };
-            if ($page.url.searchParams.get("FluxId")) {
-              data["id"] = Number($page.url.searchParams.get("FluxId"));
-            }
-            createFlux(getCookie("token"), data).then((res) => {
-              console.log(res);
-              $page.url.searchParams.set("FluxId", res["id"]);
-              goto(`?${$page.url.searchParams.toString()}`);
-            })
-            }}>
-    Save
+	<div class={`${saveMenu ? "flex" : "hidden"} gap-3 rounded-xl flex-col absolute top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%] z-[30] bg-gray border border-black p-6`}>
+		<div class="flex justify-between items-center align-middle">
+			<div></div>
+			<button on:click={() => {
+				saveMenu = false;
+			}}>
+				<Close className="w-4 h-4" color="#F3F3F3"/>
+			</button>
+		</div>
+		<TextInput label="Nom du flux" type="text" placeholder="Nom du flux" value={name}
+			onInput={(e) => {
+				name = e.target.value;
+			}}/>
+		<TextInput label="Description du flux" type="text" placeholder="Description du flux" value={descr}
+			onInput={(e) => {
+				descr = e.target.value;
+			}}/>
+		<button class="text-customWhite rounded border border-customWhite mt-2" on:click={() => {
+			const data =  {
+				"name": name,
+				"description": descr,
+				"nodes": nodes,
+				"edges": edges,
+				"id": 0,
+			};
+			if ($page.url.searchParams.get("FluxId")) {
+				data["id"] = Number($page.url.searchParams.get("FluxId"));
+			}
+			createFlux(getCookie("token"), data, true).then((res) => {
+				$page.url.searchParams.set("FluxId", res["id"]);
+				goto(`?${$page.url.searchParams.toString()}`);
+			})
+		}}>
+			Sauvergarder le flux
+		</button>
+	</div>
+  <button class="absolute top-7 right-24 px-4 py-1 rounded z-40 text-[1.7rem] font-SpaceGrotesk text-customWhite font-bold border border-customWhite hover:text-gray hover:bg-customWhite"
+		on:click={() => {
+			saveMenu = !saveMenu;
+		}}>
+	Save
   </button>
   <div class="">
-    <Addbutton showDelete={selectedNode === null} onCLickAdd={handleOnCLickAdd} onClickDelete={handleOnClickDelete}/>
+	<Addbutton showDelete={selectedNode === null} onCLickAdd={handleOnCLickAdd} onClickDelete={handleOnClickDelete}/>
   </div>
   <div
-    class={`${modifyService ? "flex" : "hidden"} flex-col bg-gray rounded-[20px] absolute w-[60%] h-[80%] top-[60%] left-[50%] -translate-x-[50%] -translate-y-[55%] z-[21] p-10`}>
-    <div class="flex w-full justify-between items-center">
-      <div class="text-[3.125rem] font-medium text-customWhite">
-        {nodeRegister?.type}
-      </div>
-      <button on:click={() => {
-                modifyService = false;
-            }}>
-        <Close className="w-8 h-8" color="#F3F3F3"/>
-      </button>
-    </div>
-    <div class="flex flex-wrap">
-      {#if Object.entries(services).length !== 0}
-        {#each services[nodeRegister.type.toLowerCase()] as service}
-          <button on:click={() => {
-                    modifyService = false;
-                    advancedModify = true
-                    nodeRegister.service = service;
-                    nodeRegister.title = service;
-                    updateNodes();
-                  }} class="text-customWhite">
-            {service}
-          </button>
-        {/each}
-      {/if}
-    </div>
+	class={`${modifyService ? "flex" : "hidden"} flex-col bg-gray rounded-[20px] absolute w-[60%] h-[80%] top-[60%] left-[50%] -translate-x-[50%] -translate-y-[55%] z-[21] p-10`}>
+	<div class="flex w-full justify-between items-center">
+		<div class="text-[3.125rem] font-medium text-customWhite">
+			{nodeRegister?.type}
+		</div>
+		<button on:click={() => {
+					modifyService = false;
+				}}>
+			<Close className="w-8 h-8" color="#F3F3F3"/>
+		</button>
+	</div>
+	<div class="flex flex-wrap">
+		{#if Object.entries(services).length !== 0}
+			{#each services[nodeRegister.type.toLowerCase()] as service}
+				<button on:click={() => {
+							modifyService = false;
+							advancedModify = true
+							nodeRegister.service = service;
+							nodeRegister.title = service;
+							updateNodes();
+						}} class="text-customWhite">
+					{service}
+				</button>
+			{/each}
+		{/if}
+	</div>
   </div>
   {#if (advancedModify)}
-    <div class="fixed top-26 right-0 w-[30%] h-screen z-[100] bg-gray px-6 py-2">
-      <button class="absolute" on:click={() => {
-                    advancedModify = false;
-                }}>
-        <Close className="w-6 h-6" color="#F3F3F3"/>
-      </button>
-      <h1
-        class="text-[2.1rem] font-SpaceGrotesk text-customWhite font-semibold w-full text-center">{nodeRegister.service}</h1>
-      <div>
-        <Select options={subServices["data"].map((subService) => subService["name"])}
-                value={subServices["data"].find((subService) => nodeRegister.subServiceId === subService["id"])?.name}
-                placeholder="Choisissez une action à éxecuter" on:change={(value) => {
-                  nodeRegister.subService = value.detail
-                  nodeRegister.subServiceId = subServices["data"].find((subService) => subService["name"] === value.detail)?.id
-                }}/>
-      </div>
-      <div>
-        {#if nodeRegister?.inputsData}
-          {#each nodeRegister.inputsData as inputData}
-            <InputData bind:inputD={inputData}/>
-          {/each}
-        {/if}
-      </div>
-    </div>
+	<div class="fixed top-26 right-0 w-[30%] h-screen z-[100] bg-gray px-6 py-2">
+		<button class="absolute"
+			on:click={() => {
+				advancedModify = false;
+			}}>
+			<Close className="w-6 h-6" color="#F3F3F3"/>
+		</button>
+		<h1 class="text-[2.2rem] font-SpaceGrotesk text-customWhite font-semibold w-full text-center">
+			{nodeRegister.service}
+		</h1>
+		<div class="pt-14 h-[80%]">
+			<div class="flex flex-col gap-16 justify-between h-full">
+				<div class="flex flex-col gap-6">
+					<div class="flex flex-col gap-6">
+						<h1 class="text-[2.2rem] font-SpaceGrotesk text-customWhite font-semibold">
+							Application
+						</h1>
+						<div class={`${nodeRegister.service && ConnectedServices[nodeRegister.type][nodeRegister.service] ? "flex" : "hidden"} font-SpaceGrotesk w-full bg-customWhite/[10%] font-medium text-[1.75rem] p-4 align-middle items-center justify-between rounded-[0.63rem]`}>
+							<h1 class="text-customWhite">{nodeRegister.service}</h1>
+							<button class="bg-primary rounded-lg p-1 px-2">
+								<p class="text-gray">modifier</p>
+							</button>
+						</div>
+					</div>
+					<div>
+						<h1 class="text-[2.2rem] font-SpaceGrotesk text-customWhite font-semibold">
+							{nodeRegister.type}
+						</h1>
+						<div class="">
+							<Select options={subServices["data"].map((subService) => subService["name"])}
+								value={subServices["data"].find((subService) => nodeRegister.subServiceId === subService["id"])?.name}
+								placeholder="Choisissez une action à éxecuter"
+								onChange={(value) => {
+									nodeRegister.subService = value
+									nodeRegister.subServiceId = subServices["data"].find((subService) => subService["name"] === value)?.id
+								}}/>
+							<div>
+								{#if nodeRegister?.inputsData}
+									{#each nodeRegister.inputsData as inputData}
+										<InputData bind:inputD={inputData}/>
+									{/each}
+								{/if}
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="">
+					<div class={`${nodeRegister.service && ConnectedServices[nodeRegister.type][nodeRegister.service] ? "flex" : "hidden"} gap-6 font-SpaceGrotesk w-full bg-customWhite/[10%] font-medium text-[1.75rem] p-4 align-middle items-center justify-center rounded-[0.63rem]`}>
+						<h1 class="text-customWhite">Connecté</h1>
+						<Validate className="w-8 h-8" color="#D9C6F4"/>
+					</div>
+					<button class={`${nodeRegister.service && ConnectedServices[nodeRegister.type][nodeRegister.service] ? "hidden" : "flex"} gap-6 font-SpaceGrotesk w-full bg-customWhite/[10%] font-medium text-[1.75rem] p-4 align-middle items-center justify-center rounded-[0.63rem]`} on:click={() => {
+						if (nodeRegister?.service) {
+							getOauthLink(getCookie("token"), nodeRegister.service).then((res) => {
+								const popup = window.open(res["url"], "popup", "width=600,height=600 popup=true");
+								const interval = setInterval(() => {
+									try {
+										if (popup?.window?.location.href) {
+											popup?.close();
+											clearInterval(interval);
+										}
+									} catch {
+										return;
+									}
+								}, 1000);
+							});
+						}
+					}}>
+						<h1 class="text-customWhite">Se connecter</h1>
+						<Profile className="w-8 h-8" color="#F3F3F3"/>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
   {/if}
   {#if (modifyMenu)}
-    <div style="transform: translate(
-            {nodeRegister.currPosition.x}px, 
-            {nodeRegister.currPosition.y}px)"
-         class={`rounded-[20px] cursor-pointer flex flex-col ${nodeRegister.type === "Action" ? "bg-gray text-customWhite" : "bg-primary text-gray"} box-border absolute left-[430px] -top-[8px] z-[20] w-[14rem] font-SpaceGrotesk p-5 gap-2`}>
-      <div class="flex w-full justify-between align-middle items-center">
-        <button on:click={handleModifyNode} class="text-[1.4rem] font-medium flex justify-between w-full">
-          Modifier
-          <Modify className="w-7 h-7" color={nodeRegister.type === "Action" ? "#F3F3F3" : "#373637"}/>
-        </button>
-      </div>
-      <div class="flex w-full justify-between align-middle items-center font-medium">
-        <button on:click={handleOnClickDelete} class="text-[1.4rem] flex justify-between w-full">
-          Supprimer
-          <Close className="w-6 h-6" color={nodeRegister.type === "Action" ? "#F3F3F3" : "#373637"}/>
-        </button>
-      </div>
-    </div>
+	<div style="transform: translate(
+			{nodeRegister.currPosition.x}px,
+			{nodeRegister.currPosition.y}px)"
+		 class={`rounded-[20px] cursor-pointer flex flex-col ${nodeRegister.type === "Action" ? "bg-gray text-customWhite" : "bg-primary text-gray"} box-border absolute left-[430px] -top-[8px] z-[20] w-[14rem] font-SpaceGrotesk p-5 gap-2`}>
+	  <div class="flex w-full justify-between align-middle items-center">
+		<button on:click={handleModifyNode} class="text-[1.4rem] font-medium flex justify-between w-full">
+		  Modifier
+		  <Modify className="w-7 h-7" color={nodeRegister.type === "Action" ? "#F3F3F3" : "#373637"}/>
+		</button>
+	  </div>
+	  <div class="flex w-full justify-between align-middle items-center font-medium">
+		<button on:click={handleOnClickDelete} class="text-[1.4rem] flex justify-between w-full">
+		  Supprimer
+		  <Close className="w-6 h-6" color={nodeRegister.type === "Action" ? "#F3F3F3" : "#373637"}/>
+		</button>
+	  </div>
+	</div>
   {/if}
   <div id="boardWrapper" class="fixed w-screen h-screen top-0 left-0 overflow-scroll">
-    <div class={`${grabbingBoard ? "boardDragging" : "board"}`} role="presentation" id="board"
-         on:mousedown={(e) => {handleMouseDown(e)}}
-         on:mouseup={(e) => {handleMouseUp(e)}}
-         on:mousemove={(e) => {handleMouseMove(e)}}>
-      {#each nodes as node}
-        <NodeComponent
-          id={node.id}
-          type={node.type}
-          pos={node.currPosition}
-          numberOfInputs={node.numberInputs}
-          numberOfOutputs={node.numberOutputs}
-          selected={node.id === selectedNode}
-          bind:modify={modifyMenu}
-          title={node.title}
-          img={node.img}
-          onMouseDownNode={handleOnMouseDownNode}
-          onMouseDownOutput={handleOnMouseDownOutput}
-          onMouseEnterInput={handleOnMouseEnterInput}
-          onMouseLeaveInput={handleOnMouseLeaveInput}/>
-      {/each}
-      {#if (newEdge)}
-        <EdgeComponent
-          selected={false}
-          isNew={true}
-          position={{
-                        x0: newEdge.currStartPos.x,
-                        y0: newEdge.currStartPos.y,
-                        x1: newEdge.currEndPos.x,
-                        y1: newEdge.currEndPos.y
-                    }}
-          onMouseDownEdge={() => {}}
-          onClickDeleteEdge={() => {}}/>
-      {/if}
-      {#each edges as edge}
-        <EdgeComponent
-          selected={selectedEdge === edge.id}
-          isNew={false}
-          position={{
-                        x0: edge.currStartPos.x,
-                        y0: edge.currStartPos.y,
-                        x1: edge.currEndPos.x,
-                        y1: edge.currEndPos.y
-                    }}
-          onMouseDownEdge={() => {handleOnMouseDownEdge(edge.id)}}
-          onClickDeleteEdge={() => {HandleOnDeleteEdge(edge.id)}}/>
-      {/each}
-    </div>
+	<div class={`${grabbingBoard ? "boardDragging" : "board"}`} role="presentation" id="board"
+			on:mousedown={(e) => {handleMouseDown(e)}}
+			on:mouseup={(e) => {handleMouseUp(e)}}
+			on:mousemove={(e) => {handleMouseMove(e)}}>
+	  {#each nodes as node}
+		<NodeComponent
+			id={node.id}
+			type={node.type}
+			pos={node.currPosition}
+			numberOfInputs={node.numberInputs}
+			numberOfOutputs={node.numberOutputs}
+			selected={node.id === selectedNode}
+			bind:modify={modifyMenu}
+			title={node.title}
+			img={node.img}
+			onMouseDownNode={handleOnMouseDownNode}
+			onMouseDownOutput={handleOnMouseDownOutput}
+			onMouseEnterInput={handleOnMouseEnterInput}
+			onMouseLeaveInput={handleOnMouseLeaveInput}/>
+	  {/each}
+	  {#if (newEdge)}
+		<EdgeComponent
+		  selected={false}
+		  isNew={true}
+		  position={{
+						x0: newEdge.currStartPos.x,
+						y0: newEdge.currStartPos.y,
+						x1: newEdge.currEndPos.x,
+						y1: newEdge.currEndPos.y
+					}}
+		  onMouseDownEdge={() => {}}
+		  onClickDeleteEdge={() => {}}/>
+	  {/if}
+	  {#each edges as edge}
+		<EdgeComponent
+		  selected={selectedEdge === edge.id}
+		  isNew={false}
+		  position={{
+						x0: edge.currStartPos.x,
+						y0: edge.currStartPos.y,
+						x1: edge.currEndPos.x,
+						y1: edge.currEndPos.y
+					}}
+		  onMouseDownEdge={() => {handleOnMouseDownEdge(edge.id)}}
+		  onClickDeleteEdge={() => {HandleOnDeleteEdge(edge.id)}}/>
+	  {/each}
+	</div>
   </div>
 </div>
 
 
 <!-- 
 for (let i = 0; i < services.length; i++) {
-    const service = services[i];
-    const randomX = Math.random() * (window.innerWidth - 300) + 300;
-    const randomY = Math.random() * (window.innerHeight - 300) + 300;
+	const service = services[i];
+	const randomX = Math.random() * (window.innerWidth - 300) + 300;
+	const randomY = Math.random() * (window.innerHeight - 300) + 300;
 
-    let nodePrev: {x: number, y: number} = {x: randomX, y: randomY};
-    let nodeCurr: {x: number, y: number} = {x: randomX, y: randomY};
-    let inputs: String[] = [];
-    let outputs: String[] = [];
+	let nodePrev: {x: number, y: number} = {x: randomX, y: randomY};
+	let nodeCurr: {x: number, y: number} = {x: randomX, y: randomY};
+	let inputs: String[] = [];
+	let outputs: String[] = [];
 
-    nodes = [
-        ...nodes,
-        {
-            id: `node_${Math.random().toString(36).substring(7)}`,
-            prevPosition: nodePrev,
-            currPosition: nodeCurr,
-            numberInputs: service.inputs.length,
-            numberOutputs: service.outputs.length,
-            type: "Service",
-            inputEdgeIds: inputs,
-            outputEdgeIds: outputs,
-            title: service.name,
-            img: "test",
-        }
-    ];
+	nodes = [
+		...nodes,
+		{
+			id: `node_${Math.random().toString(36).substring(7)}`,
+			prevPosition: nodePrev,
+			currPosition: nodeCurr,
+			numberInputs: service.inputs.length,
+			numberOutputs: service.outputs.length,
+			type: "Service",
+			inputEdgeIds: inputs,
+			outputEdgeIds: outputs,
+			title: service.name,
+			img: "test",
+		}
+	];
 } -->

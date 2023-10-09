@@ -25,7 +25,7 @@ type Props = {
 const TabItem: React.FC<{icon: any, label: string, focused: boolean}> = ({icon, label, focused}) => {
     const Styles = useThemedStyles(styles);
     const Theme = useTheme();
-    return (
+return (
         focused ? 
         <View style={Styles.itemFocused}>
             <View style={Styles.boxFocused}>

@@ -10,10 +10,38 @@ from src.models.User import UserMe
 from src.services import services
 from src.utils.Database import Base, get_db
 
-from pprint import pprint
+
+class FluxGraph(Base):
+    """Flux Graph Model"""
+    __tablename__ = "flux_graph"
+    id = Column(Integer, primary_key=True, index=True)
+    flux_id = Column(Integer, ForeignKey("flux.id"))
+    prev_data = Column(PickleType, nullable=True)
+    config = Column(PickleType)
+    service_id = Column(String)
+    action_ids = Column(PickleType)
+    prev_flux_graph_ids = Column(PickleType, nullable=True)
+    next_flux_graph_ids = Column(PickleType, nullable=True)
+
+    flux = relationship("Flux", back_populates="flux_graph")
+
+    def delete_all(self, db: Session = next(get_db())) -> None:
+        """
+        Delete all
+        :param db: Session of database
+        :return: None
+        """
+        db.query(FluxGraph).filter(FluxGraph.flux_id == self.flux_id).delete()
+        db.commit()
+
+    def __repr__(self):
+        return f"\n<FluxGraph(\n\tid={self.id},\n\tflux_id={self.flux_id},\n\tprev_data={self.prev_data},\n\tconfig={self.config},\n\t" \
+                f"service_id={self.service_id},\n\taction_ids={self.action_ids},\n\tprev_flux_graph_ids={self.prev_flux_graph_ids},\n\t" \
+                f"next_flux_graph_ids={self.next_flux_graph_ids}\n)> "
 
 
 class Flux(Base):
+    """Flux Model"""
     __tablename__ = "flux"
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
@@ -24,6 +52,7 @@ class Flux(Base):
 
     user_id = Column(Integer, ForeignKey("users.id"))
 
+    flux_graph = relationship("FluxGraph", back_populates="flux")
     user = relationship("User", back_populates="flux")
 
     class Exception:
@@ -99,6 +128,7 @@ class FluxCreateOrModify(BaseModel):
 
 
 class FluxSend(BaseModel):
+    """Flux Send Model"""
     id: int
 
 
@@ -200,7 +230,7 @@ def check_flux(CreateFlux: FluxCreateOrModify) -> List[FluxError]:
             Errors.append(
                 FluxError(id="node_service_not_found", relatedNodeIds=[node.id], error="Le noeud a un service érroné"))
             continue
-        if node.numberInputs != "" and splitted_sub_service_id[1] == "action":
+        if (node.numberInputs != "" and node.numberInputs != "0") and splitted_sub_service_id[1] == "action":
             Errors.append(FluxError(id="node_service_action_with_inputs", relatedNodeIds=[node.id],
                                     error="Un noeud action ne peut pas avoir d'entrée"))
         if node.outputEdgeIds == [] and splitted_sub_service_id[1] == "action":
@@ -252,6 +282,74 @@ def check_flux(CreateFlux: FluxCreateOrModify) -> List[FluxError]:
     return Errors
 
 
+def recreate_flux_graph(flux: Flux, db: Session):
+    """
+    Recreate flux graph
+    :param flux: Flux
+    :param db: Session of database
+    :return: Flux graph
+    """
+    db.query(FluxGraph).filter(FluxGraph.flux_id == flux.id).delete()
+    db.commit()
+    nodes = {}
+    actions = {}
+    for node in flux.frontEndData["nodes"]:
+        splitted_sub_service_id = node.subServiceId.split("_")
+        if splitted_sub_service_id[1] == "action":
+            interface = services[splitted_sub_service_id[0]]().get_interface()[ServiceType.action][node.subServiceId]
+            sub_flux = FluxGraph(
+                flux_id=flux.id,
+                prev_data={
+                    key: interface.prev_data[key]() for key in interface.prev_data
+                },
+                config={
+                    inputData.id: inputData.value for inputData in node.inputsData
+                },
+                service_id=node.subServiceId,
+                action_ids=[],
+                prev_flux_graph_ids=None,
+                next_flux_graph_ids=[],
+            )
+            db.add(sub_flux)
+            nodes[node.id] = sub_flux
+            actions[node.id] = sub_flux
+        else:
+            sub_flux = FluxGraph(
+                flux_id=flux.id,
+                prev_data=None,
+                config={
+                    inputData.id: inputData.value for inputData in node.inputsData
+                },
+                service_id=node.subServiceId,
+                action_ids=[],
+                prev_flux_graph_ids=[],
+                next_flux_graph_ids=[],
+            )
+            db.add(sub_flux)
+            nodes[node.id] = sub_flux
+    db.commit()
+    actions_ids = [action.id for action in actions.values()]
+    for action in nodes.values():
+        action.action_ids = actions_ids
+    db.commit()
+    nodes_prev = {node.id: [] for node in flux.frontEndData["nodes"]}
+    nodes_next = {node.id: [] for node in flux.frontEndData["nodes"]}
+    for node in flux.frontEndData["nodes"]:
+        for edge in flux.frontEndData["edges"]:
+            if edge.nodeStartId == node.id and nodes[edge.nodeEndId].id not in nodes[node.id].next_flux_graph_ids:
+                nodes_next[node.id] += [nodes[edge.nodeEndId].id]
+            if edge.nodeEndId == node.id and nodes[edge.nodeStartId].id not in nodes[node.id].prev_flux_graph_ids:
+                nodes_prev[node.id] += [nodes[edge.nodeStartId].id]
+    for node in flux.frontEndData["nodes"]:
+        nodes[node.id].prev_flux_graph_ids = nodes_prev[node.id]
+        nodes[node.id].next_flux_graph_ids = nodes_next[node.id]
+    db.commit()
+    data = db.query(FluxGraph).filter(FluxGraph.flux_id == flux.id).all()
+    print(data)
+
+
+
+
 def get_flux_by_id(fluxId: int, User: UserMe, db: Session):
     """
     Get flux by id
@@ -266,7 +364,8 @@ def get_flux_by_id(fluxId: int, User: UserMe, db: Session):
     return flux
 
 
-def create_or_modify_flux(FluxCorM: FluxCreateOrModify, User: UserMe, db: Session):
+def create_or_modify_flux(FluxCorM: FluxCreateOrModify, User: UserMe, db: Session, active: bool = False,
+                          checked: bool = False) -> Flux:
     """
     Create or modify flux
     :param FluxCorM: Flux
@@ -274,21 +373,29 @@ def create_or_modify_flux(FluxCorM: FluxCreateOrModify, User: UserMe, db: Sessio
     :param db: Session of database
     :return: Flux
     """
+    flux = None
     if FluxCorM.id is not None:
-        flux = get_flux_by_id(FluxCorM.id, User, db)
+        try:
+            flux = get_flux_by_id(FluxCorM.id, User, db)
+        except Flux.Exception.NotFoundException as e:
+            pass
+    if flux is not None:
         flux.name = FluxCorM.name
         flux.description = FluxCorM.description
         flux.frontEndData = {
             "nodes": list(FluxCorM.nodes),
             "edges": list(FluxCorM.edges)
         }
-        flux.checked = False
+        flux.checked = checked
+        flux.active = active
         db.commit()
         db.refresh(flux)
         return flux
     flux = Flux(
         name=FluxCorM.name,
         description=FluxCorM.description,
+        active=active,
+        checked=checked,
         frontEndData={
             "nodes": list(FluxCorM.nodes),
             "edges": list(FluxCorM.edges)
