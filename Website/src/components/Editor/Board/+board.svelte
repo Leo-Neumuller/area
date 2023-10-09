@@ -400,7 +400,7 @@
             if ($page.url.searchParams.get("FluxId")) {
               data["id"] = Number($page.url.searchParams.get("FluxId"));
             }
-            createFlux(getCookie("token"), data).then((res) => {
+            createFlux(getCookie("token"), data, true).then((res) => {
               console.log(res);
               $page.url.searchParams.set("FluxId", res["id"]);
               goto(`?${$page.url.searchParams.toString()}`);

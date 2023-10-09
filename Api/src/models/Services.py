@@ -108,6 +108,7 @@ class ServiceMetadata(BaseModel):
     description: str
     type: ServiceType
     function: Callable | None = None
+    prev_data: dict | None = None
     inputsData: List[inputData] = []
     outputsData: List[outputData] = []
 

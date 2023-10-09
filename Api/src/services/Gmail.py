@@ -194,6 +194,7 @@ class Gmail(BaseService):
         name="New email from email",
         description="New email from email",
         type=ServiceType.action,
+        prev_data={"time": lambda x: datetime.now().timestamp()},
         inputsData=[
             inputData(
                 id="email",
@@ -205,7 +206,7 @@ class Gmail(BaseService):
         ],
         outputsData=output_mail
     ))
-    def new_email_from_email(self, prevData: dict, data: dict) -> Tuple[dict, List[dict]]:
+    def new_email_from_email(self, prevData: dict, data: dict) -> Tuple[dict, dict]:
         """
         [Action] New email from email
         :param prevData: Previous data
@@ -220,17 +221,18 @@ class Gmail(BaseService):
             email_data = service.users().messages().list(userId="me",
                                                          q=f"from:{data['email']} after:{prev_time_fetch}").execute()
             if email_data["resultSizeEstimate"] == 0:
-                return next_data, {"signal": False, data: []}
+                return next_data, {"signal": False, "data": []}
             self.parse_messages(email_data, return_datas, service)
         except Exception as e:
             warn(str(e))
-            return next_data, {"signal": False, data: []}
-        return next_data, {"signal": True, data: return_datas}
+            return next_data, {"signal": False, "data": []}
+        return next_data, {"signal": True, "data": return_datas}
 
     @add_metadata(ServiceMetadata(
         name="New email with subject",
         description="New email with subject",
         type=ServiceType.action,
+        prev_data={"time": lambda x: datetime.now().timestamp()},
         inputsData=[
             inputData(
                 id="subject",
@@ -257,10 +259,10 @@ class Gmail(BaseService):
             email_data = service.users().messages().list(userId="me",
                                                          q=f"subject:{data['subject']} after:{prev_time_fetch}").execute()
             if email_data["resultSizeEstimate"] == 0:
-                return next_data, {"signal": False, data: []}
+                return next_data, {"signal": False, "data": []}
             self.parse_messages(email_data, return_datas, service)
         except Exception as e:
             warn(str(e))
-            return next_data, {"signal": False, data: []}
-        return next_data, {"signal": True, data: return_datas}
+            return next_data, {"signal": False, "data": []}
+        return next_data, {"signal": True, "data": return_datas}
 
