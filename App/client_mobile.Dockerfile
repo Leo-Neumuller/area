@@ -38,6 +38,6 @@ RUN npm install
 
 RUN npx eas secret:create --scope project --name EXPO_PUBLIC_API_URL --value ${EXPO_PUBLIC_API_URL} --type string --force
 
-RUN npx eas build -p android --profile preview --local --non-interactive
+RUN npx eas build -p android --profile preview --non-interactive
 
 RUN npx eas build:view | grep Artifact | awk '{system("wget " $2)}'
