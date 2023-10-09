@@ -32,6 +32,6 @@ services:
         - EXPO_PUBLIC_API_URL=http://${EXTERNAL_IP}:8080
     volumes:
       - api:/usr/src/api
-    command: /bin/bash -c " mv *.apk build.apk && cp /app/App/client.apk /usr/src/api/"
+    command: /bin/bash -c " mv *.apk client.apk; cp /app/App/client.apk /usr/src/api/"
 volumes:
   api:

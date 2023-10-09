@@ -36,6 +36,10 @@ WORKDIR App
 
 RUN npm install
 
+RUN rm *.apk
+
+RUN ./setup-eas.sh
+
 RUN npx eas secret:create --scope project --name EXPO_PUBLIC_API_URL --value ${EXPO_PUBLIC_API_URL} --type string --force
 
 RUN npx eas build -p android --profile preview --non-interactive
