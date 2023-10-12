@@ -1,5 +1,7 @@
 from pydantic_settings import BaseSettings
 
+from src.utils.Helper import inDocMode
+
 
 class Settings(BaseSettings):
     APP_NAME: str
@@ -13,4 +15,4 @@ class Settings(BaseSettings):
     REDIRECT_URI: str
 
     class Config:
-        env_file = ".env"
+        env_file = ".env" if not inDocMode() else "../.env"

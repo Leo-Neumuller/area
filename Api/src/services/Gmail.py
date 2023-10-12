@@ -106,14 +106,17 @@ class Gmail(BaseService):
         db.commit()
 
     @staticmethod
-    def create_email(data: dict, service: googleapiclient.discovery.Resource):
+    def create_email(data: dict, service: googleapiclient.discovery.Resource) -> str:
         """
         create email
         :param data: Dict of data with keys: content, to, subject
         :param service: Service
-        :return: None
+        :return: str encoded in base64
         """
-        email = service.users().getProfile(userId="me").execute()["emailAddress"]
+        if service is not None:
+            email = service.users().getProfile(userId="me").execute()["emailAddress"]
+        else:
+            email = "me"
         message = EmailMessage()
         message.set_content(data["content"])
         message["Subject"] = data["subject"]

@@ -5,5 +5,4 @@ area_test.db
 area_test.db-journal
 htmlcov
 secrets/*.json
-doc/openapi.json
 env

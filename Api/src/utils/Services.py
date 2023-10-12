@@ -71,8 +71,7 @@ class Google:
             flow.fetch_token(code=code)
         except Exception as e:
             raise Service.Exception.InvalidGrant(str(e))
-        credentials = flow.credentials
-        return Google.credentials_to_dict(credentials)
+        return Google.credentials_to_dict(credentials=flow.credentials)
 
     @staticmethod
     def get_service(service: str, User: UserMe, db: Session, version: str) -> googleapiclient.discovery.Resource:
@@ -85,7 +84,10 @@ class Google:
         :return: Service
         """
         refresh = db.query(Service).filter(Service.name == service,
-                                           Service.user_id == User.id).first().refresh
+                                           Service.user_id == User.id).first()
+        if refresh is None:
+            raise Service.Exception.InvalidService("Service not found or not authorized")
+        refresh = refresh.refresh
         if not refresh:
             db.query(Service).filter(Service.name == service, Service.user_id == User.id).delete()
             db.commit()
