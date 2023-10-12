@@ -39,7 +39,7 @@ class Google:
         :return: Authorization url
         """
         flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
-            os.path.join('secrets', f'{service}.json'),
+            os.path.join('secrets', f'Google.json'),
             scopes=scopes
         )
         flow.redirect_uri = f'{Env.REDIRECT_URI}/services/{service}/authorize'
@@ -62,7 +62,7 @@ class Google:
         :return: Credentials in dict
         """
         flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
-            os.path.join('secrets', f'{service}.json'),
+            os.path.join('secrets', f'Google.json'),
             scopes=scopes,
             state=state,
         )

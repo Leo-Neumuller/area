@@ -71,8 +71,7 @@ async def client(request: Request):
     Client
     :return: Client
     """
-    print(os.getcwd())
-    if os.path.isfile("client.apk"):
+    if os.path.exists("client.apk"):
         return FileResponse("client.apk")
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found")

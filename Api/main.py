@@ -11,7 +11,6 @@ from src.routers import routers
 
 import json
 
-import src.cron
 
 env = Environment.Settings()
 
@@ -53,13 +52,4 @@ async def root():  # pragma: no cover
 for router in routers.values():
     app.include_router(router)
 
-import atexit
-from src.cron.Flux import execute_flux
-from apscheduler.schedulers.background import BackgroundScheduler
-
-scheduler = BackgroundScheduler()
-scheduler.add_job(func=execute_flux, trigger="interval", seconds=60)
-execute_flux()
-scheduler.start()
-
-atexit.register(lambda: scheduler.shutdown())
+import src.cron
