@@ -85,6 +85,7 @@ class DataConfigurationType(Enum):
     textMultiline = "textMultiline"
     select = "select"
     checkbox = "checkbox"
+    date = "date"
 
 
 class inputData(BaseModel):

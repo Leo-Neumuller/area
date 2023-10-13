@@ -160,7 +160,7 @@ class Gmail(BaseService):
         """
         [Reaction] Create draft
         :param data: Dict of data with keys: content, to, subject
-        :return: None
+        :return: dict of signal
         """
         service = Google.get_service(self.service_name, self.User, self.db, self.version)
         try:
