@@ -12,16 +12,15 @@ jobs:
     timeout-minutes: 20
     runs-on: ubuntu-latest
     env:
-      APP_NAME: "${{ env.APP_NAME }}"
-      APP_VERSION: "${{ env.APP_VERSION }}"
+      APP_NAME: ${{ env.APP_NAME }}
+      APP_VERSION: ${{ env.APP_VERSION }}
       JWT_ALGORITHM: "HS256"
       JWT_EXPIRE_DAYS: 1
       JWT_EXPIRE_SECONDS: 3600
-      REDIRECT_URI: "${{ env.REDIRECT_URI }}"
+      REDIRECT_URI: ${{ env.REDIRECT_URI }}
       SQL_TEST_URL: "sqlite:///./area_test.db"
-      SQL_URL: "${{ env.SQL_URL }}"
-      JWT_SECRET: "${{ secrets.JWT_SECRET }}"
-    environment: Api
+      SQL_URL: ${{ env.SQL_URL }}
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
     defaults:
       run:
         working-directory: ./Api
