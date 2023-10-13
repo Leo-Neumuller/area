@@ -21,6 +21,9 @@ jobs:
 
       - name: Setup Python
         run: ./install.sh
+
+      - name: Setup Google service
+        run: echo ${{ secrets.GOOGLE_SERVICE }} > ./secrets/Gooogle.json && cat ./secrets/Gooogle.json
       
       - name: Test api
         run: ./run.sh tests
