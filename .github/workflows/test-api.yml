@@ -22,17 +22,17 @@ jobs:
         run: ./install.sh
 
       - name: Setup Google service
-        run: echo "${{ secrets.GOOGLE_SERVICE }}" > ./secrets/Gooogle.json && cat ./secrets/Gooogle.json
+        run: echo "${{ secrets.GOOGLE_SERVICE }}" > ./secrets/Google.json
       
       - name: Test api
         run: ./run.sh tests
         env:
           APP_NAME: ${{ vars.APP_NAME }}
           APP_VERSION: ${{ vars.APP_VERSION }}
-          JWT_ALGORITHM: "HS256"
-          JWT_EXPIRE_DAYS: 1
-          JWT_EXPIRE_SECONDS: 3600
+          JWT_ALGORITHM: ${{ vars.JWT_ALGORITHM }}
+          JWT_EXPIRE_DAYS: ${{ vars.JWT_EXPIRE_DAYS }}
+          JWT_EXPIRE_SECONDS: ${{ vars.JWT_EXPIRE_SECONDS }}
           REDIRECT_URI: ${{ vars.REDIRECT_URI }}
-          SQL_TEST_URL: "sqlite:///./area_test.db"
+          SQL_TEST_URL: ${{ vars.SQL_TEST_URL }}
           SQL_URL: ${{ vars.SQL_URL }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
