@@ -13,7 +13,7 @@ if inTestMode():
         env.SQL_TEST_URL,
         connect_args={"check_same_thread": False}
     )
-else:  # pragma: no cover
+else: # pragma: no cover
     engine = create_engine(
         env.SQL_URL,
         connect_args={"check_same_thread": False}
@@ -23,7 +23,7 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
 
-def get_db() -> SessionLocal:  # pragma: no cover
+def get_db() -> SessionLocal:
     """
     Get database session
     :return: Database session

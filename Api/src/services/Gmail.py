@@ -113,10 +113,7 @@ class Gmail(BaseService):
         :param service: Service
         :return: str encoded in base64
         """
-        if service is not None:
-            email = service.users().getProfile(userId="me").execute()["emailAddress"]
-        else:
-            email = "me"
+        email = service.users().getProfile(userId="me").execute()["emailAddress"]
         message = EmailMessage()
         message.set_content(data["content"])
         message["Subject"] = data["subject"]
@@ -138,7 +135,7 @@ class Gmail(BaseService):
                 "To": "",
                 "Date": "",
             })
-            email_data["Date"] = datetime.strptime(email_data["Date"], "%a, %d %b %Y %H:%M:%S %z")
+            email_data["Date"] = datetime.strptime(email_data["Date"], '%a, %d %b %Y %H:%M:%S %z')
             email_data["Content"] = ""
             if "parts" not in email_content.keys():
                 return_datas.append(email_data)

@@ -34,7 +34,7 @@ app.env = env
 
 
 @app.on_event("startup")
-async def startup_event():  # pragma: no cover
+async def startup_event():
     print("Starting up with Env")
     for key, value in app.env.model_dump().items():
         print(f"{key}: " + "*" * (len(str(value))))
@@ -46,12 +46,12 @@ async def startup_event():  # pragma: no cover
 
 
 @app.get("/")
-async def root():  # pragma: no cover
+async def root():
     return {"name": app.env.APP_NAME, "version": app.env.APP_VERSION}
 
 
 for router in routers.values():
     app.include_router(router)
 
-if not inTestMode():
+if not inTestMode(): # pragma: no cover
     import src.cron

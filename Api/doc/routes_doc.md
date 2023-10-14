@@ -1752,6 +1752,7 @@ DataConfigurationType
 |DataConfigurationType|textMultiline|
 |DataConfigurationType|select|
 |DataConfigurationType|checkbox|
+|DataConfigurationType|date|
 
 <h2 id="tocS_FluxBasicData">FluxBasicData</h2>
 <!-- backwards compatibility -->

@@ -24,7 +24,7 @@ def warn(message: str):
     :param message: Message
     :return: None
     """
-    if not inTestMode():  # pragma: no cover
+    if not inTestMode():
         warnings.warn(message)
 
 

@@ -38,7 +38,7 @@ async def createUser(UserCreate: UserCreate, db: Session = Depends(get_db), resp
         raise HTTPException(status_code=e.code, detail=e.message)
     try:
         jwt = create_jwt_from_user(createUser)
-    except JWTException as e:  # pragma: no cover
+    except JWTException as e:
         warn(str(e))
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Issue when creating authorization token")
     response.headers["Authorization"] = jwt
@@ -66,7 +66,7 @@ async def loginUser(UserLogin: UserLogin, db: Session = Depends(get_db), respons
         raise HTTPException(status_code=e.code, detail=e.message)
     try:
         jwt = create_jwt_from_user(loginUser)
-    except JWTException as e:  # pragma: no cover
+    except JWTException as e:
         warn(str(e))
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Erreur lors de la création du token")
     response.headers["Authorization"] = jwt
