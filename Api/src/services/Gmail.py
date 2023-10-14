@@ -1,5 +1,5 @@
 import base64
-from datetime import datetime
+from datetime import datetime, timezone
 from email.message import EmailMessage
 from typing import List, Dict, Callable, Tuple
 from pprint import pprint
@@ -197,7 +197,7 @@ class Gmail(BaseService):
         name="New email from email",
         description="New email from email",
         type=ServiceType.action,
-        prev_data={"time": lambda: datetime.now().timestamp()},
+        prev_data={"time": lambda: datetime.now().astimezone(timezone.utc).timestamp()},
         inputsData=[
             inputData(
                 id="email",
@@ -217,15 +217,15 @@ class Gmail(BaseService):
         :return: None
         """
         service = Google.get_service(self.service_name, self.User, self.db, self.version)
-        prev_time_fetch = prev_data["time"]
+        prev_time_fetch = datetime.fromtimestamp(prev_data["time"]).astimezone(timezone.utc)
         return_datas = []
         try:
             email_data = service.users().messages().list(userId="me",
-                                                         q=f"from:{data['email']} after:{prev_time_fetch}").execute()
+                                                         q=f"from:{data['email']} after:{prev_time_fetch.timestamp()}").execute()
             if email_data["resultSizeEstimate"] == 0:
                 return prev_data, {"signal": False, "data": []}
             self.parse_messages(email_data, return_datas, service)
-            next_after = max([i["Date"] for i in return_datas]).timestamp()
+            next_after = max([i["Date"] for i in return_datas]).astimezone(timezone.utc).timestamp()
             next_data = {"time": next_after}
         except Exception as e:
             warn(str(e))
@@ -236,7 +236,7 @@ class Gmail(BaseService):
         name="New email with subject",
         description="New email with subject",
         type=ServiceType.action,
-        prev_data={"time": lambda: datetime.now().timestamp()},
+        prev_data={"time": lambda: datetime.now().astimezone(timezone.utc).timestamp()},
         inputsData=[
             inputData(
                 id="subject",
@@ -256,15 +256,15 @@ class Gmail(BaseService):
         :return: None
         """
         service = Google.get_service(self.service_name, self.User, self.db, self.version)
-        prev_time_fetch = prev_data["time"]
+        prev_time_fetch = datetime.fromtimestamp(prev_data["time"]).astimezone(timezone.utc)
         return_datas = []
         try:
             email_data = service.users().messages().list(userId="me",
-                                                         q=f"subject:{data['subject']} after:{prev_time_fetch}").execute()
+                                                         q=f"subject:{data['subject']} after:{prev_time_fetch.timestamp()}").execute()
             if email_data["resultSizeEstimate"] == 0:
                 return prev_data, {"signal": False, "data": []}
             self.parse_messages(email_data, return_datas, service)
-            next_after = max([i["Date"] for i in return_datas]).timestamp()
+            next_after = max([i["Date"] for i in return_datas]).astimezone(timezone.utc).timestamp()
             next_data = {"time": next_after}
         except Exception as e:
             warn(str(e))
