@@ -10,6 +10,14 @@ def inTestMode():
     return "unittest" in sys.modules.keys()
 
 
+def inDocMode():
+    """
+    Check if in doc mode
+    :return: True if in doc mode
+    """
+    return "sphinx" in sys.modules.keys()
+
+
 def warn(message: str):
     """
     Warn message if not in test mode
@@ -26,6 +34,3 @@ def DefaultErrorResponse() -> dict:
     :return: Error response
     """
     return {"content": {"application/json": {"example": {"detail": "string"}}}}
-
-
-

@@ -1,5 +1,5 @@
 import base64
-from datetime import datetime
+from datetime import datetime, timezone
 from email.message import EmailMessage
 from typing import List, Dict, Callable, Tuple
 from pprint import pprint
@@ -106,14 +106,17 @@ class Gmail(BaseService):
         db.commit()
 
     @staticmethod
-    def create_email(data: dict, service: googleapiclient.discovery.Resource):
+    def create_email(data: dict, service: googleapiclient.discovery.Resource) -> str:
         """
         create email
         :param data: Dict of data with keys: content, to, subject
         :param service: Service
-        :return: None
+        :return: str encoded in base64
         """
-        email = service.users().getProfile(userId="me").execute()["emailAddress"]
+        if service is not None:
+            email = service.users().getProfile(userId="me").execute()["emailAddress"]
+        else:
+            email = "me"
         message = EmailMessage()
         message.set_content(data["content"])
         message["Subject"] = data["subject"]
@@ -157,7 +160,7 @@ class Gmail(BaseService):
         """
         [Reaction] Create draft
         :param data: Dict of data with keys: content, to, subject
-        :return: None
+        :return: dict of signal
         """
         service = Google.get_service(self.service_name, self.User, self.db, self.version)
         try:
@@ -194,7 +197,7 @@ class Gmail(BaseService):
         name="New email from email",
         description="New email from email",
         type=ServiceType.action,
-        prev_data={"time": lambda x: datetime.now().timestamp()},
+        prev_data={"time": lambda: datetime.now().astimezone(timezone.utc).timestamp()},
         inputsData=[
             inputData(
                 id="email",
@@ -206,33 +209,34 @@ class Gmail(BaseService):
         ],
         outputsData=output_mail
     ))
-    def new_email_from_email(self, prevData: dict, data: dict) -> Tuple[dict, dict]:
+    def new_email_from_email(self, prev_data: dict, data: dict) -> Tuple[dict, dict]:
         """
         [Action] New email from email
-        :param prevData: Previous data
+        :param prev_data: Previous data
         :param data: Dict of data with keys: email
         :return: None
         """
         service = Google.get_service(self.service_name, self.User, self.db, self.version)
-        prev_time_fetch = prevData["time"]
+        prev_time_fetch = datetime.fromtimestamp(prev_data["time"]).astimezone(timezone.utc)
         return_datas = []
-        next_data = {"time": datetime.now().timestamp()}
         try:
             email_data = service.users().messages().list(userId="me",
-                                                         q=f"from:{data['email']} after:{prev_time_fetch}").execute()
+                                                         q=f"from:{data['email']} after:{prev_time_fetch.timestamp()}").execute()
             if email_data["resultSizeEstimate"] == 0:
-                return next_data, {"signal": False, "data": []}
+                return prev_data, {"signal": False, "data": []}
             self.parse_messages(email_data, return_datas, service)
+            next_after = max([i["Date"] for i in return_datas]).astimezone(timezone.utc).timestamp()
+            next_data = {"time": next_after}
         except Exception as e:
             warn(str(e))
-            return next_data, {"signal": False, "data": []}
+            return prev_data, {"signal": False, "data": []}
         return next_data, {"signal": True, "data": return_datas}
 
     @add_metadata(ServiceMetadata(
         name="New email with subject",
         description="New email with subject",
         type=ServiceType.action,
-        prev_data={"time": lambda x: datetime.now().timestamp()},
+        prev_data={"time": lambda: datetime.now().astimezone(timezone.utc).timestamp()},
         inputsData=[
             inputData(
                 id="subject",
@@ -244,25 +248,25 @@ class Gmail(BaseService):
         ],
         outputsData=output_mail
     ))
-    def new_email_with_subject(self, prevData: dict, data: dict) -> Tuple[dict, List[dict]]:
+    def new_email_with_subject(self, prev_data: dict, data: dict) -> Tuple[dict, List[dict]]:
         """
         [Action] New email with subject
-        :param prevData: Previous data
+        :param prev_data: Previous data
         :param data: Dict of data with keys: subject
         :return: None
         """
         service = Google.get_service(self.service_name, self.User, self.db, self.version)
-        prev_time_fetch = prevData["time"]
+        prev_time_fetch = datetime.fromtimestamp(prev_data["time"]).astimezone(timezone.utc)
         return_datas = []
-        next_data = {"time": datetime.now().timestamp()}
         try:
             email_data = service.users().messages().list(userId="me",
-                                                         q=f"subject:{data['subject']} after:{prev_time_fetch}").execute()
+                                                         q=f"subject:{data['subject']} after:{prev_time_fetch.timestamp()}").execute()
             if email_data["resultSizeEstimate"] == 0:
-                return next_data, {"signal": False, "data": []}
+                return prev_data, {"signal": False, "data": []}
             self.parse_messages(email_data, return_datas, service)
+            next_after = max([i["Date"] for i in return_datas]).astimezone(timezone.utc).timestamp()
+            next_data = {"time": next_after}
         except Exception as e:
             warn(str(e))
-            return next_data, {"signal": False, "data": []}
+            return prev_data, {"signal": False, "data": []}
         return next_data, {"signal": True, "data": return_datas}
-

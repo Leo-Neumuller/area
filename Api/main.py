@@ -11,7 +11,7 @@ from src.routers import routers
 
 import json
 
-import src.cron
+from src.utils.Helper import inTestMode
 
 env = Environment.Settings()
 
@@ -52,3 +52,6 @@ async def root():  # pragma: no cover
 
 for router in routers.values():
     app.include_router(router)
+
+if not inTestMode():
+    import src.cron

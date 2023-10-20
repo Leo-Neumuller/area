@@ -10,6 +10,7 @@
         "textMultiline": "text",
         "select": "select",
         "checkbox": "checkbox",
+        "date" : "datetime-local"
     }
 
     const changeInput = {
@@ -18,15 +19,17 @@
         "textMultiline": (e: any) => inputD.value = e.target.value,
         "select": (e: any) => inputD.value = e.target.value,
         "checkbox": (e: any) => inputD.value = e.target.checked,
+        "date": (e: any) => inputD.value = new Date(e.target.value).toString()
     }
 
     const classInput = {
-      //Basic css créé par github copilot pour montrée le fonctionement
-      "text": "p-2 border-2 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full",
+        //Basic css créé par github copilot pour montrée le fonctionement
+        "text": "p-2 border-2 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full",
         "number": "p-2 border-2 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full",
         "textMultiline": "p-2 border-2 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full resize-none scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200",
         "select": "p-2 border-2 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full",
         "checkbox": "p-2 border-2 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full",
+        "date": "p-2 border-2 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full"
     }
 
     const type = {type: typeInput[inputD.inputType]}

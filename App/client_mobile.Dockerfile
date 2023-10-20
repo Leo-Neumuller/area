@@ -2,6 +2,8 @@ FROM node:20-buster
 
 ARG EXPO_TOKEN
 ENV EXPO_TOKEN $EXPO_TOKEN
+ARG EXPO_PUBLIC_API_URL
+ENV EXPO_PUBLIC_API_URL $EXPO_PUBLIC_API_URL
 
 WORKDIR /app
 
@@ -34,4 +36,10 @@ WORKDIR App
 
 RUN npm install
 
-RUN npx eas build -p android --profile preview --local --non-interactive
+RUN ./setup-eas.sh
+
+RUN npx eas secret:create --scope project --name EXPO_PUBLIC_API_URL --value ${EXPO_PUBLIC_API_URL} --type string --force
+
+RUN npx eas build -p android --profile preview --non-interactive
+
+RUN npx eas build:view | grep Artifact | awk '{system("wget " $2)}'

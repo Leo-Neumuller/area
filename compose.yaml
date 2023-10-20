@@ -19,7 +19,7 @@ services:
     ports:
       - '8080:8000'
     volumes:
-      - api:/usr/src/api
+      - apk:/apk/
     env_file:
       - .env
     hostname: api
@@ -31,7 +31,7 @@ services:
         - EXPO_TOKEN=${EXPO_TOKEN}
         - EXPO_PUBLIC_API_URL=http://${EXTERNAL_IP}:8080
     volumes:
-      - api:/usr/src/api
-    command: /bin/bash -c " mv *.apk build.apk && cp /app/App/build.apk /usr/src/api/"
+      - apk:/apk/
+    command: /bin/bash -c " mv /app/App/*.apk /app/App/client.apk; cp /app/App/client.apk /apk/"
 volumes:
-  api:
+  apk:
