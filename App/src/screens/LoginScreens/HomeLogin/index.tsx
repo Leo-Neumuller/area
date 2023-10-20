@@ -4,7 +4,6 @@ import {
     View,
     SafeAreaView,
 } from "react-native";
-import {StatusBar} from "expo-status-bar";
 import useThemedStyles from "../../../hooks/Theme/useThemedStyle";
 import ButtonCompenents from "../../../components/ButtonLogin"
 import useTheme from "../../../hooks/Theme/useTheme";
@@ -21,7 +20,7 @@ export default function HomeLogin({navigation}) {
     return (
         <SafeAreaView style={{height: "100%",
         backgroundColor: Theme.colors.White}}>
-            <StatusBar style="auto"/>
+            {/* <StatusBar style="auto"/> */}
             <View style={{
                 height: "65%",
                 justifyContent: "space-evenly",

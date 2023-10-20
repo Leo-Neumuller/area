@@ -56,14 +56,14 @@ export const Flux: React.FC<Props> = ({navigation}) => {
                     </Text>
                 </View>
             </View>
-            {userFluxs.map((value, index) => {
+            {/* {userFluxs.map((value, index) => {
                 return (
                     <FluxOverview key={index}
                                   desc={value.description}
                                   name={value.name}
                     />
                 )
-            })}
+            })} */}
         </ScrollView>
     )
 }

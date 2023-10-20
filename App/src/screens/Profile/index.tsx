@@ -5,7 +5,7 @@ import HomeLogin from "../LoginScreens/HomeLogin"
 import useThemedStyles from "../../hooks/Theme/useThemedStyle";
 import useTheme from "../../hooks/Theme/useTheme";
 import ButtonComponents from "../../components/ButtonLogin";
-import * as SecureStore from "expo-secure-store";
+// import * as SecureStore from "expo-secure-store";
 import {loadUserData, servicesGet} from "../../api/api";
 import {createOnShouldStartLoadWithRequest} from "react-native-webview/lib/WebViewShared";
 import {RFValue} from "react-native-responsive-fontsize";
@@ -24,7 +24,7 @@ type Props = {
 export const Profile: React.FC<Props> = ({navigation}) => {
     const Styles = useThemedStyles(styles);
     const Theme = useTheme();
-    const token = SecureStore.getItemAsync("userToken");
+    // const token = EncryptedStorage.getItem("userToken");
     const [userData, setUserData] = useState({
         email: "",
         name: "",
@@ -164,7 +164,7 @@ export const Profile: React.FC<Props> = ({navigation}) => {
                             text={"SE DECONNECTER"}
                             textColor={Theme.colors.Black}
                             onPress={() => {
-                                SecureStore.setItemAsync("userToken", "");
+                                // EncryptedStorage.setItem("userToken", "");
                                 navigation.reset(
                                     {
                                         index: 0,

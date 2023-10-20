@@ -1,12 +1,9 @@
 
-
-
-import * as SecureStore from 'expo-secure-store';
-
-
+import EncryptedStorage from 'react-native-encrypted-storage';
 
 export async function signupPost (data: {[key: string] : string}) {
-    const res = await fetch(process.env.EXPO_PUBLIC_API_URL +  "/user/signup", {
+    console.log("data", data);
+    const res = await fetch(process.env.API_URL +  "/user/signup", {
         method: "POST",
         body: JSON.stringify(data),
         headers: {
@@ -23,7 +20,8 @@ export async function signupPost (data: {[key: string] : string}) {
 }
 
 export async function loginPost (data: {[key: string] : string}) {
-    const res = await fetch(process.env.EXPO_PUBLIC_API_URL + "/user/login", {
+    console.log(process.env.API_URL)
+    const res = await fetch(process.env.API_URL + "/user/login", {
         method: "POST",
         body: JSON.stringify(data),
         headers: {
@@ -40,8 +38,8 @@ export async function loginPost (data: {[key: string] : string}) {
 }
 
 export async function loadUserData() {
-    const token = await SecureStore.getItemAsync("userToken");
-    const res = await fetch(process.env.EXPO_PUBLIC_API_URL + "/user/me", {
+    const token = await EncryptedStorage.getItem("userToken");
+    const res = await fetch(process.env.API_URL + "/user/me", {
         method: "GET",
         headers: {
             "accept": "application/json",
@@ -56,7 +54,7 @@ export async function loadUserData() {
 }
 
 export async function servicesGet (token: string) {
-    const res = await fetch(process.env.EXPO_PUBLIC_API_URL + "/services/services", {
+    const res = await fetch(process.env.API_URL + "/services/services", {
         method: "GET",
         headers: {
             "accept" : "application/json",
@@ -72,7 +70,7 @@ export async function servicesGet (token: string) {
 }
 
 export async function servicesAREAGet (token: string, area: string, service: string) {
-    const res = await fetch(process.env.EXPO_PUBLIC_API_URL + "/services/" + service + "/" + area, {
+    const res = await fetch(process.env.API_URL + "/services/" + service + "/" + area, {
         method: "GET",
         headers: {
             "accept" : "application/json",
@@ -88,7 +86,7 @@ export async function servicesAREAGet (token: string, area: string, service: str
 }
 
 export async function serviceSchemaGet (token: string, serviceId: string) {
-    const res = await fetch(process.env.EXPO_PUBLIC_API_URL + "/services/metadata/" + serviceId, {
+    const res = await fetch(process.env.API_URL + "/services/metadata/" + serviceId, {
         method: "GET",
         headers: {
             "accept" : "application/json",
@@ -104,7 +102,7 @@ export async function serviceSchemaGet (token: string, serviceId: string) {
 }
 
 export async function authorizeUrlGet (token: string, serviceId: string) {
-    const res = await fetch(process.env.EXPO_PUBLIC_API_URL + "/services/" + serviceId + "/authorize_url", {
+    const res = await fetch(process.env.API_URL + "/services/" + serviceId + "/authorize_url", {
         method: "GET",
         headers: {
             "accept" : "application/json",
@@ -120,8 +118,8 @@ export async function authorizeUrlGet (token: string, serviceId: string) {
 }
 
 export async function fluxGet() {
-    const token = await SecureStore.getItemAsync("userToken");
-    const res = await fetch(process.env.EXPO_PUBLIC_API_URL + "/flux/fluxs", {
+    const token = await EncryptedStorage.getItem("userToken");
+    const res = await fetch(process.env.API_URL + "/flux/fluxs", {
         method: "GET",
         headers: {
             "accept" : "application/json",
