@@ -14,6 +14,7 @@
     import { getCookie } from "../../api/helpers";
     import { onMount } from "svelte";
     import DashboardPage from "../../components/DashboardPage/+DashboardPage.svelte";
+    import AllFluxPage from "../../components/AllFluxPage/+AllFluxPage.svelte";
 
     let selected: number = 0;
     let toggleMenu: boolean = true;
@@ -80,8 +81,8 @@
             <DashboardPage/>
         </div>
     {:else if selected === 1}
-        <div>
-            
+        <div class={`w-full ${toggleMenu ? "pl-[24rem]" : ""}`}>
+            <AllFluxPage/>
         </div>
     {:else if selected === 2}
         <div>

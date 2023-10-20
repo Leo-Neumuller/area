@@ -5,18 +5,11 @@
     import FluxRow from "../FluxRow/+FluxRow.svelte";
     import Input from "../Input/+input.svelte";
     import Instagram from "../SVGs/+Instagram.svelte";
-    
-    let flux: {
-        id: number;
-        name: string;
-        description: string;
-        active: boolean;
-    };
+
 
     async function getFLux() {
         const res = await getAllFlux(getCookie("token"));
         console.log(res)
-        flux = res;
         return res;
     }
 </script>
