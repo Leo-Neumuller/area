@@ -15,34 +15,35 @@ import {ThemeTypeContext} from "../../../constants/Theme";
 import {AREAComponent} from "../AREAComponent";
 import React, {useEffect} from "react";
 import {authorizeUrlGet, servicesAREAGet, serviceSchemaGet, servicesGet} from "../../../api/api";
-import * as SecureStore from "expo-secure-store";
+// import * as SecureStore from "expo-secure-store";
 import {IAREAComponent} from "../../../interfaces/IAREAComponent";
 import {IAREAServices} from "../../../interfaces/IAREAServices";
 import {Picker} from "@react-native-picker/picker";
 import {IServiceSchema} from "../../../interfaces/IServiceSchema";
 import ButtonComponents from "../../ButtonLogin";
+import EncryptedStorage from "react-native-encrypted-storage";
 
 type AREABottomSheetProps = {
     currentArea?: IAREAComponent,
 };
 
 async function getServices(): Promise<IService> {
-    const token = await SecureStore.getItemAsync("userToken");
+    const token = await EncryptedStorage.getItem("userToken");
     return await servicesGet(token as string);
 }
 
 async function getAREAServices(area: string, service: string): Promise<[IAREAServices]> {
-    const token = await SecureStore.getItemAsync("userToken");
+    const token = await EncryptedStorage.getItem("userToken");
     return await servicesAREAGet(token as string, area, service);
 }
 
 async function getServiceSchema(serviceId: string): Promise<IServiceSchema> {
-    const token = await SecureStore.getItemAsync("userToken");
+    const token = await EncryptedStorage.getItem("userToken");
     return await serviceSchemaGet(token as string, serviceId);
 }
 
 async function getAuthorizeUrlFromApi(serviceId: string): Promise<{ url: string }> {
-    const token = await SecureStore.getItemAsync("userToken");
+    const token = await EncryptedStorage.getItem("userToken");
     return await authorizeUrlGet(token as string, serviceId);
 }
 

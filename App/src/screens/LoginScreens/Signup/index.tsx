@@ -10,21 +10,20 @@ import {
     ScrollView, TouchableOpacity
 } from "react-native";
 import React, {useState} from "react";
-import {StatusBar} from "expo-status-bar";
+// import {StatusBar} from "expo-status-bar";
 import useThemedStyles from "../../../hooks/Theme/useThemedStyle";
 import ButtonCompenents from "../../../components/ButtonLogin"
 import useTheme from "../../../hooks/Theme/useTheme";
-import {BlurView} from 'expo-blur';
 import absoluteFill = StyleSheet.absoluteFill;
 import {RFValue} from "react-native-responsive-fontsize";
 import {get} from "react-native/Libraries/TurboModule/TurboModuleRegistry";
-import * as SecureStore from 'expo-secure-store';
 
 import {signupPost} from "../../../api/api";
 
 
 import Login from "../Login";
 import {ThemeTypeContext} from "../../../constants/Theme";
+import EncryptedStorage from "react-native-encrypted-storage";
 
 export default function Signup({navigation}) {
     const Styles = useThemedStyles(styles);
@@ -47,7 +46,7 @@ export default function Signup({navigation}) {
                 height: Dimensions.get("window").height * 0.97,
                 width: "100%"
             }}>
-                <StatusBar style="auto"/>
+                {/* <StatusBar style="auto"/> */}
                 <View style={{
                     height: "20%",
                 }}>
@@ -196,7 +195,7 @@ export default function Signup({navigation}) {
                                         textColor={Theme.colors.Black}
                                         onPress={() => {
                                             signupPost(data).then((res) => {
-                                                SecureStore.setItemAsync('userToken', res.access_token).then(() =>
+                                                EncryptedStorage.setItem('userToken', res.access_token).then(() =>
                                                 navigation.push("BottomBar"))
                                             }).catch((err) => {
                                                 setError(err.toString());

@@ -6,16 +6,16 @@ import {
     TextInput,
     ScrollView, TouchableOpacity
 } from "react-native";
-import {StatusBar} from "expo-status-bar";
+// import {StatusBar} from "expo-status-bar";
 import useThemedStyles from "../../../hooks/Theme/useThemedStyle";
 import ButtonCompenents from "../../../components/ButtonLogin"
 import useTheme from "../../../hooks/Theme/useTheme";
 import {RFValue} from "react-native-responsive-fontsize";
 import React, {useState} from "react";
-import * as SecureStore from "expo-secure-store";
 
 import {loginPost} from "../../../api/api";
 import {ThemeTypeContext} from "../../../constants/Theme";
+import EncryptedStorage from "react-native-encrypted-storage";
 
 
 export default function Login({navigation}) {
@@ -37,7 +37,7 @@ export default function Login({navigation}) {
                 height: Dimensions.get("window").height,
                 backgroundColor: Theme.colors.White
             }}>
-                <StatusBar style="auto"/>
+                {/* <StatusBar style="auto"/> */}
                 <View style={{
                     height: "30%",
                     justifyContent: "space-evenly",
@@ -139,7 +139,7 @@ export default function Login({navigation}) {
                                     textColor={Theme.colors.Black}
                                     onPress={() => {
                                         loginPost(data).then((res) => {
-                                            SecureStore.setItemAsync('userToken', res["access_token"]).then(() =>
+                                            EncryptedStorage.setItem('userToken', res["access_token"]).then(() =>
                                                 navigation.push("BottomBar"))
                                         }).catch((err) => {
                                             setError(err.toString());
