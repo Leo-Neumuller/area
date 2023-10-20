@@ -13,6 +13,7 @@
     import ProfilePage from "../../components/ProfilePage/+ProfilePage.svelte";
     import { getCookie } from "../../api/helpers";
     import { onMount } from "svelte";
+    import DashboardPage from "../../components/DashboardPage/+DashboardPage.svelte";
 
     let selected: number = 0;
     let toggleMenu: boolean = true;
@@ -31,7 +32,7 @@
 </svelte:head>
 
 <section class="flex items-center w-full">
-    <button class="absolute top-10 left-10 z-50" on:click={() => {
+    <button class="fixed top-10 left-10 z-50" on:click={() => {
         toggleMenu = !toggleMenu;
     }}>
         {#if toggleMenu}
@@ -75,8 +76,8 @@
         </div>
     {/if}
     {#if selected === 0}
-        <div>
-            
+        <div class={`w-full ${toggleMenu ? "pl-[24rem]" : ""}`}>
+            <DashboardPage/>
         </div>
     {:else if selected === 1}
         <div>
@@ -88,7 +89,7 @@
         </div>
     {:else if selected === 3}
         <div>
-                
+            
         </div>
     {:else if selected === 4}
         <div class={`w-full ${toggleMenu ? "pl-[24rem]" : ""}`}>

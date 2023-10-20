@@ -230,7 +230,7 @@ def check_flux(CreateFlux: FluxCreateOrModify) -> List[FluxError]:
             Errors.append(
                 FluxError(id="node_service_not_found", relatedNodeIds=[node.id], error="Le noeud a un service érroné"))
             continue
-        if (node.numberInputs != "" and node.numberInputs != "0") and splitted_sub_service_id[1] == "action":
+        if (node.numberInputs != "" and node.numberInputs != "0" and node.numberInputs != 0) and splitted_sub_service_id[1] == "action":
             Errors.append(FluxError(id="node_service_action_with_inputs", relatedNodeIds=[node.id],
                                     error="Un noeud action ne peut pas avoir d'entrée"))
         if node.outputEdgeIds == [] and splitted_sub_service_id[1] == "action":

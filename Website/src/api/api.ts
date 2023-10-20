@@ -98,6 +98,7 @@ interface CreateFlux {
 }
 
 export async function createFlux(cookie: string, flux: CreateFlux, verify: boolean = false) {
+    console.log(flux)
     const res = await fetch(import.meta.env.VITE_API_URL + `/flux?verify=${verify}`, {
         method: 'POST',
         body: JSON.stringify(flux),
@@ -166,6 +167,22 @@ export async function getFlux(cookie: string, fluxId: any) {
 
 export async function userMe(cookie: string) {
     const res = await fetch(import.meta.env.VITE_API_URL + `/user/me`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'access-token': cookie
+        }
+    })
+    if (res.status !== 200) {
+        let err = await res.json();
+
+        throw new Error(err.detail);
+    }
+    return res.json();
+}
+
+export async function getAllFlux(cookie: string) {
+    const res = await fetch(import.meta.env.VITE_API_URL + `/flux/fluxs`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',

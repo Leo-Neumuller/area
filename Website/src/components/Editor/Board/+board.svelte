@@ -385,7 +385,7 @@
 						ConnectedServices = {
 							...ConnectedServices,
 							'Action' : {
-								...ConnectedServices['action'],
+								...ConnectedServices['Action'],
 								[action]: res["is_connected"],
 							}
 						};
@@ -396,7 +396,7 @@
 						ConnectedServices = {
 							...ConnectedServices,
 							'Reaction' : {
-								...ConnectedServices['reaction'],
+								...ConnectedServices['Reaction'],
 								[reaction]: res["is_connected"],
 							}
 						};
@@ -484,7 +484,7 @@
 			<Close className="w-8 h-8" color="#F3F3F3"/>
 		</button>
 	</div>
-	<div class="flex flex-wrap">
+	<div class="flex flex-wrap gap-4">
 		{#if Object.entries(services).length !== 0}
 			{#each services[nodeRegister.type.toLowerCase()] as service}
 				<button on:click={() => {
@@ -493,7 +493,7 @@
 							nodeRegister.service = service;
 							nodeRegister.title = service;
 							updateNodes();
-						}} class="text-customWhite">
+						}} class="text-customWhite bg-customWhite/10 p-4 rounded-xl text-[1.7rem] font-SpaceGrotesk">
 					{service}
 				</button>
 			{/each}
@@ -518,9 +518,12 @@
 						<h1 class="text-[2.2rem] font-SpaceGrotesk text-customWhite font-semibold">
 							Application
 						</h1>
-						<div class={`${nodeRegister.service && ConnectedServices[nodeRegister.type][nodeRegister.service] ? "flex" : "hidden"} font-SpaceGrotesk w-full bg-customWhite/[10%] font-medium text-[1.75rem] p-4 align-middle items-center justify-between rounded-[0.63rem]`}>
+						<div class={`${nodeRegister.service && ConnectedServices[nodeRegister.type][nodeRegister.service] ? "flex" : "flex"} font-SpaceGrotesk w-full bg-customWhite/[10%] font-medium text-[1.75rem] p-4 align-middle items-center justify-between rounded-[0.63rem]`}>
 							<h1 class="text-customWhite">{nodeRegister.service}</h1>
-							<button class="bg-primary rounded-lg p-1 px-2">
+							<button class="bg-primary rounded-lg p-1 px-2" on:click={() => {
+								advancedModify = false;
+								modifyService = true;
+							}}>
 								<p class="text-gray">modifier</p>
 							</button>
 						</div>
@@ -553,8 +556,10 @@
 						<h1 class="text-customWhite">Connecté</h1>
 						<Validate className="w-8 h-8" color="#D9C6F4"/>
 					</div>
-					<button class={`${nodeRegister.service && ConnectedServices[nodeRegister.type][nodeRegister.service] ? "hidden" : "flex"} gap-6 font-SpaceGrotesk w-full bg-customWhite/[10%] font-medium text-[1.75rem] p-4 align-middle items-center justify-center rounded-[0.63rem]`} on:click={() => {
+					<button class={`${nodeRegister.service && ConnectedServices[nodeRegister.type][nodeRegister.service] ? "hidden" : "flex"} gap-6 font-SpaceGrotesk w-full bg-customWhite/[10%] font-medium text-[1.75rem] p-4 align-middle items-center justify-center rounded-[0.63rem]`}
+					on:click={() => {
 						if (nodeRegister?.service) {
+							console.log(ConnectedServices);
 							getOauthLink(getCookie("token"), nodeRegister.service).then((res) => {
 								const popup = window.open(res["url"], "popup", "width=600,height=600 popup=true");
 								const interval = setInterval(() => {
@@ -562,6 +567,13 @@
 										if (popup?.window?.location.href) {
 											popup?.close();
 											clearInterval(interval);
+											// ConnectedServices = {
+											// 	...ConnectedServices,
+											// 	[nodeRegister.type]: {
+											// 		...ConnectedServices[nodeRegister.type],
+											// 		[nodeRegister.service]: true,
+											// 	}
+											// };
 										}
 									} catch {
 										return;
