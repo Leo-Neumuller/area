@@ -9,14 +9,13 @@
 
     async function getFLux() {
         const res = await getAllFlux(getCookie("token"));
-        console.log(res)
         return res;
     }
 </script>
 
 <div class="pl-6 py-6">
     <div>
-        <h1 class="text-[3rem] font-SpaceGrotesk font-medium">
+        <h1 class="text-[3rem] font-SpaceGrotesk font-medium text-gray">
             Actifs
         </h1>
         <div class="flex gap-10 overflow-auto w-full pb-4 pt-10">
@@ -32,7 +31,7 @@
         </div>
     </div>
     <div class="pt-20 pr-6">
-        <h1 class="text-[3rem] font-SpaceGrotesk font-medium">
+        <h1 class="text-[3rem] font-SpaceGrotesk font-medium text-gray">
             Tous les flux
         </h1>
         <div class="bg-gray w-full rounded-3xl pb-6">

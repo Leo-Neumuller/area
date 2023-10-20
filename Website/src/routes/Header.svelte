@@ -15,7 +15,6 @@
         {/if}
         {#if $page.url.pathname === '/flux-editor'}
             <button on:click={() => {
-                console.log(document.cookie);
                 if (document.cookie.includes("token")) {
                     goto("/dashboard");
                 } else {

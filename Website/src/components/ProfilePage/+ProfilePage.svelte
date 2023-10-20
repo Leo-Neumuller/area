@@ -1,6 +1,6 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
-    import { userMe } from "../../api/api";
+    import { checkConnected, getServices, userMe } from "../../api/api";
     import { getCookie } from "../../api/helpers";
     import TextInput from "../TextInput/+TextInput.svelte";
 
@@ -8,28 +8,36 @@
         const res = await userMe(getCookie("token"));
         return res
     }
+
+	let ConnectedServices: { [key: string]: {[key: string] : boolean} } = {};
+
+    getServices(getCookie("token")).then((res) => {
+        console.log(res);   
+    })
 </script>
 
 <div class="p-6">
     {#await getUserMe()}
         <div>Loading...</div>
     {:then user}
-        <h1 class="text-[5.62rem] font-bold font-SpaceGrotesk text-gray">Bonjour {user.name}</h1>
-        <h1 class="text-[3.1rem] font-SpaceGrotesk font-medium text-gray pt-5">Informations</h1>
-        <div class="bg-gray rounded-3xl p-10 flex flex-wrap justify-between gap-2">
-            <div class="flex flex-col gap-2 font-SpaceGrotesk font-medium text-[1.8rem] text-customWhite">
+        <h1 class="text-[5.22rem] font-bold font-SpaceGrotesk text-gray">Bonjour {user.name}</h1>
+        <h1 class="text-[3rem] font-SpaceGrotesk font-medium text-gray">
+            Informations
+        </h1>
+        <div class="bg-gray rounded-3xl p-10 flex flex-wrap justify-between gap-2 mt-4">
+            <div class="flex flex-col gap-2 font-SpaceGrotesk font-medium text-[1.5rem] text-customWhite">
                 <h1 class="text-customWhite">Nom</h1>
                 <h1 class={`rounded-xl px-4 py-2 bg-customWhite/[10%] outline-none text-customWhite/20 w-[30rem]`}>
                     {user.name}
                 </h1>   
             </div>
-            <div class="flex flex-col gap-2 font-SpaceGrotesk font-medium text-[1.8rem] text-customWhite">
+            <div class="flex flex-col gap-2 font-SpaceGrotesk font-medium text-[1.5rem] text-customWhite">
                 <h1 class="text-customWhite">Prénom</h1>
                 <h1 class={`rounded-xl px-4 py-2 bg-customWhite/[10%] outline-none text-customWhite/20 w-[30rem]`}>
                     {user.surname}
                 </h1>   
             </div>
-            <div class="flex flex-col gap-2 font-SpaceGrotesk font-medium text-[1.8rem] text-customWhite">
+            <div class="flex flex-col gap-2 font-SpaceGrotesk font-medium text-[1.5rem] text-customWhite">
                 <h1 class="text-customWhite">Email</h1>
                 <h1 class={`rounded-xl px-4 py-2 bg-customWhite/[10%] outline-none text-customWhite/20 w-[30rem]`}>
                     {user.email}
@@ -46,4 +54,7 @@
             <h1 class="font-SpaceGrotesk font-medium text-[2.1rem] p-2 ">Déconnexion</h1>
         </button>
     </div>
+    <h1 class="text-[3rem] font-SpaceGrotesk font-medium text-gray mt-10">
+        Comptes connectés
+    </h1>
 </div>

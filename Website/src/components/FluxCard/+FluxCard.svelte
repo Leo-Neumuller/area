@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { goto } from "$app/navigation";
     import Instagram from "../SVGs/+Instagram.svelte";
     import RightArrow from "../SVGs/+RightArrow.svelte";
 
@@ -17,10 +18,13 @@
         <Instagram className="w-12 h-12" color="#000"/>
     </div>
     <h1 class="text-[1.7rem] font-normal font-SpaceGrotesk mx-4">{flux.description}</h1>
-    <div class="flex justify-between text-[1.5rem] font-normal font-SpaceGrotesk bg-gray/10 rounded-b-3xl px-3 py-3">
+    <button class="flex justify-between text-[1.5rem] font-normal font-SpaceGrotesk bg-gray/10 rounded-b-3xl px-3 py-3"
+        on:click={() => {
+            goto(`/flux-editor?FluxId=${flux.id}`);
+        }}>
         <h1>Caca + Prout</h1>
         <div class=" align-middle">
             <RightArrow className="w-10 h-10" color="#000"/>
         </div>
-    </div>
+    </button>
 </div>
