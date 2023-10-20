@@ -16,7 +16,7 @@
 	import InputData from "../InputData/+InputData.svelte"
 
 	import Validate from "../../SVGs/+Validate.svelte";
-	import Profile from "../../SVGs/Profile.svelte";
+	import Profile from "../../SVGs/+Profile.svelte";
   import TextInput from "../../TextInput/+TextInput.svelte";
 
 	let grabbingBoard: boolean = false;
@@ -80,7 +80,15 @@
 							return;
 						}
 					}
-					if (nodeStart.outputEdgeIds.includes(edgeId) || nodeEnd.inputEdgeIds.includes(edgeId)) {
+
+					console.log(nodes, edges, edgeId)
+					edges.forEach((edge) => {
+						if (edge.outputIndex === newEdge.outputIndex && edge.nodeEndId === nodeEnd.id) {
+							newEdge = null;
+							return;
+						}
+					})
+					if (nodeStart.outputEdgeIds.includes(edgeId) || nodeEnd.inputEdgeIds.includes(edgeId) || nodeStart.id === nodeEnd.id) {
 						newEdge = null;
 						return;
 					}
@@ -428,11 +436,11 @@
 				<Close className="w-4 h-4" color="#F3F3F3"/>
 			</button>
 		</div>
-		<TextInput label="Nom du flux" type="text" placeholder="Nom du flux" value={name}
+		<TextInput label="Nom du flux" type="text" placeholder="Nom du flux" value={name} deactivated={false}
 			onInput={(e) => {
 				name = e.target.value;
 			}}/>
-		<TextInput label="Description du flux" type="text" placeholder="Description du flux" value={descr}
+		<TextInput label="Description du flux" type="text" placeholder="Description du flux" value={descr} deactivated={false}
 			onInput={(e) => {
 				descr = e.target.value;
 			}}/>

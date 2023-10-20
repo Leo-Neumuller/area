@@ -163,3 +163,19 @@ export async function getFlux(cookie: string, fluxId: any) {
     }
     return res.json();
 }
+
+export async function userMe(cookie: string) {
+    const res = await fetch(import.meta.env.VITE_API_URL + `/user/me`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'access-token': cookie
+        }
+    })
+    if (res.status !== 200) {
+        let err = await res.json();
+
+        throw new Error(err.detail);
+    }
+    return res.json();
+}
