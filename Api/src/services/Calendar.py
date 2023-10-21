@@ -138,6 +138,7 @@ class Calendar(BaseService):
         name="New Created Event",
         description="New created event",
         type=ServiceType.action,
+        prev_data={"time": lambda: datetime.now().astimezone(timezone.utc).timestamp()},
         inputsData=[],
         outputsData=[
             outputData(
