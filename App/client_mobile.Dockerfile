@@ -93,6 +93,10 @@ COPY . .
 
 WORKDIR android
 
-RUN --mount=type=cache,target=~/.gradle/ API_URL=$API_URL ./gradlew bundleRelease
+RUN chmod +x ./gradlew
 
-RUN --mount=type=cache,target=~/.gradle/ API_URL=$API_URL ./gradlew assembleRelease
+RUN sed -i -e 's/\r$//' gradlew
+
+RUN API_URL=$API_URL ./gradlew bundleRelease
+
+RUN API_URL=$API_URL ./gradlew assembleRelease

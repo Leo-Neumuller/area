@@ -8,6 +8,8 @@ COPY requirements.txt .
 
 COPY install.sh .
 
+RUN sed -i -e 's/\r$//' install.sh
+
 RUN ./install.sh
 
 COPY . .
