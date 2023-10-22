@@ -11,6 +11,9 @@ export async function signupPost (data: {[key: string] : string}) {
             "Content-Type" : "application/json"
         }
     })
+    .catch((error) => {
+        throw new Error(error);
+    })
 
     if (res.status !== 201) {
         const error = await res.json();
@@ -20,7 +23,6 @@ export async function signupPost (data: {[key: string] : string}) {
 }
 
 export async function loginPost (data: {[key: string] : string}) {
-    console.log(process.env.API_URL)
     const res = await fetch(process.env.API_URL + "/user/login", {
         method: "POST",
         body: JSON.stringify(data),
@@ -28,6 +30,9 @@ export async function loginPost (data: {[key: string] : string}) {
             "accept" : "application/json",
             "Content-Type" : "application/json"
         }
+    })
+    .catch((error) => {
+        throw new Error(error);
     })
 
     if (res.status !== 200) {
@@ -46,6 +51,10 @@ export async function loadUserData() {
             "access-token": "" + token,
         }
     })
+    .catch((error) => {
+        throw new Error(error);
+    })
+
     if (res.status !== 200) {
         const error = await res.json();
         throw new Error(error.detail);
@@ -62,6 +71,10 @@ export async function servicesGet (token: string) {
             "access-token" : token,
         }
     })
+    .catch((error) => {
+        throw new Error(error);
+    })
+
     if (res.status !== 200) {
         const error = await res.json();
         throw new Error(error.detail);
@@ -78,6 +91,10 @@ export async function servicesAREAGet (token: string, area: string, service: str
             "access-token" : token,
         }
     })
+    .catch((error) => {
+        throw new Error(error);
+    })
+
     if (res.status !== 200) {
         const error = await res.json();
         throw new Error(error.detail);
@@ -94,6 +111,10 @@ export async function serviceSchemaGet (token: string, serviceId: string) {
             "access-token" : token,
         }
     })
+    .catch((error) => {
+        throw new Error(error);
+    })
+
     if (res.status !== 200) {
         const error = await res.json();
         throw new Error(error.detail);
@@ -110,6 +131,10 @@ export async function authorizeUrlGet (token: string, serviceId: string) {
             "access-token" : token,
         }
     })
+    .catch((error) => {
+        throw new Error(error);
+    })
+
     if (res.status !== 200) {
         const error = await res.json();
         throw new Error(error.detail);
@@ -126,6 +151,9 @@ export async function fluxGet() {
             "Content-Type" : "application/json",
             "access-token" : "" + token,
         }})
+        .catch((error) => {
+            throw new Error(error);
+        })
     if (res.status !== 200) {
         const error = await res.json();
         throw new Error(error.detail);

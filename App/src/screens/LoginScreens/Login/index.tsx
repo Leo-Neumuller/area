@@ -27,7 +27,7 @@ export default function Login({navigation}) {
         password: ""
     })
 
-    const [error, setError] = useState();
+    const [error, setError] = useState<string>();
 
 
 

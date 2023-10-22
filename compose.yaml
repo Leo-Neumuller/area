@@ -23,15 +23,16 @@ services:
     env_file:
       - .env
     hostname: api
+    depends_on:
+      - client_mobile
   client_mobile:
     build:
-      context: .
-      dockerfile: ./App/client_mobile.Dockerfile
+      context: ./App
+      dockerfile: client_mobile.Dockerfile
       args:
-        - EXPO_TOKEN=${EXPO_TOKEN}
-        - EXPO_PUBLIC_API_URL=http://${EXTERNAL_IP}:8080
+        - API_URL=http://${EXTERNAL_IP}:8080
     volumes:
       - apk:/apk/
-    command: /bin/bash -c " mv /app/App/*.apk /app/App/client.apk; cp /app/App/client.apk /apk/"
+    command: /bin/bash -c "rm /apk/*; cp /usr/src/app/android/app/build/outputs/apk/release/app-release.apk /apk/client.apk"
 volumes:
   apk:
