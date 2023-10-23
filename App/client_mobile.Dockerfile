@@ -80,6 +80,17 @@ RUN curl -sS https://dl.google.com/android/repository/${SDK_VERSION} -o /tmp/sdk
     && rm -rf ${ANDROID_HOME}/.android \
     && chmod 777 -R /opt/android
 
+# install gradle
+RUN curl -L https://services.gradle.org/distributions/gradle-8.0.1-all.zip -o gradle-8.0.1-all.zip
+RUN apt-get install -y unzip
+RUN unzip gradle-8.0.1-all.zip
+RUN echo 'export GRADLE_HOME=/gradle-8.0.1' >> $HOME/.bashrc
+RUN echo 'export PATH=$PATH:$GRADLE_HOME/bin' >> $HOME/.bashrc
+RUN /bin/bash -c "source $HOME/.bashrc"
+
+ENV GRADLE_HOME=/gradle-8.0.1
+ENV PATH=$PATH:$GRADLE_HOME/bin
+
 ARG API_URL
 ENV API_URL $API_URL
 
@@ -97,6 +108,6 @@ RUN chmod +x ./gradlew
 
 RUN sed -i -e 's/\r$//' gradlew
 
-RUN API_URL=$API_URL ./gradlew bundleRelease
+RUN API_URL=$API_URL gradle bundleRelease
 
-RUN API_URL=$API_URL ./gradlew assembleRelease
+RUN API_URL=$API_URL gradle assembleRelease
