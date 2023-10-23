@@ -19,7 +19,7 @@
         "textMultiline": (e: any) => inputD.value = e.target.value,
         "select": (e: any) => inputD.value = e.target.value,
         "checkbox": (e: any) => inputD.value = e.target.checked,
-        "date": (e: any) => inputD.value = new Date(e.target.value).toString()
+        "date": (e: any) => inputD.value = e.target.value,
     }
 
     const classInput = {

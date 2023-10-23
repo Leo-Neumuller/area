@@ -4,6 +4,7 @@ enum inputType {
     "textMultiline" = "textMultiline",
     "select" = "select",
     "checkbox" = "checkbox"
+    "date" = "date"
 }
 
 interface inputData {

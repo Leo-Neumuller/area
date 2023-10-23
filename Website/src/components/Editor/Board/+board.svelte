@@ -16,8 +16,9 @@
 	import InputData from "../InputData/+InputData.svelte"
 
 	import Validate from "../../SVGs/+Validate.svelte";
-	import Profile from "../../SVGs/Profile.svelte";
+	import Profile from "../../SVGs/+Profile.svelte";
   import TextInput from "../../TextInput/+TextInput.svelte";
+	import { browser } from '$app/environment';
 
 	let grabbingBoard: boolean = false;
 	let scale: number = 1;
@@ -80,7 +81,15 @@
 							return;
 						}
 					}
-					if (nodeStart.outputEdgeIds.includes(edgeId) || nodeEnd.inputEdgeIds.includes(edgeId)) {
+
+					console.log(nodes, edges, edgeId)
+					edges.forEach((edge) => {
+						if (edge.outputIndex === newEdge.outputIndex && edge.nodeEndId === nodeEnd.id) {
+							newEdge = null;
+							return;
+						}
+					})
+					if (nodeStart.outputEdgeIds.includes(edgeId) || nodeEnd.inputEdgeIds.includes(edgeId) || nodeStart.id === nodeEnd.id) {
 						newEdge = null;
 						return;
 					}
@@ -173,8 +182,8 @@
 
 
 	function handleOnCLickAdd(numberInputs: number, numberOutputs: number, type: string) {
-		const randomX = Math.random() * (window.innerWidth - 300) + 300;
-		const randomY = Math.random() * (window.innerHeight - 300) + 300;
+		const randomX = (window.innerWidth / 2) - 200;
+		const randomY = (window.innerHeight / 2);
 
 		let nodePrev: { x: number, y: number } = {x: randomX, y: randomY};
 		let nodeCurr: { x: number, y: number } = {x: randomX, y: randomY};
@@ -364,7 +373,33 @@
 			getFlux(getCookie("token"), $page.url.searchParams.get("FluxId")).then((res) => {
 				nodes = res["nodes"];
 				edges = res["edges"];
+				getServices(getCookie("token")).then((res) => {
+					services = res;
+					res["action"].forEach((action: any) => {
+						checkConnected(getCookie("token"), action).then((res) => {
+							ConnectedServices = {
+								...ConnectedServices,
+								'Action' : {
+									...ConnectedServices['Action'],
+									[action]: res["is_connected"],
+								}
+							};
+						})
+					})
+					res["reaction"].forEach((reaction: any) => {
+						checkConnected(getCookie("token"), reaction).then((res) => {
+							ConnectedServices = {
+								...ConnectedServices,
+								'Reaction' : {
+									...ConnectedServices['Reaction'],
+									[reaction]: res["is_connected"],
+								}
+							};
+						})
+					})
+				})
 			})
+
 		}
 	})
 
@@ -377,7 +412,7 @@
 						ConnectedServices = {
 							...ConnectedServices,
 							'Action' : {
-								...ConnectedServices['action'],
+								...ConnectedServices['Action'],
 								[action]: res["is_connected"],
 							}
 						};
@@ -388,7 +423,7 @@
 						ConnectedServices = {
 							...ConnectedServices,
 							'Reaction' : {
-								...ConnectedServices['reaction'],
+								...ConnectedServices['Reaction'],
 								[reaction]: res["is_connected"],
 							}
 						};
@@ -397,7 +432,7 @@
 			})
 		}
 
-		if (advancedModify && nodeRegister.service != null && ((nodeRegister.subService === undefined && nodeRegister.subServiceId === undefined) || subServices["nodeId"] !== nodeRegister.id)) {
+		if (advancedModify && nodeRegister.service != null && (subServices["nodeId"] !== nodeRegister.id)) {
 			getSubServices(getCookie("token"), nodeRegister.service, nodeRegister.type).then((res) => {
 				subServices = {
 					"data": res,
@@ -428,11 +463,11 @@
 				<Close className="w-4 h-4" color="#F3F3F3"/>
 			</button>
 		</div>
-		<TextInput label="Nom du flux" type="text" placeholder="Nom du flux" value={name}
+		<TextInput label="Nom du flux" type="text" placeholder="Nom du flux" value={name} deactivated={false}
 			onInput={(e) => {
 				name = e.target.value;
 			}}/>
-		<TextInput label="Description du flux" type="text" placeholder="Description du flux" value={descr}
+		<TextInput label="Description du flux" type="text" placeholder="Description du flux" value={descr} deactivated={false}
 			onInput={(e) => {
 				descr = e.target.value;
 			}}/>
@@ -450,6 +485,7 @@
 			createFlux(getCookie("token"), data, true).then((res) => {
 				$page.url.searchParams.set("FluxId", res["id"]);
 				goto(`?${$page.url.searchParams.toString()}`);
+				alert("Ouais mon gars")
 			})
 		}}>
 			Sauvergarder le flux
@@ -459,7 +495,7 @@
 		on:click={() => {
 			saveMenu = !saveMenu;
 		}}>
-	Save
+	Sauvegarder
   </button>
   <div class="">
 	<Addbutton showDelete={selectedNode === null} onCLickAdd={handleOnCLickAdd} onClickDelete={handleOnClickDelete}/>
@@ -476,8 +512,8 @@
 			<Close className="w-8 h-8" color="#F3F3F3"/>
 		</button>
 	</div>
-	<div class="flex flex-wrap">
-		{#if Object.entries(services).length !== 0}
+	<div class="flex flex-wrap gap-4">
+		{#if Object.entries(services).length !== 0 && nodeRegister != null}
 			{#each services[nodeRegister.type.toLowerCase()] as service}
 				<button on:click={() => {
 							modifyService = false;
@@ -485,7 +521,7 @@
 							nodeRegister.service = service;
 							nodeRegister.title = service;
 							updateNodes();
-						}} class="text-customWhite">
+						}} class="text-customWhite bg-customWhite/10 p-4 rounded-xl text-[1.7rem] font-SpaceGrotesk">
 					{service}
 				</button>
 			{/each}
@@ -503,16 +539,19 @@
 		<h1 class="text-[2.2rem] font-SpaceGrotesk text-customWhite font-semibold w-full text-center">
 			{nodeRegister.service}
 		</h1>
-		<div class="pt-14 h-[80%]">
+		<div class="pt-14 h-[80%] overflow-auto">
 			<div class="flex flex-col gap-16 justify-between h-full">
 				<div class="flex flex-col gap-6">
 					<div class="flex flex-col gap-6">
 						<h1 class="text-[2.2rem] font-SpaceGrotesk text-customWhite font-semibold">
 							Application
 						</h1>
-						<div class={`${nodeRegister.service && ConnectedServices[nodeRegister.type][nodeRegister.service] ? "flex" : "hidden"} font-SpaceGrotesk w-full bg-customWhite/[10%] font-medium text-[1.75rem] p-4 align-middle items-center justify-between rounded-[0.63rem]`}>
+						<div class={`flex font-SpaceGrotesk w-full bg-customWhite/[10%] font-medium text-[1.75rem] p-4 align-middle items-center justify-between rounded-[0.63rem]`}>
 							<h1 class="text-customWhite">{nodeRegister.service}</h1>
-							<button class="bg-primary rounded-lg p-1 px-2">
+							<button class="bg-primary rounded-lg p-1 px-2" on:click={() => {
+								advancedModify = false;
+								modifyService = true;
+							}}>
 								<p class="text-gray">modifier</p>
 							</button>
 						</div>
@@ -545,8 +584,10 @@
 						<h1 class="text-customWhite">Connecté</h1>
 						<Validate className="w-8 h-8" color="#D9C6F4"/>
 					</div>
-					<button class={`${nodeRegister.service && ConnectedServices[nodeRegister.type][nodeRegister.service] ? "hidden" : "flex"} gap-6 font-SpaceGrotesk w-full bg-customWhite/[10%] font-medium text-[1.75rem] p-4 align-middle items-center justify-center rounded-[0.63rem]`} on:click={() => {
+					<button class={`${nodeRegister.service && ConnectedServices[nodeRegister.type][nodeRegister.service] ? "hidden" : "flex"} gap-6 font-SpaceGrotesk w-full bg-customWhite/[10%] font-medium text-[1.75rem] p-4 align-middle items-center justify-center rounded-[0.63rem]`}
+					on:click={() => {
 						if (nodeRegister?.service) {
+							console.log(ConnectedServices);
 							getOauthLink(getCookie("token"), nodeRegister.service).then((res) => {
 								const popup = window.open(res["url"], "popup", "width=600,height=600 popup=true");
 								const interval = setInterval(() => {
@@ -554,6 +595,13 @@
 										if (popup?.window?.location.href) {
 											popup?.close();
 											clearInterval(interval);
+											ConnectedServices = {
+												...ConnectedServices,
+												[nodeRegister.type]: {
+													...ConnectedServices[nodeRegister.type],
+													[nodeRegister.service]: true,
+												}
+											};
 										}
 									} catch {
 										return;
