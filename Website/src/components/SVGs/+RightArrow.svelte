@@ -9,14 +9,8 @@
   fill="none"
   class={className}
 >
-  <rect width="45" height="28" fill="#1E1E1E" />
+  <rect width="45" height="28" />
   <g id="Landing page" clip-path="url(#clip0_0_1)">
-    <rect
-      width="1728"
-      height="4596"
-      transform="translate(-1544 -1627)"
-      fill="#F3F3F3"
-    />
     <g id="formkit:arrowright">
       <path
         id="Vector"

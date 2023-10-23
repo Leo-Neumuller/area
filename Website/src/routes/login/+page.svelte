@@ -8,8 +8,8 @@
   let errorMsg: string;
   
   onMount(() => {
-    if (document.cookie.includes("access_token")) {
-      goto("/flux-editor");
+    if (document.cookie.includes("token")) {
+      goto("/dashboard");
     }
   });
 
@@ -30,7 +30,7 @@
     .then((res: Response) => res.json())
     .then((res) => {
       document.cookie = `token=${res.access_token}; path=/`;
-      goto("/flux-editor");
+      goto("/dashboard");
     })
     .catch((err: Error) => {
       errorMsg = err.message;

@@ -6,6 +6,7 @@ export interface TextInputProps {
     type: string;
     placeholder: string;
     onInput: (e: any) => void;
+    deactivated?: boolean;
 }
 
 export default TextInput__SvelteComponent_;
