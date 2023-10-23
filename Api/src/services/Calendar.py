@@ -19,6 +19,14 @@ class Calendar(BaseService):
         self.version = "v3"
 
     @staticmethod
+    def get_name() -> str:
+        """
+        Get name of service
+        :return: Name of service
+        """
+        return "Google Calendar"
+
+    @staticmethod
     def get_authorization_url(User: UserMe, db: Session) -> str:
         """
         Get authorization url

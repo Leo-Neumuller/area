@@ -72,6 +72,14 @@ class Gmail(BaseService):
         self.version = "v1"
 
     @staticmethod
+    def get_name() -> str:
+        """
+        Get name of service
+        :return: Name of service
+        """
+        return "Gmail"
+
+    @staticmethod
     def get_authorization_url(User: UserMe, db: Session) -> str:
         """
         Get authorization url

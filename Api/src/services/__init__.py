@@ -12,4 +12,4 @@ for filename in os.listdir(current_dir):
         for name in dir(module):
             obj = getattr(module, name)
             if hasattr(obj, "__class__") and obj.__class__.__name__ == "type" and obj.__name__ == module_name.title():
-                services[name] = obj
+                services[obj.get_name()] = obj
