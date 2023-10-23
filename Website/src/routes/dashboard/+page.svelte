@@ -15,6 +15,7 @@
     import { onMount } from "svelte";
     import DashboardPage from "../../components/DashboardPage/+DashboardPage.svelte";
     import AllFluxPage from "../../components/AllFluxPage/+AllFluxPage.svelte";
+    import ApplicationPage from "../../components/ApplicationPage/+ApplicationPage.svelte";
 
     let selected: number = 0;
     let toggleMenu: boolean = true;
@@ -85,8 +86,8 @@
             <AllFluxPage/>
         </div>
     {:else if selected === 2}
-        <div>
-                
+        <div class={`w-full ${toggleMenu ? "pl-[24rem]" : ""}`}>
+            <ApplicationPage/>
         </div>
     {:else if selected === 3}
         <div>

@@ -8,7 +8,7 @@
   let errorMsg: string;
 
   onMount(() => {
-    if (document.cookie.includes("access_token")) {
+    if (document.cookie.includes("token")) {
       goto("/dashboard");
     }
   });
@@ -29,7 +29,7 @@
     signupPost(data)
     .then((res: Response) => res.json())
     .then((res) => {
-      document.cookie = `access_token=${res.access_token}; path=/`;
+      document.cookie = `token=${res.access_token}; path=/`;
       goto("/dashboard")
     })
     .catch((err: Error) => {

@@ -1,18 +1,30 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
-    import { checkConnected, getServices, userMe } from "../../api/api";
+    import { checkConnected, getOauthLink, getServices, userMe } from "../../api/api";
     import { getCookie } from "../../api/helpers";
+    import Goto from "../SVGs/+Goto";
+    import Instagram from "../SVGs/+Instagram.svelte";
+    import Validate from "../SVGs/+Validate.svelte";
     import TextInput from "../TextInput/+TextInput.svelte";
 
+    let services:any = [];
     async function getUserMe() {
         const res = await userMe(getCookie("token"));
         return res
     }
 
-	let ConnectedServices: { [key: string]: {[key: string] : boolean} } = {};
+    async function isConnected(service: string) {
+        const res = await checkConnected(getCookie("token"), service);
+        return res.is_connected;
+    }
+
+    function onlyUnique(value: any, index: any, array: any) {
+        return array.indexOf(value) === index;
+    }
 
     getServices(getCookie("token")).then((res) => {
-        console.log(res);   
+        let data = [...res.action, ...res.reaction];
+        services = data.filter(onlyUnique) 
     })
 </script>
 
@@ -57,4 +69,47 @@
     <h1 class="text-[3rem] font-SpaceGrotesk font-medium text-gray mt-10">
         Comptes connectés
     </h1>
+    <div class="flex gap-6 flex-wrap pt-4">
+        {#each services as service}
+            <div class="border border-gray rounded-lg p-3 text-[1.5rem]">
+                {#await isConnected(service)}
+                    Wait
+                {:then res}
+                    {#if res}
+                        <div class="flex justify-between gap-5">
+                            <Instagram className="w-10 h-10" color="#373637"/>
+                            <h1 class="items-center">Connecté</h1>
+                            <div>
+                                <Validate className="w-8 h-8 pt-1" color="#373637"/>
+                            </div>
+                        </div>
+                    {:else}
+                        <button class="flex justify-between gap-5"
+                            on:click={() => {
+                                getOauthLink(getCookie("token"), service).then((res) => {
+								const popup = window.open(res["url"], "popup", "width=600,height=600 popup=true");
+								const interval = setInterval(() => {
+									try {
+										if (popup?.window?.location.href) {
+											popup?.close();
+                                            res = true;
+											clearInterval(interval);
+										}
+									} catch {
+										return;
+									}
+								}, 1000);
+							});
+                            }}>
+                            <Instagram className="w-10 h-10" color="#373637"/>
+                            <h1 class="items-center">Se connecter</h1>
+                            <div>
+                                <Goto className="w-8 h-8 pt-2" color="#373637"/>
+                            </div>
+                        </button>
+                    {/if}
+                {/await}
+            </div>
+        {/each}
+    </div>
 </div>

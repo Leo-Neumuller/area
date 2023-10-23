@@ -458,6 +458,7 @@
 			createFlux(getCookie("token"), data, true).then((res) => {
 				$page.url.searchParams.set("FluxId", res["id"]);
 				goto(`?${$page.url.searchParams.toString()}`);
+				alert("Ouais mon gars")
 			})
 		}}>
 			Sauvergarder le flux
@@ -467,7 +468,7 @@
 		on:click={() => {
 			saveMenu = !saveMenu;
 		}}>
-	Save
+	Sauvegarder
   </button>
   <div class="">
 	<Addbutton showDelete={selectedNode === null} onCLickAdd={handleOnCLickAdd} onClickDelete={handleOnClickDelete}/>
