@@ -18,6 +18,7 @@
 	import Validate from "../../SVGs/+Validate.svelte";
 	import Profile from "../../SVGs/+Profile.svelte";
   import TextInput from "../../TextInput/+TextInput.svelte";
+	import { browser } from '$app/environment';
 
 	let grabbingBoard: boolean = false;
 	let scale: number = 1;
@@ -372,7 +373,33 @@
 			getFlux(getCookie("token"), $page.url.searchParams.get("FluxId")).then((res) => {
 				nodes = res["nodes"];
 				edges = res["edges"];
+				getServices(getCookie("token")).then((res) => {
+					services = res;
+					res["action"].forEach((action: any) => {
+						checkConnected(getCookie("token"), action).then((res) => {
+							ConnectedServices = {
+								...ConnectedServices,
+								'Action' : {
+									...ConnectedServices['Action'],
+									[action]: res["is_connected"],
+								}
+							};
+						})
+					})
+					res["reaction"].forEach((reaction: any) => {
+						checkConnected(getCookie("token"), reaction).then((res) => {
+							ConnectedServices = {
+								...ConnectedServices,
+								'Reaction' : {
+									...ConnectedServices['Reaction'],
+									[reaction]: res["is_connected"],
+								}
+							};
+						})
+					})
+				})
 			})
+
 		}
 	})
 
@@ -405,7 +432,7 @@
 			})
 		}
 
-		if (advancedModify && nodeRegister.service != null && ((nodeRegister.subService === undefined && nodeRegister.subServiceId === undefined) || subServices["nodeId"] !== nodeRegister.id)) {
+		if (advancedModify && nodeRegister.service != null && (subServices["nodeId"] !== nodeRegister.id)) {
 			getSubServices(getCookie("token"), nodeRegister.service, nodeRegister.type).then((res) => {
 				subServices = {
 					"data": res,
@@ -485,7 +512,7 @@
 		</button>
 	</div>
 	<div class="flex flex-wrap gap-4">
-		{#if Object.entries(services).length !== 0}
+		{#if Object.entries(services).length !== 0 && nodeRegister != null}
 			{#each services[nodeRegister.type.toLowerCase()] as service}
 				<button on:click={() => {
 							modifyService = false;
@@ -518,7 +545,7 @@
 						<h1 class="text-[2.2rem] font-SpaceGrotesk text-customWhite font-semibold">
 							Application
 						</h1>
-						<div class={`${nodeRegister.service && ConnectedServices[nodeRegister.type][nodeRegister.service] ? "flex" : "flex"} font-SpaceGrotesk w-full bg-customWhite/[10%] font-medium text-[1.75rem] p-4 align-middle items-center justify-between rounded-[0.63rem]`}>
+						<div class={`flex font-SpaceGrotesk w-full bg-customWhite/[10%] font-medium text-[1.75rem] p-4 align-middle items-center justify-between rounded-[0.63rem]`}>
 							<h1 class="text-customWhite">{nodeRegister.service}</h1>
 							<button class="bg-primary rounded-lg p-1 px-2" on:click={() => {
 								advancedModify = false;
