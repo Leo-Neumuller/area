@@ -133,6 +133,12 @@ class FluxSend(BaseModel):
     id: int
 
 
+class FluxToggleSend(BaseModel):
+    """Flux Toggle Model"""
+    id: int
+    active: bool
+
+
 class FluxError(BaseModel):
     """Flux Error Model"""
     id: str

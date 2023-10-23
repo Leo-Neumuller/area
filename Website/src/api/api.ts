@@ -98,7 +98,14 @@ interface CreateFlux {
 }
 
 export async function createFlux(cookie: string, flux: CreateFlux, verify: boolean = false) {
-    console.log(flux)
+    // formater for api
+    for (let node of flux.nodes) {
+        for (let inputData of node.inputsData ?? []) {
+            if (inputData.inputType === "date") {
+                inputData.value = new Date(inputData.value).toISOString();
+            }
+        }
+    }
     const res = await fetch(import.meta.env.VITE_API_URL + `/flux?verify=${verify}`, {
         method: 'POST',
         body: JSON.stringify(flux),

@@ -27,7 +27,7 @@ async def about(request: Request):
     services_data = []
     for service in services.keys():
         new_service = Service(
-            name=service,
+            name=services[service].get_name(),
             actions=[],
             reactions=[]
         )
@@ -43,7 +43,7 @@ async def about(request: Request):
                 else:
                     new_service.reactions.append(
                         Reaction(
-                            name=service_name,
+                            name=services[service]().get_interface()[service_type][service_name].name,
                             description=services[service]().get_interface()[service_type][service_name].description
                         )
                     )

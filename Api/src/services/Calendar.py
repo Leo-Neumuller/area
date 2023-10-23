@@ -19,6 +19,14 @@ class Calendar(BaseService):
         self.version = "v3"
 
     @staticmethod
+    def get_name() -> str:
+        """
+        Get name of service
+        :return: Name of service
+        """
+        return "Google Calendar"
+
+    @staticmethod
     def get_authorization_url(User: UserMe, db: Session) -> str:
         """
         Get authorization url
@@ -27,10 +35,10 @@ class Calendar(BaseService):
         :return: Authorize URL
         """
         authorization_url, state = Google.get_authorization_url(
-            service="Calendar",
+            service=Calendar.get_name(),
             scopes=['https://www.googleapis.com/auth/calendar'],
         )
-        save_start_authorization("Calendar", state, User, db)
+        save_start_authorization(Calendar.get_name(), state, User, db)
         return authorization_url
 
     @staticmethod
@@ -44,12 +52,12 @@ class Calendar(BaseService):
         :return: Authorize
         """
         refresh = Google.authorize(
-            service="Calendar",
+            service=Calendar.get_name(),
             state=state,
             code=code,
             scopes=scopes,
         )
-        db.query(Service).filter(Service.name == "Calendar", Service.state == state).update({"refresh": refresh})
+        db.query(Service).filter(Service.name == Calendar.get_name(), Service.state == state).update({"refresh": refresh})
         db.commit()
 
     @staticmethod
@@ -125,7 +133,7 @@ class Calendar(BaseService):
         :param data: Data
         :return: None
         """
-        service = Google.get_service(self.service_name, self.User, self.db, self.version)
+        service = Google.get_service(Calendar.get_name(), self.User, self.db, self.version)
         try:
             data = self.create_event_data(data)
             event = service.events().insert(calendarId='primary', body=data).execute()
@@ -169,7 +177,7 @@ class Calendar(BaseService):
         :param prev_data: Previous data
         :param data: Data
         """
-        service = Google.get_service(self.service_name, self.User, self.db, self.version)
+        service = Google.get_service(Calendar.get_name(), self.User, self.db, self.version)
         prev_time_fetch = prev_data["time"]
         prev_time_fetch = datetime.fromtimestamp(prev_time_fetch).astimezone(timezone.utc)
         parsed_data = []
