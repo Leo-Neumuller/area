@@ -182,8 +182,8 @@
 
 
 	function handleOnCLickAdd(numberInputs: number, numberOutputs: number, type: string) {
-		const randomX = Math.random() * (window.innerWidth - 300) + 300;
-		const randomY = Math.random() * (window.innerHeight - 300) + 300;
+		const randomX = (window.innerWidth / 2) - 200;
+		const randomY = (window.innerHeight / 2);
 
 		let nodePrev: { x: number, y: number } = {x: randomX, y: randomY};
 		let nodeCurr: { x: number, y: number } = {x: randomX, y: randomY};

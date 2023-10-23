@@ -20,7 +20,13 @@
             {#each actions as action}
                 <div class="bg-gray/20 rounded-2xl p-6 justify-center items-center flex flex-col gap-6 min-w-[13rem]">
                     <Instagram className="w-20 h-20" color="#373637"/>
-                    <h1>{action}</h1>
+                    <div style="text-align:center;
+                        width: min-content;
+                        white-space: break-space;
+                        margin-left: auto;
+                        margin-right: auto;">
+                        <h1>{action}</h1>
+                    </div>
                 </div>
             {/each}
         </div>
@@ -33,7 +39,13 @@
             {#each reactions as reaction}
                 <div class="bg-gray/20 rounded-2xl p-6 justify-center items-center flex flex-col gap-6 min-w-[13rem]">
                     <Instagram className="w-20 h-20" color="#373637"/>
-                    <h1>{reaction}</h1>
+                    <div style="text-align:center;
+                        width: min-content;
+                        white-space: break-space;
+                        margin-left: auto;
+                        margin-right: auto;">
+                        <h1>{reaction}</h1>
+                    </div> 
                 </div>
             {/each}
         </div>
