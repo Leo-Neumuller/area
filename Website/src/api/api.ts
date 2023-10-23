@@ -204,3 +204,20 @@ export async function getAllFlux(cookie: string) {
     }
     return res.json();
 }
+
+export async function toggleFlux(cookie: string, id: number) {
+    const res = await fetch(import.meta.env.VITE_API_URL + `/flux/${id}`, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+            'access-token': cookie,
+            'fluxId': `${id}`
+        }
+    })
+    if (res.status !== 200) {
+        let err = await res.json();
+
+        throw new Error(err.detail);
+    }
+    return res.json();
+}

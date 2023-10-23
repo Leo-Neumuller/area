@@ -36,24 +36,26 @@
         <h1 class="text-[3rem] font-SpaceGrotesk font-medium text-gray">
             Informations
         </h1>
-        <div class="bg-gray rounded-3xl p-10 flex flex-wrap justify-between gap-2 mt-4">
-            <div class="flex flex-col gap-2 font-SpaceGrotesk font-medium text-[1.5rem] text-customWhite">
-                <h1 class="text-customWhite">Nom</h1>
-                <h1 class={`rounded-xl px-4 py-2 bg-customWhite/[10%] outline-none text-customWhite/20 w-[30rem]`}>
-                    {user.name}
-                </h1>   
-            </div>
-            <div class="flex flex-col gap-2 font-SpaceGrotesk font-medium text-[1.5rem] text-customWhite">
-                <h1 class="text-customWhite">Prénom</h1>
-                <h1 class={`rounded-xl px-4 py-2 bg-customWhite/[10%] outline-none text-customWhite/20 w-[30rem]`}>
-                    {user.surname}
-                </h1>   
-            </div>
-            <div class="flex flex-col gap-2 font-SpaceGrotesk font-medium text-[1.5rem] text-customWhite">
-                <h1 class="text-customWhite">Email</h1>
-                <h1 class={`rounded-xl px-4 py-2 bg-customWhite/[10%] outline-none text-customWhite/20 w-[30rem]`}>
-                    {user.email}
-                </h1>   
+        <div class="bg-gray rounded-[3rem] p-10 flex justify-center items-center mt-4 mx-10">
+            <div class="flex flex-wrap gap-6">
+                <div class="flex flex-col gap-2 font-SpaceGrotesk font-medium text-[1.5rem] text-customWhite">
+                    <h1 class="text-customWhite">Nom</h1>
+                    <h1 class={`rounded-xl px-4 py-2 bg-customWhite/[10%] outline-none text-customWhite/20 w-[30rem]`}>
+                        {user.name}
+                    </h1>   
+                </div>
+                <div class="flex flex-col gap-2 font-SpaceGrotesk font-medium text-[1.5rem] text-customWhite">
+                    <h1 class="text-customWhite">Prénom</h1>
+                    <h1 class={`rounded-xl px-4 py-2 bg-customWhite/[10%] outline-none text-customWhite/20 w-[30rem]`}>
+                        {user.surname}
+                    </h1>   
+                </div>
+                <div class="flex flex-col gap-2 font-SpaceGrotesk font-medium text-[1.5rem] text-customWhite">
+                    <h1 class="text-customWhite">Email</h1>
+                    <h1 class={`rounded-xl px-4 py-2 bg-customWhite/[10%] outline-none text-customWhite/20 w-[30rem]`}>
+                        {user.email}
+                    </h1>   
+                </div>
             </div>
         </div>
     {/await}

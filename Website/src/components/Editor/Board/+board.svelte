@@ -539,7 +539,7 @@
 		<h1 class="text-[2.2rem] font-SpaceGrotesk text-customWhite font-semibold w-full text-center">
 			{nodeRegister.service}
 		</h1>
-		<div class="pt-14 h-[80%]">
+		<div class="pt-14 h-[80%] overflow-auto">
 			<div class="flex flex-col gap-16 justify-between h-full">
 				<div class="flex flex-col gap-6">
 					<div class="flex flex-col gap-6">
@@ -595,13 +595,13 @@
 										if (popup?.window?.location.href) {
 											popup?.close();
 											clearInterval(interval);
-											// ConnectedServices = {
-											// 	...ConnectedServices,
-											// 	[nodeRegister.type]: {
-											// 		...ConnectedServices[nodeRegister.type],
-											// 		[nodeRegister.service]: true,
-											// 	}
-											// };
+											ConnectedServices = {
+												...ConnectedServices,
+												[nodeRegister.type]: {
+													...ConnectedServices[nodeRegister.type],
+													[nodeRegister.service]: true,
+												}
+											};
 										}
 									} catch {
 										return;

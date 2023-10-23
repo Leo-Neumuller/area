@@ -15,30 +15,41 @@
         }
         return res;
     }
+
+    function checkActive(flux: any) {
+        for (let i = 0; i < flux.length; i++) {
+            if (flux[i].active) {
+                return true;
+            }
+        }
+        return false;
+    }
 </script>
 
-<div class="pl-6 py-6">
+<div class="pl-14 py-6">
     {#if !noFLux}
         <div>
-            <h1 class="text-[3rem] font-SpaceGrotesk font-medium text-gray">
-                Actifs
-            </h1>
-            <div class="flex gap-10 overflow-auto w-full pb-4 pt-10">
-                {#await getFLux()}
-                    <div>Loading...</div>
-                {:then flux}
-                    {#each flux as f}
-                        {#if !flux}
-                            Aucun flux
-                        {/if}
-                        {#if f.active}
-                            <FluxCard flux={f}/>
-                        {/if}
-                    {/each}
-                {/await}
-            </div>
+            {#await getFLux()}
+                <div>Loading...</div>
+            {:then flux}
+                {#if checkActive(flux)}
+                    <h1 class="text-[3rem] font-SpaceGrotesk font-medium text-gray">
+                        Actifs
+                    </h1>
+                    <div class="flex gap-10 overflow-auto w-full pt-10 pb-20">
+                        {#each flux as f}
+                            {#if !flux}
+                                Aucun flux
+                            {/if}
+                            {#if f.active}
+                                <FluxCard flux={f}/>
+                            {/if}
+                        {/each}
+                    </div>
+                {/if}
+            {/await}
         </div>
-        <div class="pt-20 pr-6">
+        <div class="pr-6">
             <h1 class="text-[3rem] font-SpaceGrotesk font-medium text-gray">
                 Tous les flux
             </h1>
@@ -48,7 +59,7 @@
                         <div>Loading...</div>
                     {:then flux}
                         {#each flux as f, index}
-                            <FluxRow description={f.description} active={f.active} index={index}/>
+                            <FluxRow description={f.description} active={f.active} index={index} id={f.id}/>
                         {/each}
                     {/await}
                 </div>
