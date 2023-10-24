@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List
 
 from fastapi import APIRouter, HTTPException, status, Depends
@@ -174,6 +174,6 @@ async def test_action_or_reaction(User: UserMe = Depends(MiddlewareUser.check), 
     Test action or reaction
     :return: Test action or reaction
     """
-    time = 1696630169
-    services["Gmail"](User, db).new_email_from_email({"time": time}, {"email": "area.shcb@gmail.com"})
+    time = 1697325948
+    services["Calendar"](User, db).new_created_event({"time": time}, {})
     return {"test": "test"}

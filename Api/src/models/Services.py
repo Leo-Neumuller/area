@@ -160,7 +160,7 @@ class BaseService:
         methods = inspect.getmembers(self, predicate=inspect.ismethod)
         for name, method in methods:
             if hasattr(method, "metadata"):
-                id = f"{self.__class__.__name__}_{method.metadata.type.value}_{name}"
+                id = f"{self.__class__.get_name()}_{method.metadata.type.value}_{name}"
                 method.metadata.id = id
                 method.metadata.function = method
                 if method.metadata.type not in data:
