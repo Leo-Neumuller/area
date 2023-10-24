@@ -15,16 +15,19 @@ import {ThemeTypeContext} from "../../../constants/Theme";
 import {AREAComponent} from "../AREAComponent";
 import React, {useEffect} from "react";
 import {authorizeUrlGet, servicesAREAGet, serviceSchemaGet, servicesGet} from "../../../api/api";
-// import * as SecureStore from "expo-secure-store";
 import {IAREAComponent} from "../../../interfaces/IAREAComponent";
 import {IAREAServices} from "../../../interfaces/IAREAServices";
 import {Picker} from "@react-native-picker/picker";
 import {IServiceSchema} from "../../../interfaces/IServiceSchema";
 import ButtonComponents from "../../ButtonLogin";
 import EncryptedStorage from "react-native-encrypted-storage";
+import {BottomSheetMethods} from "@gorhom/bottom-sheet/lib/typescript/types";
+import * as fs from "fs";
 
 type AREABottomSheetProps = {
     currentArea?: IAREAComponent,
+    bottomSheetRef?:  React.RefObject<BottomSheetMethods> | undefined,
+    setSaveSelectedArea?: React.Dispatch<React.SetStateAction<IAREAComponent | undefined>>
 };
 
 async function getServices(): Promise<IService> {
@@ -47,13 +50,37 @@ async function getAuthorizeUrlFromApi(serviceId: string): Promise<{ url: string 
     return await authorizeUrlGet(token as string, serviceId);
 }
 
-const AREAParamBottomSheet: React.FC<{data: IAREAComponent, setAREAParamOpened: React.Dispatch<React.SetStateAction<boolean>>}> = ({data, setAREAParamOpened}) => {
+const AREAParamBottomSheet: React.FC<{
+    data: IAREAComponent,
+    setAREAParamOpened: React.Dispatch<React.SetStateAction<boolean>>,
+    closeBottomSheet: Function
+    setSaveSelectedArea?: React.Dispatch<React.SetStateAction<IAREAComponent | undefined>>
+    }> = ({data, setAREAParamOpened, closeBottomSheet, setSaveSelectedArea}) => {
     const Styles = useThemedStyles(styles);
     const Theme = useTheme();
     const [services, setServices] = React.useState<[IAREAServices]>([{"name": "", "id": "", "description": ""}]);
     const [selectedService, setSelectedService] = React.useState<string>("");
     const [schema, setSchema] = React.useState<IServiceSchema>();
     const [authUrl, setAuthUrl] = React.useState<string>("");
+
+
+    const setSchemaData = (id: string, value: string) => {
+        let schemaData: IServiceSchema = schema!;
+        let indexItem = 0;
+
+        let item = { ...schemaData?.inputsData.find((element, index) => {
+                if (element.id == id) {
+                    indexItem = index;
+                    return element;
+                }
+        })};
+        if (item) {
+            item.data![0] = ({ Items: value });
+            // @ts-ignore
+            schemaData.inputsData[indexItem] = item;
+            setSchema(schemaData!)
+        }
+    }
 
     useEffect(() => {
         if (!data.default) {
@@ -119,10 +146,17 @@ const AREAParamBottomSheet: React.FC<{data: IAREAComponent, setAREAParamOpened: 
                                     height: item.inputType == "textMultiline" ? 100 : "10%",
                                 }}>
                                     {item.inputType == "textMultiline" &&
-                                        <TextInput style={[Styles.input, {color: Theme.colors.White, paddingLeft: 20}]} placeholder={item.name} placeholderTextColor={Theme.colors.Gray} />
+                                        <TextInput style={[Styles.input, {color: Theme.colors.White, paddingLeft: 20}]} placeholder={item.name} placeholderTextColor={Theme.colors.Gray} onChangeText={
+                                            (text: string) => {
+                                                setSchemaData(item.id, text);
+                                            }} />
                                     }
                                     {item.inputType == "text" &&
-                                        <TextInput style={[Styles.input, {color: Theme.colors.White, paddingLeft: 20}]} placeholder={item.name} placeholderTextColor={Theme.colors.Gray} />
+                                        <TextInput style={[Styles.input, {color: Theme.colors.White, paddingLeft: 20}]} placeholder={item.name} placeholderTextColor={Theme.colors.Gray} onChangeText={
+                                            (text: string) => {
+                                                setSchemaData(item.id, text);
+                                            }
+                                        } />
                                     }
                                 </View>
                             )
@@ -153,7 +187,6 @@ const AREAParamBottomSheet: React.FC<{data: IAREAComponent, setAREAParamOpened: 
                             borderRadius: 20,
                         }}
                         onPress={() => {
-                            console.log(data.name)
                             getAuthorizeUrlFromApi(data.name!)
                                 .then((res: any) => {
                                     Linking.openURL(res.url)
@@ -180,18 +213,27 @@ const AREAParamBottomSheet: React.FC<{data: IAREAComponent, setAREAParamOpened: 
                 alignItems: "center",
                 paddingTop: 20
             }}>
-                <ButtonComponents text={"Save"} wid={"80%"} hei={"100%"} bgColor={Theme.colors.Primary}/>
+                <ButtonComponents onPress={
+                    () => {
+                        setSaveSelectedArea!({...data, serviceSchema: schema});
+                        closeBottomSheet();
+                    }
+                } text={"Save"} wid={"80%"} hei={"100%"} bgColor={Theme.colors.Primary}/>
             </View>
         </ScrollView>
     )
 }
 
-export const AREABottomSheet: React.FC<AREABottomSheetProps> = ({currentArea}) => {
+export const AREABottomSheet: React.FC<AREABottomSheetProps> = ({currentArea, bottomSheetRef, setSaveSelectedArea}) => {
     const Styles = useThemedStyles(styles);
     const Theme = useTheme();
     const [services, setServices] = React.useState<IService>({"action": [""], "reaction": [""]});
     const [actionParamOpened, setAREAParamOpened] = React.useState<boolean>(false);
     const [currentAreaParam, setCurrentAreaParam] = React.useState<IAREAComponent>();
+
+    const closeBottomSheet = () => {
+        bottomSheetRef?.current?.close();
+    }
 
     useEffect(() => {
         getServices()
@@ -208,7 +250,7 @@ export const AREABottomSheet: React.FC<AREABottomSheetProps> = ({currentArea}) =
     }, [currentArea]);
 
     return (
-        actionParamOpened ? <AREAParamBottomSheet data={currentAreaParam!} setAREAParamOpened={setAREAParamOpened} /> :
+        actionParamOpened ? <AREAParamBottomSheet data={currentAreaParam!} setAREAParamOpened={setAREAParamOpened} closeBottomSheet={closeBottomSheet} setSaveSelectedArea={setSaveSelectedArea} /> :
         <View style={Styles.container}>
             <Text style={[Theme.Title, {color: Theme.colors.White, paddingLeft: 20}]}>
                 {currentArea?.type == "action" ? "Action" : "Reaction"}

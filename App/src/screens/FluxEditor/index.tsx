@@ -13,6 +13,7 @@ import { BottomSheetComponent } from '../../components/BottomSheetComponent';
 import { ThemeTypeContext } from '../../constants/Theme';
 import { AREABottomSheet } from '../../components/Editor/AREABottomSheet';
 import IAREAComponent from "../../interfaces/IAREAComponent";
+import {Board} from "../../components/Editor/Board";
 
 type RootStackParamList = {
     FluxEditor: undefined;
@@ -78,21 +79,7 @@ export const FluxEditor: React.FC<{navigation: StackNavigationProp<RootStackPara
 
     return (
         <View style={{width: "100%", height: "100%"}}>
-            <BottomSheetComponent ref={bottomSheetRef} setOpened={setBottomSheetOpened} opened={bottomSheetOpened} content={<AREABottomSheet currentArea={currentArea} />}>
-                <View style={Styles.container}>
-                    <AREAComponent data={action} inEditor={true} onPress={(data) => {
-                        bottomSheetRef.current?.expand();
-                        setBottomSheetOpened(true);
-                        setCurrentArea(data);
-                    }} />
-                    <View style={Styles.line} />
-                    <AREAComponent data={reaction} inEditor={true} onPress={(data) => {
-                        bottomSheetRef.current?.expand();
-                        setBottomSheetOpened(true);
-                        setCurrentArea(data);
-                    }} />
-                </View>
-            </BottomSheetComponent>
+            <Board />
         </View>
     )
 }
