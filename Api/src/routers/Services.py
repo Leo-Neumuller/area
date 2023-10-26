@@ -132,6 +132,19 @@ async def is_connected(service: str, User: UserMe = Depends(MiddlewareUser.check
     return {"is_connected": check_if_service_exist(service, User, db)}
 
 
+@ServicesRouter.get("/{service}/disconnect",
+                    summary="Disconnect",
+                    description="Disconnect",
+                    response_description="Disconnect",
+                    status_code=200)
+async def disconnect(service: str, User: UserMe = Depends(MiddlewareUser.check), db=Depends(get_db)):
+    if service not in services:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Service not found")
+    db.query(Service).filter(Service.name == service, Service.user_id == User.id).delete()
+    db.commit()
+    return {"disconnect": True}
+
+
 @ServicesRouter.get("/{service}/{serviceType}",
                     summary="Get all actions or reactions",
                     description="Get all actions or reactions",
