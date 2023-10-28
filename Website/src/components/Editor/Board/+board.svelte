@@ -38,6 +38,7 @@
 	let modifyMenu: boolean = false;
 	let advancedModify: boolean = false;
 	let saveMenu: boolean = false;
+	let successCheckmark: boolean = false;
 	let subServices: {"data" : { [key: string]: string }[], "nodeId" : string | undefined} = {
 		"data": [{}],
 		"nodeId": undefined,
@@ -362,26 +363,28 @@
 
 	onMount(() => {
 		setInterval(() => {
-			const data =  {
-				"name": name,
-				"description": descr,
-				"nodes": nodes,
-				"edges": edges,
-				"id": 0,
-			};
-			if ($page.url.searchParams.get("FluxId")) {
-				data["id"] = Number($page.url.searchParams.get("FluxId"));
-			}
-			createFlux(getCookie("token"), data, true).then((res) => {
-				if (res && res?.detail && res?.detail[0] && res?.detail[0]?.error) {
-					errorMessage = res?.detail[0]?.error;
-					return;
+			if (!saveMenu) {
+				const data =  {
+					"name": name,
+					"description": descr,
+					"nodes": nodes,
+					"edges": edges,
+					"id": 0,
+				};
+				if ($page.url.searchParams.get("FluxId")) {
+					data["id"] = Number($page.url.searchParams.get("FluxId"));
 				}
-				errorMessage = "";
-				console.log("ici	")
-				$page.url.searchParams.set("FluxId", res["id"]);
-				goto(`?${$page.url.searchParams.toString()}`);
-			})
+				createFlux(getCookie("token"), data, true).then((res) => {
+					if (res && res?.detail && res?.detail[0] && res?.detail[0]?.error) {
+						errorMessage = res?.detail[0]?.error;
+						return;
+					}
+					errorMessage = "";
+					console.log("ici")
+					$page.url.searchParams.set("FluxId", res["id"]);
+					goto(`?${$page.url.searchParams.toString()}`);
+				})
+			}
 		}, 2000)
 
 		const board = document.getElementById("board");
@@ -489,46 +492,68 @@
 		</div>
 	{/if}
 	<div class={`${saveMenu ? "flex" : "hidden"} gap-3 rounded-xl flex-col absolute top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%] z-[30] bg-gray border border-black p-6`}>
-		<div class="flex justify-between items-center align-middle">
-			<div></div>
+		<div class={`${successCheckmark ? "flex" : "hidden"}  flex-col`}>
 			<button on:click={() => {
 				saveMenu = false;
 			}}>
 				<Close className="w-4 h-4" color="#F3F3F3"/>
 			</button>
+			<div class="px-12 pr-14">
+				<div class="success-checkmark">
+					<div class="check-icon">
+						<span class="icon-line line-tip"></span>
+						<span class="icon-line line-long"></span>
+						<div class="icon-circle"></div>
+						<div class="icon-fix"></div>
+					</div>
+				</div>
+			</div>
+			</div>
+		<div class={`${successCheckmark ? "hidden" : "flex"} flex-col gap-3`}>			
+			<div class="flex justify-between items-center align-middle">
+				<button on:click={() => {
+					saveMenu = false;
+				}}>
+					<Close className="w-4 h-4" color="#F3F3F3"/>
+				</button>
+			</div>
+			<TextInput label="Nom du flux" type="text" placeholder="Nom du flux" value={name} deactivated={false}
+				onInput={(e) => {
+					name = e.target.value;
+				}}/>
+			<TextInput label="Description du flux" type="text" placeholder="Description du flux" value={descr} deactivated={false}
+				onInput={(e) => {
+					descr = e.target.value;
+				}}/>
+			<button class="text-customWhite rounded border border-customWhite mt-2" on:click={() => {
+				const data =  {
+					"name": name,
+					"description": descr,
+					"nodes": nodes,
+					"edges": edges,
+					"id": 0,
+				};
+				if ($page.url.searchParams.get("FluxId")) {
+					data["id"] = Number($page.url.searchParams.get("FluxId"));
+				}
+				createFlux(getCookie("token"), data, true).then((res) => {
+					$page.url.searchParams.set("FluxId", res["id"]);
+					goto(`?${$page.url.searchParams.toString()}`);
+					successCheckmark = true;
+				})
+			}}>
+				Sauvergarder le flux
+			</button>
 		</div>
-		<TextInput label="Nom du flux" type="text" placeholder="Nom du flux" value={name} deactivated={false}
-			onInput={(e) => {
-				name = e.target.value;
-			}}/>
-		<TextInput label="Description du flux" type="text" placeholder="Description du flux" value={descr} deactivated={false}
-			onInput={(e) => {
-				descr = e.target.value;
-			}}/>
-		<button class="text-customWhite rounded border border-customWhite mt-2" on:click={() => {
-			const data =  {
-				"name": name,
-				"description": descr,
-				"nodes": nodes,
-				"edges": edges,
-				"id": 0,
-			};
-			if ($page.url.searchParams.get("FluxId")) {
-				data["id"] = Number($page.url.searchParams.get("FluxId"));
-			}
-			createFlux(getCookie("token"), data, true).then((res) => {
-				$page.url.searchParams.set("FluxId", res["id"]);
-				goto(`?${$page.url.searchParams.toString()}`);
-				alert("Ouais mon gars")
-			})
-		}}>
-			Sauvergarder le flux
-		</button>
+
 	</div>
-  <button class="absolute top-7 right-24 px-4 py-1 rounded z-40 text-[1.7rem] font-SpaceGrotesk text-customWhite font-bold border border-customWhite hover:text-gray hover:bg-customWhite"
+  <button class={`absolute top-7 right-24 px-4 py-1 rounded z-40 text-[1.7rem] font-SpaceGrotesk  
+  				  font-bold border
+				  ${errorMessage !== "" ? "border-customWhite/50 text-customWhite/50" : "border-customWhite text-customWhite hover:text-gray hover:bg-customWhite"}`}
 		on:click={() => {
+			successCheckmark = false;
 			saveMenu = !saveMenu;
-		}}>
+		}} disabled={errorMessage !== "" ? true : false}>
 	Sauvegarder
   </button>
   <div class="">
