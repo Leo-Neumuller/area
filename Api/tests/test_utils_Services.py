@@ -9,13 +9,13 @@ class TestUtilsServices(unittest.TestCase):
         self.db = test_help_create_db()
 
     def test_get_authorization_url(self):
-        authorisation, state = Google.get_authorization_url("Gmail", ["https://mail.google.com/"])
+        authorisation, state = Google.get_authorization_url("Gmail" , ["https://mail.google.com/"])
         self.assertTrue(state in authorisation)
 
     def test_get_services_with_no_service_saved(self):
         user = test_help_create_user(self.db)
         with self.assertRaises(Service.Exception.InvalidService):
-            Google.get_service("Gmail", UserMe(**(user._asdict())), self.db, "v1")
+            Google.get_service("gmail", "Gmail", UserMe(**(user._asdict())), self.db, "v1")
 
     def test_get_services_with_service_saved_but_not_refresh(self):
         user = test_help_create_user(self.db)
@@ -28,12 +28,12 @@ class TestUtilsServices(unittest.TestCase):
         self.db.add(service)
         self.db.commit()
         with self.assertRaises(Service.Exception.InvalidService):
-            Google.get_service("Gmail", UserMe(**(user._asdict())), self.db, "v1")
+            Google.get_service("gmail", "Gmail", UserMe(**(user._asdict())), self.db, "v1")
 
     def test_get_services_with_service_saved(self):
         user = test_help_create_user(self.db)
         test_help_create_fake_service("Gmail", self.db, user)
-        service = Google.get_service("Gmail", UserMe(**(user._asdict())), self.db, "v1")
+        service = Google.get_service("gmail", "Gmail", UserMe(**(user._asdict())), self.db, "v1")
         self.assertTrue(isinstance(service, googleapiclient.discovery.Resource))
 
     def test_authorize_with_invalid_grant(self):
