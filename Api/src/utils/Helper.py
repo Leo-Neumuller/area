@@ -1,8 +1,11 @@
+import base64
 import os
+import string
 import traceback
 import warnings
 import sys
 from inspect import getframeinfo, stack
+import random
 
 
 def inTestMode():
@@ -28,7 +31,7 @@ def warn(message: str):
     :return: None
     """
     if not inTestMode():  # pragma: no cover*
-        if os.environ["DEBUG"] == "True":
+        if "DEBUG" in os.environ.keys() and os.environ["DEBUG"] == "True":
             print(f"\x1b[31;20m" + f"ERROR:\x1b[0m {traceback.format_exc()}", end="")
         for call in range(min(len(stack()), 3), 0, -1):
             caller = getframeinfo(stack()[call][0])
@@ -50,3 +53,21 @@ def DefaultErrorResponse() -> dict:
     :return: Error response
     """
     return {"content": {"application/json": {"example": {"detail": "string"}}}}
+
+
+def get_random_string(length: int):
+    """
+    Get random string
+    :param length: Length of string
+    :return: Random string
+    """
+    return ''.join(random.choice(string.ascii_lowercase) for i in range(length))
+
+
+def encode_base64(string: str):
+    """
+    Encode string to base64
+    :param string: String
+    :return: Base64 string
+    """
+    return base64.b64encode(string.encode('ascii')).decode('utf-8')
