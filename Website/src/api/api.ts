@@ -115,10 +115,7 @@ export async function createFlux(cookie: string, flux: CreateFlux, verify: boole
         },
     })
     if (res.status !== 201) {
-        let err = await res.json();
-        console.log(err);
-        alert(err.detail[0].error);
-        throw new Error(err.detail);
+        return res.json();
     }
     return res.json();
 }

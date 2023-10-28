@@ -19,6 +19,7 @@
 	import Profile from "../../SVGs/+Profile.svelte";
   import TextInput from "../../TextInput/+TextInput.svelte";
 	import { browser } from '$app/environment';
+    import Warning from "../../SVGs/+Warning.svelte";
 
 	let grabbingBoard: boolean = false;
 	let scale: number = 1;
@@ -46,6 +47,8 @@
 	let ConnectedServices: { [key: string]: {[key: string] : boolean} } = {};
 	let name: string = "";
 	let descr: string = "";
+
+	let errorMessage: string = "";
 
 	function updateNodes() {
 		nodes = [...nodes];
@@ -358,6 +361,29 @@
 	}
 
 	onMount(() => {
+		setInterval(() => {
+			const data =  {
+				"name": name,
+				"description": descr,
+				"nodes": nodes,
+				"edges": edges,
+				"id": 0,
+			};
+			if ($page.url.searchParams.get("FluxId")) {
+				data["id"] = Number($page.url.searchParams.get("FluxId"));
+			}
+			createFlux(getCookie("token"), data, true).then((res) => {
+				if (res && res?.detail && res?.detail[0] && res?.detail[0]?.error) {
+					errorMessage = res?.detail[0]?.error;
+					return;
+				}
+				errorMessage = "";
+				console.log("ici	")
+				$page.url.searchParams.set("FluxId", res["id"]);
+				goto(`?${$page.url.searchParams.toString()}`);
+			})
+		}, 2000)
+
 		const board = document.getElementById("board");
 		if (board) {
 			board.addEventListener("wheel", (e) => {
@@ -454,6 +480,14 @@
 </script>
 
 <div>
+	{#if errorMessage !== ""}
+		<div class="group absolute top-[13%] left-4 w-16 h-16 bg-gray rounded-lg flex items-center hover:w-[18rem] z-[100] pl-2 ease-in-out duration-500">
+			<Warning className="w-12 h-12" color="#d1c71a"/>
+			<h1 class="opacity-0 group-hover:opacity-100 ease-in-out duration-700 text-[#d1c71a] text-lg font-SpaceGrotesk absolute top-[6%] left-16 w-[13rem]">
+				{errorMessage}
+			</h1>
+		</div>
+	{/if}
 	<div class={`${saveMenu ? "flex" : "hidden"} gap-3 rounded-xl flex-col absolute top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%] z-[30] bg-gray border border-black p-6`}>
 		<div class="flex justify-between items-center align-middle">
 			<div></div>
