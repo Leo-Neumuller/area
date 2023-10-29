@@ -26,7 +26,7 @@ export const AREAComponent: React.FC<Props> = ({inEditor, onPress, data}) => {
                         <FluxSVG style={[{color: data.type == 'action' ? Theme.colors.Black : Theme.colors.Primary}, Styles.svgDefault]} />
                     </View>
                     <View style={{justifyContent: "center", width: "50%"}}>
-                        <Text style={[Theme.Title, inEditor ? Styles.textEditor : Styles.textDefault, {color: data.type ==  'action' || !inEditor ? Theme.colors.White : Theme.colors.Black}]}>
+                        <Text numberOfLines={1} style={[Theme.Title, inEditor ? Styles.textEditor : Styles.textDefault, {color: data.type ==  'action' || !inEditor ? Theme.colors.White : Theme.colors.Black}]}>
                             {data.default ? (data.type == 'action' ? "Action" : "Reaction") : data.name!}
                         </Text>
                     </View>

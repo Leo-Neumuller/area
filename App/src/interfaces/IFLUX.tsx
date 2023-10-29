@@ -1,10 +1,11 @@
 import React from "react";
+import {IServiceSchema} from "./IServiceSchema";
 
 export interface IFLUX {
     id: number,
     name: string,
     description: string,
-    nodes: [
+    nodes:
         {
             id: string,
             numberInputs: number,
@@ -13,7 +14,7 @@ export interface IFLUX {
             subService?: string,
             subServiceId?: string,
             inputDataFromSubServiceId?: string,
-            inputsData?: Array<object>,
+            inputsData?: IServiceSchema["inputsData"],
             prevPosition: { x: number, y: number },
             currPosition: { x: number, y: number },
             type: string,
@@ -21,9 +22,8 @@ export interface IFLUX {
             outputEdgeIds: Array<string>,
             title: string,
             img: string,
-        }
-    ],
-    edges: [
+        }[],
+    edges:
         {
             id: string,
             nodeStartId: string,
@@ -34,8 +34,7 @@ export interface IFLUX {
             currStartPos: { x: number, y: number },
             prevEndPos: { x: number, y: number },
             currEndPos: { x: number, y: number },
-        }
-    ]
+        }[]
 }
 
 export default IFLUX;
