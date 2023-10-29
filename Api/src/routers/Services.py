@@ -194,6 +194,5 @@ async def test_action_or_reaction(User: UserMe = Depends(MiddlewareUser.check), 
     Test action or reaction
     :return: Test action or reaction
     """
-    time = 1697325948
-    services["Calendar"](User, db).new_created_event({"time": time}, {})
+    services["Spotify"](User, db).volume({"volume": 200})
     return {"test": "test"}
