@@ -15,6 +15,7 @@ export interface IServiceSchema {
                     Items: string;
                 }
             ]
+            value?: string;
         }
     ],
     outputData : [

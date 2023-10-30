@@ -1,8 +1,8 @@
 
 import EncryptedStorage from 'react-native-encrypted-storage';
+import IFLUX from "../interfaces/IFLUX";
 
 export async function signupPost (data: {[key: string] : string}) {
-    console.log("data", data);
     const res = await fetch(process.env.API_URL +  "/user/signup", {
         method: "POST",
         body: JSON.stringify(data),
@@ -145,6 +145,44 @@ export async function authorizeUrlGet (token: string, serviceId: string) {
 export async function fluxGet() {
     const token = await EncryptedStorage.getItem("userToken");
     const res = await fetch(process.env.API_URL + "/flux/fluxs", {
+        method: "GET",
+        headers: {
+            "accept" : "application/json",
+            "Content-Type" : "application/json",
+            "access-token" : "" + token,
+        }})
+        .catch((error) => {
+            throw new Error(error);
+        })
+    if (res.status !== 200) {
+        const error = await res.json();
+        throw new Error(error.detail);
+    }
+    return res.json();
+}
+
+export async function fluxPost(token: string, flux: IFLUX) {
+    const res = await fetch(process.env.API_URL + "/flux", {
+        method: "POST",
+        body: JSON.stringify(flux),
+        headers: {
+            "accept" : "application/json",
+            "Content-Type" : "application/json",
+            "access-token" : token,
+        }})
+        .catch((error) => {
+            throw new Error(error);
+        })
+
+    if (res.status !== 201) {
+        const error = await res.json();
+        throw new Error(error.detail);
+    }
+    return res.json();
+}
+
+export async function fluxIdGet(token: string, fluxId: number) {
+    const res = await fetch(process.env.API_URL + "/flux/" + fluxId, {
         method: "GET",
         headers: {
             "accept" : "application/json",
