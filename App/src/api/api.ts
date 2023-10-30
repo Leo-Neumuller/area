@@ -1,6 +1,7 @@
 
 import EncryptedStorage from 'react-native-encrypted-storage';
 
+
 export async function signupPost (data: {[key: string] : string}) {
     console.log("data", data);
     const res = await fetch(process.env.API_URL +  "/user/signup", {

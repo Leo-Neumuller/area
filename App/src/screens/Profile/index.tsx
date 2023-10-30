@@ -5,7 +5,6 @@ import HomeLogin from "../LoginScreens/HomeLogin"
 import useThemedStyles from "../../hooks/Theme/useThemedStyle";
 import useTheme from "../../hooks/Theme/useTheme";
 import ButtonComponents from "../../components/ButtonLogin";
-// import * as SecureStore from "expo-secure-store";
 import {loadUserData, servicesGet} from "../../api/api";
 import {createOnShouldStartLoadWithRequest} from "react-native-webview/lib/WebViewShared";
 import {RFValue} from "react-native-responsive-fontsize";
