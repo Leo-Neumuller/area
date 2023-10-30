@@ -1,17 +1,19 @@
 <script lang="ts">
     import Gmail from "../SVGs/+Gmail.svelte";
+  import GoogleCalendar from "../SVGs/+GoogleCalendar.svelte";
 
     export let name: string | undefined;
+    export let className: string;
 </script>
 
 <div>
     {#if name === "Gmail"}
         <div>
-            <Gmail className="w-8 h-8" color=""/>
+            <Gmail className={className} color=""/>
         </div>    
     {:else if name === "Google Calendar"}
         <div>
-            b   
+            <GoogleCalendar className={className} color=""/>
         </div>
     {/if}
 </div>

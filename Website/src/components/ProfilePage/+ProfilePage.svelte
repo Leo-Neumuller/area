@@ -2,6 +2,7 @@
     import { goto } from "$app/navigation";
     import { checkConnected, getOauthLink, getServices, userMe } from "../../api/api";
     import { getCookie } from "../../api/helpers";
+  import Icon from "../Icon/+Icon.svelte";
     import Goto from "../SVGs/+Goto";
     import Instagram from "../SVGs/+Instagram.svelte";
     import Validate from "../SVGs/+Validate.svelte";
@@ -79,7 +80,7 @@
                 {:then res}
                     {#if res}
                         <div class="flex justify-between gap-5">
-                            <Instagram className="w-10 h-10" color="#373637"/>
+                            <Icon name={service} className="w-10 h-10"/>
                             <h1 class="items-center">Connecté</h1>
                             <div>
                                 <Validate className="w-8 h-8 pt-1" color="#373637"/>
@@ -103,7 +104,7 @@
 								}, 1000);
 							});
                             }}>
-                            <Instagram className="w-10 h-10" color="#373637"/>
+                            <Icon name={service} className="w-10 h-10"/>
                             <h1 class="items-center">Se connecter</h1>
                             <div>
                                 <Goto className="w-8 h-8 pt-2" color="#373637"/>

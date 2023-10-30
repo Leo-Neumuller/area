@@ -607,7 +607,7 @@
 							Application
 						</h1>
 						<div class={`flex font-SpaceGrotesk w-full bg-customWhite/[10%] font-medium text-[1.75rem] p-4 align-middle items-center justify-between rounded-[0.63rem]`}>
-							<Icon name={nodeRegister.service}/>
+							<Icon name={nodeRegister.service} className="w-8 h-8"/>
 							<h1 class="text-customWhite">{nodeRegister.service}</h1>
 							<button class="bg-primary rounded-lg p-1 px-2" on:click={() => {
 								advancedModify = false;
