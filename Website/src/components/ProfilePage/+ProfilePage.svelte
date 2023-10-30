@@ -79,13 +79,16 @@
                     Wait
                 {:then res}
                     {#if res}
-                        <div class="flex justify-between gap-5">
+                        <button class="flex justify-between gap-5"
+                            on:click={() => {
+                                
+                            }}>
                             <Icon name={service} className="w-10 h-10"/>
-                            <h1 class="items-center">Connecté</h1>
+                            <h1 class="items-center">Se déconnecter</h1>
                             <div>
                                 <Validate className="w-8 h-8 pt-1" color="#373637"/>
                             </div>
-                        </div>
+                        </button>
                     {:else}
                         <button class="flex justify-between gap-5"
                             on:click={() => {

@@ -42,7 +42,7 @@
                                 Aucun flux
                             {/if}
                             {#if f.active}
-                                <FluxCard flux={f}/>
+                                <FluxCard flux={f} deleteButton={false}/>
                             {/if}
                         {/each}
                     </div>

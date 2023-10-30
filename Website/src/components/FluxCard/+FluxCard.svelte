@@ -9,6 +9,7 @@
         description: string;
         active: boolean;
     };
+    export let deleteButton: boolean | undefined;
 
 </script>
 
@@ -18,12 +19,14 @@
             <Instagram className="w-12 h-12" color="#000"/>
             <Instagram className="w-12 h-12" color="#000"/>
         </div>
-        <button class="font-SpaceGrotesk text-red-600 border border-red-600 rounded-2xl px-6 font-bold hover:text-customWhite hover:bg-red-600"
-            on:click={() => {
-                
-            }}>
-            Supprimer
-        </button>
+        {#if deleteButton}
+            <button class="font-SpaceGrotesk text-red-600 border border-red-600 rounded-2xl px-6 font-bold hover:text-customWhite hover:bg-red-600"
+                on:click={() => {
+                    
+                }}>
+                Supprimer
+            </button>
+        {/if}
     </div>
     <h1 class="text-[1.7rem] font-normal font-SpaceGrotesk mx-4">{flux.description}</h1>
     <button class="flex justify-between text-[1.5rem] font-normal font-SpaceGrotesk bg-gray/10 rounded-b-3xl px-3 py-3"

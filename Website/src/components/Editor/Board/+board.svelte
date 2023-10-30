@@ -47,8 +47,8 @@
 
 	let services: { [key: string]: string } = {};
 	let ConnectedServices: { [key: string]: {[key: string] : boolean} } = {};
-	let name: string = "";
-	let descr: string = "";
+	let name: string = "Non définit";
+	let descr: string = "Non définit";
 
 	let errorMessage: string = "";
 
@@ -141,14 +141,14 @@
 				const node = nodes.find((node) => node.id === selectedNode);
 				if (node) {
 					nodeRegister = node;
-					node.currPosition = {x: (node.currPosition.x + deltaX) * scale, y: (node.currPosition.y + deltaY) * scale};
+					node.currPosition = {x: (node.currPosition.x + deltaX), y: (node.currPosition.y + deltaY)};
 					clickedPosition = {x: e.x, y: e.y};
 					for (let i = 0; i < node.inputEdgeIds.length; i++) {
 						const edge = edges.find((edge) => edge.id === node.inputEdgeIds[i]);
 						if (edge) {
 							edge.currEndPos = {
-								x: (edge.currEndPos.x + deltaX) * scale,
-								y: (edge.currEndPos.y + deltaY) * scale,
+								x: (edge.currEndPos.x + deltaX),
+								y: (edge.currEndPos.y + deltaY),
 							}
 						}
 					}
@@ -157,8 +157,8 @@
 						const edge = edges.find((edge) => edge.id === node.outputEdgeIds[i]);
 						if (edge) {
 							edge.currStartPos = {
-								x: (edge.currStartPos.x + deltaX) * scale,
-								y: (edge.currStartPos.y + deltaY) * scale,
+								x: (edge.currStartPos.x + deltaX),
+								y: (edge.currStartPos.y + deltaY),
 							}
 						}
 					}
@@ -401,6 +401,8 @@
 		}
 		if ($page.url.searchParams.get("FluxId")) {
 			getFlux(getCookie("token"), $page.url.searchParams.get("FluxId")).then((res) => {
+				name = res["name"];
+				descr = res["description"];
 				nodes = res["nodes"];
 				edges = res["edges"];
 				getServices(getCookie("token")).then((res) => {
