@@ -88,33 +88,37 @@ def execute_flux(db=next(get_db())):
     all_flux = db.query(Flux).all()
     all_flux_ids = {i.id: i for i in all_flux}
     for flux_id in all_flux_ids:
-        if not all_flux_ids[flux_id].active or not all_flux_ids[flux_id].checked:
-            continue
-        all_AREA = db.query(FluxGraph).filter(FluxGraph.flux_id == flux_id).all()
-        if len(all_AREA) == 0:
-            continue
-        User = UserMe(
-            id=all_flux_ids[flux_id].user_id,
-            email=all_flux_ids[flux_id].user.email,
-            surname=all_flux_ids[flux_id].user.surname,
-            name=all_flux_ids[flux_id].user.name
-        )
-        AREA_actions_ids = all_AREA[0].action_ids
-        datas = {i.id: {} for i in all_AREA}
-        all_AREA_by_id = {i.id: i for i in all_AREA}
-        already_executed = set()
-        for AREA in all_AREA:
-            if AREA.id in AREA_actions_ids:
-                splitted_service_id = AREA.service_id.split('_')
-                interface = \
-                    services[splitted_service_id[0]](User, db).get_interface()[ServiceType(splitted_service_id[1])][
-                        AREA.service_id]
-                prev_data, datas[AREA.id] = interface.function(AREA.prev_data, AREA.config)
-                db.query(FluxGraph).filter(FluxGraph.id == AREA.id).update({"prev_data": prev_data})
-                already_executed.add(AREA.id)
-        db.commit()
-        for action_id in AREA_actions_ids:
-            for REA in all_AREA_by_id[action_id].next_flux_graph_ids:
-                run_next_flux(all_AREA_by_id[REA], datas, already_executed, User, all_AREA_by_id, db)
-        print(f"Flux {flux_id} executed")
+        try:
+            if not all_flux_ids[flux_id].active or not all_flux_ids[flux_id].checked:
+                continue
+            all_AREA = db.query(FluxGraph).filter(FluxGraph.flux_id == flux_id).all()
+            if len(all_AREA) == 0:
+                continue
+            User = UserMe(
+                id=all_flux_ids[flux_id].user_id,
+                email=all_flux_ids[flux_id].user.email,
+                surname=all_flux_ids[flux_id].user.surname,
+                name=all_flux_ids[flux_id].user.name
+            )
+            AREA_actions_ids = all_AREA[0].action_ids
+            datas = {i.id: {} for i in all_AREA}
+            all_AREA_by_id = {i.id: i for i in all_AREA}
+            already_executed = set()
+            for AREA in all_AREA:
+                if AREA.id in AREA_actions_ids:
+                    splitted_service_id = AREA.service_id.split('_')
+                    interface = \
+                        services[splitted_service_id[0]](User, db).get_interface()[ServiceType(splitted_service_id[1])][
+                            AREA.service_id]
+                    prev_data, datas[AREA.id] = interface.function(AREA.prev_data, AREA.config)
+                    db.query(FluxGraph).filter(FluxGraph.id == AREA.id).update({"prev_data": prev_data})
+                    already_executed.add(AREA.id)
+            db.commit()
+            for action_id in AREA_actions_ids:
+                for REA in all_AREA_by_id[action_id].next_flux_graph_ids:
+                    run_next_flux(all_AREA_by_id[REA], datas, already_executed, User, all_AREA_by_id, db)
+            print(f"Flux {flux_id} executed")
+        except Exception as e:
+            print(f"Flux {flux_id} error")
+            print(str(e))
     print("All flux executed")

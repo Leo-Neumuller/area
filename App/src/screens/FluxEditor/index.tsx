@@ -1,4 +1,5 @@
-import { StackNavigationProp } from '@react-navigation/stack';
+import { StackNavigationProp, StackScreenProps } from '@react-navigation/stack';
+import { RouteProp } from '@react-navigation/native';
 import React, { useEffect, useState, useRef } from 'react';
 import { Text, View, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { HeaderTitleProps } from '@react-navigation/elements/src/types'
@@ -13,10 +14,13 @@ import { BottomSheetComponent } from '../../components/BottomSheetComponent';
 import { ThemeTypeContext } from '../../constants/Theme';
 import { AREABottomSheet } from '../../components/Editor/AREABottomSheet';
 import IAREAComponent from "../../interfaces/IAREAComponent";
+import {Board} from "../../components/Editor/Board";
+import IFLUX from "../../interfaces/IFLUX";
 
 type RootStackParamList = {
     FluxEditor: undefined;
     Details: { itemId: number };
+    params: { flux?: IFLUX };
 };
 
 const HeaderTitle: React.FC<{props: HeaderTitleProps, setTitle: React.Dispatch<React.SetStateAction<string>> }> = ({ props, setTitle }) => {
@@ -36,12 +40,27 @@ const HeaderTitle: React.FC<{props: HeaderTitleProps, setTitle: React.Dispatch<R
                 <TextInput
                     editable={editable}
                     ref={refInput}
-                    style={[Theme.Title, {color: Theme.colors.White, display: "flex", flexDirection: "column", maxWidth: 200}]}
                     onChangeText={setTitle}
                     onEndEditing={() => { setEditable(false) }}
+                    style={{maxWidth: 250, display: editable ? "flex" : "none"}}
                 >
-                        {props.children}
+                    {editable &&
+                        <Text
+                            style={[Theme.Title, {color: Theme.colors.White, textAlign: "left"}]}
+                            numberOfLines={1}
+                        >
+                            {props.children}
+                        </Text>
+                    }
                 </TextInput>
+                    {!editable &&
+                        <Text
+                            style={[Theme.Title, {color: Theme.colors.White, textAlign: "left", maxWidth: 250}]}
+                            numberOfLines={1}
+                        >
+                            {props.children}
+                        </Text>
+                    }
             </View>
             <View>
                 <TouchableOpacity onPress={() => { setEditable(true) }}>
@@ -52,47 +71,22 @@ const HeaderTitle: React.FC<{props: HeaderTitleProps, setTitle: React.Dispatch<R
     )
 }
 
-export const FluxEditor: React.FC<{navigation: StackNavigationProp<RootStackParamList, 'FluxEditor'>}> = ({ navigation }) => {
+export const FluxEditor: React.FC<StackScreenProps<RootStackParamList, 'FluxEditor'>> = ({navigation, route }) => {
     const [title, setTitle] = useState<string>("Sans nom");
-    const [bottomSheetOpened, setBottomSheetOpened] = useState<boolean>(false);
-    const [areaType, setAreaType] = useState<"action" | "reaction">("action");
-    const [areaData, setAreaData] = useState<{}>({});
-    const bottomSheetRef = useRef<BottomSheet>(null);
-    const Styles = useThemedStyles(styles);
     const Theme = useTheme();
-    const [currentArea, setCurrentArea] = useState<IAREAComponent>();
 
     useEffect(() => {
         navigation.setOptions({ title: title, headerStyle: { backgroundColor: Theme.colors.Black }, headerTitle(props) { return <HeaderTitle props={props} setTitle={setTitle} /> }, headerTitleAlign: 'center', headerBackTitleVisible: false });
     }, [title]);
 
-    const action: IAREAComponent = {
-        default: true,
-        type: "action",
-    }
-
-    const reaction: IAREAComponent = {
-        default: true,
-        type: "reaction",
-    }
-
     return (
         <View style={{width: "100%", height: "100%"}}>
-            <BottomSheetComponent ref={bottomSheetRef} setOpened={setBottomSheetOpened} opened={bottomSheetOpened} content={<AREABottomSheet currentArea={currentArea} />}>
-                <View style={Styles.container}>
-                    <AREAComponent data={action} inEditor={true} onPress={(data) => {
-                        bottomSheetRef.current?.expand();
-                        setBottomSheetOpened(true);
-                        setCurrentArea(data);
-                    }} />
-                    <View style={Styles.line} />
-                    <AREAComponent data={reaction} inEditor={true} onPress={(data) => {
-                        bottomSheetRef.current?.expand();
-                        setBottomSheetOpened(true);
-                        setCurrentArea(data);
-                    }} />
-                </View>
-            </BottomSheetComponent>
+            {
+                route.params ?
+                <Board title={title} flux={route.params!["otherParam"]["flux"]} setTitle={setTitle} goBack={navigation.goBack}/>
+                :
+                <Board title={title} setTitle={setTitle} goBack={navigation.goBack}/>
+            }
         </View>
     )
 }

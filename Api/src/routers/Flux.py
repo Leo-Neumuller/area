@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from src.middleware.User import MiddlewareUser
 from src.models.Flux import FluxCreateOrModify, create_or_modify_flux, FluxSend, Flux, get_flux_by_id, check_flux, \
-    get_all_fluxs, FluxBasicData, recreate_flux_graph
+    get_all_fluxs, FluxBasicData, recreate_flux_graph, FluxToggleSend
 from src.models.User import UserMe
 from src.utils.Database import get_db
 from src.utils.Helper import DefaultErrorResponse
@@ -92,3 +92,27 @@ async def get_flux(fluxId: int, User: UserMe = Depends(MiddlewareUser.check), db
         nodes=flux.frontEndData["nodes"],
         edges=flux.frontEndData["edges"]
     )
+
+
+@FluxRouters.patch("/{fluxId}",
+                   summary="Toggle active flux",
+                   description="Toggle active flux",
+                   response_description="Toggle works",
+                   status_code=status.HTTP_200_OK,
+                   response_model=FluxToggleSend,
+                   dependencies=[Depends(MiddlewareUser.check)],
+                   responses={**MiddlewareUser.responses(),
+                              status.HTTP_404_NOT_FOUND: {"description": "Flux not found",
+                                                          **DefaultErrorResponse()}})
+async def toggle_flux(fluxId: int, User: UserMe = Depends(MiddlewareUser.check), db: Session = Depends(get_db)):
+    """
+    Toggle active flux
+    :return: Flux
+    """
+    try:
+        flux = get_flux_by_id(fluxId, User, db)
+    except Flux.Exception.NotFoundException as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+    flux.active = not flux.active
+    db.commit()
+    return FluxToggleSend(id=flux.id, active=flux.active)

@@ -27,8 +27,8 @@
 <svg class="wrapper">
     <path role="presentation" class={`${isNew ? "edgeNew" : selected ? "edgeSelected" : "edge"}`}
         d={`M ${position.x0} ${position.y0} 
-            C ${position.x0 + (Math.abs(position.x1 - position.x0) / 2)} ${position.y0}, 
-              ${position.x1 - (Math.abs(position.x1 - position.x0) / 2)} ${position.y1}, 
+            C ${position.x1 - (Math.abs(position.x1 - position.x1) / 2)} ${position.y0}, 
+              ${position.x0 + (Math.abs(position.x1 - position.x1) / 2)} ${position.y1}, 
               ${position.x1} ${position.y1}`} on:mousedown={handleOnMouseDown}>
         
     </path>

@@ -14,4 +14,4 @@ RUN ./install.sh
 
 COPY . .
 
-CMD ls -la /usr/src/api/ && ls -la /apk; rm /usr/src/api/*.apk; cp /apk/*.apk /usr/src/api/; venv/bin/uvicorn main:app --host 0.0.0.0 --port 8000
+CMD rm /usr/src/api/*.apk; cp /apk/*.apk /usr/src/api/; venv/bin/uvicorn main:app --host 0.0.0.0 --port 8000

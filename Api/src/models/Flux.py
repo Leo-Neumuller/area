@@ -1,4 +1,5 @@
 from copy import copy
+from datetime import datetime
 from typing import List, Any, Optional
 
 from pydantic import BaseModel
@@ -36,8 +37,8 @@ class FluxGraph(Base):
 
     def __repr__(self):
         return f"\n<FluxGraph(\n\tid={self.id},\n\tflux_id={self.flux_id},\n\tprev_data={self.prev_data},\n\tconfig={self.config},\n\t" \
-                f"service_id={self.service_id},\n\taction_ids={self.action_ids},\n\tprev_flux_graph_ids={self.prev_flux_graph_ids},\n\t" \
-                f"next_flux_graph_ids={self.next_flux_graph_ids}\n)> "
+               f"service_id={self.service_id},\n\taction_ids={self.action_ids},\n\tprev_flux_graph_ids={self.prev_flux_graph_ids},\n\t" \
+               f"next_flux_graph_ids={self.next_flux_graph_ids}\n)> "
 
 
 class Flux(Base):
@@ -132,6 +133,12 @@ class FluxSend(BaseModel):
     id: int
 
 
+class FluxToggleSend(BaseModel):
+    """Flux Toggle Model"""
+    id: int
+    active: bool
+
+
 class FluxError(BaseModel):
     """Flux Error Model"""
     id: str
@@ -149,9 +156,18 @@ class FluxBasicData(BaseModel):
     active: bool
 
 
+def check_iso_format(x):
+    try:
+        datetime.fromisoformat(x.replace("Z", ""))
+        return True
+    except ValueError:
+        return False
+
+
 # TODO: add check for all input data type
 flux_check_input_data_type = {
-    "string": lambda x: x == "" and type(x) == str,
+    "string": lambda x: type(x) != str or x == "",
+    "date": lambda x: type(x) != str or not check_iso_format(x),
 }
 
 
@@ -230,7 +246,8 @@ def check_flux(CreateFlux: FluxCreateOrModify) -> List[FluxError]:
             Errors.append(
                 FluxError(id="node_service_not_found", relatedNodeIds=[node.id], error="Le noeud a un service érroné"))
             continue
-        if (node.numberInputs != "" and node.numberInputs != "0") and splitted_sub_service_id[1] == "action":
+        if (node.numberInputs != "" and node.numberInputs != "0" and node.numberInputs != 0) and \
+                splitted_sub_service_id[1] == "action":
             Errors.append(FluxError(id="node_service_action_with_inputs", relatedNodeIds=[node.id],
                                     error="Un noeud action ne peut pas avoir d'entrée"))
         if node.outputEdgeIds == [] and splitted_sub_service_id[1] == "action":
@@ -246,6 +263,7 @@ def check_flux(CreateFlux: FluxCreateOrModify) -> List[FluxError]:
                                         error="Donnée d'entrée inconnue"))
                 continue
             if not isinstance(inputData.value, dict):
+                print(inputData.value, flux_check_input_data_type[inputData.type](inputData.value))
                 if inputData.required and (
                         inputData.value is None or flux_check_input_data_type[inputData.type](inputData.value)):
                     Errors.append(FluxError(id="node_input_data_required", relatedNodeIds=[node.id],
@@ -346,8 +364,6 @@ def recreate_flux_graph(flux: Flux, db: Session):
     db.commit()
     data = db.query(FluxGraph).filter(FluxGraph.flux_id == flux.id).all()
     print(data)
-
-
 
 
 def get_flux_by_id(fluxId: int, User: UserMe, db: Session):

@@ -7,7 +7,8 @@ import {ThemeTypeContext} from "../../constants/Theme";
 import EditSVG from "../../../assets/Vector.svg";
 import AddSVG from "../../../assets/AddComponent.svg";
 import FluxOverview from "../../components/fluxOverviewComponent"
-import {fluxGet} from "../../api/api";
+import {fluxGet, fluxIdGet} from "../../api/api";
+import EncryptedStorage from "react-native-encrypted-storage";
 
 
 type RootStackParamList = {
@@ -29,14 +30,21 @@ interface flux {
 export const Flux: React.FC<Props> = ({navigation}) => {
     const Styles = useThemedStyles(styles);
     const Theme = useTheme();
-
     const [userFluxs, setUserFluxs] = useState<flux[]>([])
 
     useEffect(() => {
+        const onFocus = navigation.addListener('focus', () => {
+            fluxGet().then((res) => {
+                setUserFluxs(res);
+            })
+        })
         fluxGet().then((res) => {
             setUserFluxs(res);
         })
-    }, [navigation.getState()])
+        return function clean() {
+            onFocus();
+        }
+    }, [])
 
     return (
         <ScrollView>
@@ -92,6 +100,19 @@ export const Flux: React.FC<Props> = ({navigation}) => {
                     <FluxOverview key={index}
                                   desc={value.description}
                                   name={value.name}
+                                  onPress={() => {
+                                      return(
+                                          EncryptedStorage.getItem("userToken").then((token) => {
+                                                  fluxIdGet(token!, value.id).then((res) => {
+                                                        // @ts-ignore
+                                                      navigation.navigate('FluxEditor', {
+                                                          itemId: value.id,
+                                                          otherParam: {flux: res}
+                                                      })
+                                                  })
+                                          })
+                                      )
+                              }}
                     />
                 )
             })}

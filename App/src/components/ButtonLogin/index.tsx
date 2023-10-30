@@ -9,6 +9,7 @@ interface Props {
     textColor?: string;
     hei?: DimensionValue | undefined;
     wid?: DimensionValue | undefined;
+
 }
 
 export default function ButtonComponents(Props: Props) {

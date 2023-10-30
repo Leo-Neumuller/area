@@ -10,7 +10,7 @@
     }
 </script>
 
-<select on:input={handleChangeType} class="w-full bg-customWhite/[10%] rounded-lg p-4 font-SpaceGrotesk text-customWhite text-[1.75rem] font-normal">
+<select value={value} on:input={handleChangeType} class="w-full bg-customWhite/[10%] rounded-lg p-4 font-SpaceGrotesk text-customWhite text-[1.75rem] font-normal">
     {#if placeholder}
         <option class="bg-gray" disabled selected value>{placeholder}</option>
     {/if}

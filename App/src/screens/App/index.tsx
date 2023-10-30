@@ -58,7 +58,6 @@ export const App: React.FC<Props> = ({navigation}) => {
 
     }, []);
 
-    // flatlist pour le display horizontal
 
     return (
         <ScrollView>
