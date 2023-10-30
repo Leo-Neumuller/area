@@ -12,15 +12,20 @@ type Props = {
     inEditor: boolean,
     onPress: (data?: IAREAComponent) => void,
     data: IAREAComponent,
+    customSvg?: React.ReactNode,
 }
 
-export const AREAComponent: React.FC<Props> = ({inEditor, onPress, data}) => {
+export const AREAComponent: React.FC<Props> = ({inEditor, onPress, data, customSvg}) => {
     const Styles = useThemedStyles(styles);
     const Theme = useTheme();
+    const [selected, setSelected] = React.useState(false);
 
     return (
         <View style={inEditor ? (data.type == "action" ? Styles.actionContainer : Styles.reactionContainer) : Styles.editorContainer}>
-            <TouchableOpacity onPress={() => onPress(data)}>
+            <TouchableOpacity onPress={() => {
+                onPress(data)
+                setSelected(!selected)
+            }}>
                 <View style={inEditor ? Styles.editorContentContainer : Styles.contentContainer}>
                     <View style={[Styles.svgBackground, {backgroundColor: (data.type == 'action' ? Theme.colors.Primary : Theme.colors.Black)}]}>
                         <FluxSVG style={[{color: data.type == 'action' ? Theme.colors.Black : Theme.colors.Primary}, Styles.svgDefault]} />
@@ -30,9 +35,12 @@ export const AREAComponent: React.FC<Props> = ({inEditor, onPress, data}) => {
                             {data.default ? (data.type == 'action' ? "Action" : "Reaction") : data.name!}
                         </Text>
                     </View>
-                    {inEditor && <EditSVG style={[Styles.svgEdit, {
+                    {inEditor && customSvg == undefined && <EditSVG style={[Styles.svgEdit, {
                         color: data.type == 'action' ? Theme.colors.White : Theme.colors.Black
                     }]}/>}
+                    {customSvg &&
+                        customSvg
+                    }
                 </View>
             </TouchableOpacity>
         </View>
