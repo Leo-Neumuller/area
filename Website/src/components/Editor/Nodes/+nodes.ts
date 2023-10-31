@@ -14,7 +14,6 @@ export interface ChildProps {
 
     modify: boolean;
     title: string;
-    img: string;
 }
 
 export default Nodes__SvelteComponent_;

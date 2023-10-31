@@ -17,7 +17,7 @@
 
 	import Validate from "../../SVGs/+Validate.svelte";
 	import Profile from "../../SVGs/+Profile.svelte";
-  import TextInput from "../../TextInput/+TextInput.svelte";
+  	import TextInput from "../../TextInput/+TextInput.svelte";
 	import { browser } from '$app/environment';
     import Warning from "../../SVGs/+Warning.svelte";
     import Icon from "../../Icon/+Icon.svelte";
@@ -484,7 +484,8 @@
 
 	
 	function getSubeserviceid() {
-		let parentNode = nodes.find((nodes) => nodes.id === nodeRegister.inputEdgeIds[0]?.slice(6, 31))
+		let parentNode = nodes.find((nodes) => nodes.id === nodeRegister.inputEdgeIds[0]?.slice(6, 30))
+		console.log(nodeRegister.inputEdgeIds[0]?.slice(6, 30), nodes, parentNode)
 		return parentNode?.subServiceId;
 	}
 
@@ -579,7 +580,7 @@
 			<Close className="w-8 h-8" color="#F3F3F3"/>
 		</button>
 	</div>
-	<div class="flex flex-wrap gap-4">
+	<div class="flex flex-wrap gap-4 pt-4">
 		{#if Object.entries(services).length !== 0 && nodeRegister != null}
 			{#each services[nodeRegister.type.toLowerCase()] as service}
 				<button on:click={() => {
@@ -588,7 +589,8 @@
 							nodeRegister.service = service;
 							nodeRegister.title = service;
 							updateNodes();
-						}} class="text-customWhite bg-customWhite/10 p-4 rounded-xl text-[1.7rem] font-SpaceGrotesk">
+						}} class="text-customWhite bg-customWhite/10 p-4 rounded-xl text-[1.7rem] font-SpaceGrotesk flex justify-between gap-4 items-center">
+					<Icon name={service} className="w-8 h-8"/>
 					{service}
 				</button>
 			{/each}
@@ -664,10 +666,14 @@
 											clearInterval(interval);
 											ConnectedServices = {
 												...ConnectedServices,
-												[nodeRegister.type]: {
-													...ConnectedServices[nodeRegister.type],
+												"Action": {
+													...ConnectedServices["Action"],
 													[nodeRegister.service]: true,
-												}
+												},
+												"Reaction": {
+													...ConnectedServices["Reaction"],
+													[nodeRegister.service]: true,
+												},
 											};
 										}
 									} catch {
@@ -720,7 +726,6 @@
 			selected={node.id === selectedNode}
 			bind:modify={modifyMenu}
 			title={node.title}
-			img={node.img}
 			onMouseDownNode={handleOnMouseDownNode}
 			onMouseDownOutput={handleOnMouseDownOutput}
 			onMouseEnterInput={handleOnMouseEnterInput}

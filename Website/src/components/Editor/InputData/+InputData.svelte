@@ -42,7 +42,6 @@
     if (nodeType) {
       getSubServiceMetadata(getCookie("token"), nodeType).then((res) => {
         metadata = res["outputsData"];
-        console.log(metadata)
       })
     }
 </script>
