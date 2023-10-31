@@ -121,7 +121,8 @@ export async function createFlux(cookie: string, flux: CreateFlux, verify: boole
 }
 
 export async function getOauthLink(cookie: string, service: string) {
-    const res = await fetch(import.meta.env.VITE_API_URL + `/services/` + service + "/authorize_url", {
+    const redirect_uri = window.location.origin + "/redirected";
+    const res = await fetch(import.meta.env.VITE_API_URL + `/services/` + service + `/authorize_url?redirect_uri=${redirect_uri}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',

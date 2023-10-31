@@ -18,6 +18,7 @@ class Service(Base):
     name = Column(String, index=True)
     state = Column(String)
     refresh = Column(PickleType)
+    redirect_uri = Column(String)
     user_id = Column(Integer, ForeignKey("users.id"))
 
     user = relationship("User", back_populates="services")
@@ -216,6 +217,36 @@ def save_start_authorization(service_name: str, state: str, User: UserMe, db: Se
     db.add(service)
     db.commit()
     db.refresh(service)
+
+
+def add_redirect_uri(service_name: str, redirect_uri: str, User: UserMe, db: Session):
+    """
+    Add redirect uri
+    :param service_name: Service name
+    :param redirect_uri: Redirect URI
+    :param User: User
+    :param db: Session of database
+    :return: None
+    """
+    service = db.query(Service).filter(Service.name == service_name, Service.user_id == User.id).first()
+    service.redirect_uri = redirect_uri
+    db.commit()
+    db.refresh(service)
+
+
+def get_redirect_uri(service_name: str, state: str, db: Session) -> Optional[str]:
+    """
+    Get redirect uri
+    :param service_name: Service name
+    :param state: State
+    :param db: Session of database
+    :return: Redirect URI
+    """
+    service = db.query(Service).filter(Service.name == service_name, Service.state == state).first()
+    db.query(Service).filter(Service.name == service_name, Service.state == state).update({"state": ""})
+    if service is None:
+        return None
+    return service.redirect_uri
 
 
 def check_if_service_exist(service_name: str, User: UserMe, db: Session):
