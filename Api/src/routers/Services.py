@@ -39,6 +39,22 @@ async def get_services():
     )
 
 
+@ServicesRouter.get("/services/oauth",
+                    summary="Services",
+                    description="Get services",
+                    response_description="Services",
+                    status_code=status.HTTP_200_OK,
+                    response_model=List[str],
+                    dependencies=[Depends(MiddlewareUser.check)],
+                    responses={**MiddlewareUser.responses()})
+async def get_services_with_oauth():
+    """
+    Get services with oauth
+    :return: Services
+    """
+    return [service for service in services.keys() if "authorize" in dir(services[service])]
+
+
 @ServicesRouter.get("/metadata/{areaId}",
                     summary="Get action or reaction input schema",
                     description="Get action or reaction input schema",
@@ -105,7 +121,8 @@ async def authorize_url(service: str, redirect_uri: str | None = None, User: Use
                     description="Authorize",
                     response_description="Authorize",
                     status_code=200)
-async def authorize(service: str, state: str = None, code: str = None, scope: str = None, error: str = None, db=Depends(get_db)):
+async def authorize(service: str, state: str = None, code: str = None, scope: str = None, error: str = None,
+                    db=Depends(get_db)):
     """
     Authorize
     :return: Authorize
