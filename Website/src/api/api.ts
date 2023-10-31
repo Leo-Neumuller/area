@@ -221,13 +221,28 @@ export async function toggleFlux(cookie: string, id: number) {
 }
 
 
-export async function deleteFlux(cookie: string, id: number) {
-    const res = await fetch(import.meta.env.VITE_API_URL + `/flux/${id}`, {
-        method: 'PATCH',
+export async function disconnectService(cookie: string, service: number) {
+    const res = await fetch(import.meta.env.VITE_API_URL + `/services/${service}/disconnect`, {
+        method: 'GET',
         headers: {
             'Content-Type': 'application/json',
             'access-token': cookie,
-            'fluxId': `${id}`
+        }
+    })
+    if (res.status !== 200) {
+        let err = await res.json();
+
+        throw new Error(err.detail);
+    }
+    return res.json();
+}
+
+export async function deleteFlux(cookie: string, fluxId: any) {
+    const res = await fetch(import.meta.env.VITE_API_URL + `/flux/${fluxId}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'access-token': cookie
         }
     })
     if (res.status !== 200) {

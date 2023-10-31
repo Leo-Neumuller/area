@@ -1,6 +1,6 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
-    import { checkConnected, getOauthLink, getServices, userMe } from "../../api/api";
+    import { checkConnected, disconnectService, getOauthLink, getServices, userMe } from "../../api/api";
     import { getCookie } from "../../api/helpers";
   import Icon from "../Icon/+Icon.svelte";
     import Goto from "../SVGs/+Goto";
@@ -14,9 +14,10 @@
         return res
     }
 
+    let dic: {[key: string] : boolean} = {};
     async function isConnected(service: string) {
         const res = await checkConnected(getCookie("token"), service);
-        return res.is_connected;
+        dic = {...dic, [service]: res.is_connected}
     }
 
     function onlyUnique(value: any, index: any, array: any) {
@@ -78,10 +79,12 @@
                 {#await isConnected(service)}
                     Wait
                 {:then res}
-                    {#if res}
+                    {#if dic[service]}
                         <button class="flex justify-between gap-5"
                             on:click={() => {
-                                
+                                disconnectService(getCookie("token"), service).then((res) => {
+                                    dic = {...dic, [service]: false};
+                                })
                             }}>
                             <Icon name={service} className="w-10 h-10"/>
                             <h1 class="items-center">Se déconnecter</h1>
@@ -100,6 +103,7 @@
 											popup?.close();
                                             res = true;
 											clearInterval(interval);
+                                            dic = {...dic, [service]: true};
 										}
 									} catch {
 										return;

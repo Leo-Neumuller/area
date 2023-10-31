@@ -1,5 +1,7 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
+  import { deleteFlux } from "../../api/api";
+  import { getCookie } from "../../api/helpers";
     import Instagram from "../SVGs/+Instagram.svelte";
     import RightArrow from "../SVGs/+RightArrow.svelte";
 
@@ -22,7 +24,9 @@
         {#if deleteButton}
             <button class="font-SpaceGrotesk text-red-600 border border-red-600 rounded-2xl px-6 font-bold hover:text-customWhite hover:bg-red-600"
                 on:click={() => {
-                    
+                    deleteFlux(getCookie("token"), flux.id).then((res) => {
+                        console.log(res)
+                    });
                 }}>
                 Supprimer
             </button>
