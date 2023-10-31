@@ -37,6 +37,7 @@
 	let modifyServiceType: string = "";
 
 	let modifyMenu: boolean = false;
+	let newNodeMenu: boolean = false;
 	let advancedModify: boolean = false;
 	let saveMenu: boolean = false;
 	let successCheckmark: boolean = false;
@@ -87,7 +88,6 @@
 						}
 					}
 
-					console.log(nodes, edges, edgeId)
 					edges.forEach((edge) => {
 						if (edge.outputIndex === newEdge.outputIndex && edge.nodeEndId === nodeEnd.id) {
 							newEdge = null;
@@ -364,7 +364,7 @@
 
 	onMount(() => {
 		setInterval(() => {
-			if (!saveMenu) {
+			if (!saveMenu && !advancedModify && !modifyMenu && !newNodeMenu) {
 				const data =  {
 					"name": name,
 					"description": descr,
@@ -381,7 +381,6 @@
 						return;
 					}
 					errorMessage = "";
-					console.log("ici")
 					$page.url.searchParams.set("FluxId", res["id"]);
 					goto(`?${$page.url.searchParams.toString()}`);
 				})
@@ -483,6 +482,12 @@
 		}
 	}
 
+	
+	function getSubeserviceid() {
+		let parentNode = nodes.find((nodes) => nodes.id === nodeRegister.inputEdgeIds[0]?.slice(6, 31))
+		return parentNode?.subServiceId;
+	}
+
 </script>
 
 <div>
@@ -560,7 +565,7 @@
 	Sauvegarder
   </button>
   <div class="">
-	<Addbutton showDelete={selectedNode === null} onCLickAdd={handleOnCLickAdd} onClickDelete={handleOnClickDelete}/>
+	<Addbutton showDelete={selectedNode === null} onCLickAdd={handleOnCLickAdd} onClickDelete={handleOnClickDelete} bind:open={newNodeMenu}/>
   </div>
   <div
 	class={`${modifyService ? "flex" : "hidden"} flex-col bg-gray rounded-[20px] absolute w-[60%] h-[80%] top-[60%] left-[50%] -translate-x-[50%] -translate-y-[55%] z-[21] p-10`}>
@@ -591,7 +596,7 @@
 	</div>
   </div>
   {#if (advancedModify)}
-	<div class="fixed top-26 right-0 w-[30%] h-screen z-[100] bg-gray px-6 py-2">
+	<div class="fixed top-26 right-0 w-screen md:w-[34rem] h-screen z-[100] bg-gray px-6 py-2">
 		<button class="absolute"
 			on:click={() => {
 				advancedModify = false;
@@ -601,7 +606,7 @@
 		<h1 class="text-[2.2rem] font-SpaceGrotesk text-customWhite font-semibold w-full text-center">
 			{nodeRegister.service}
 		</h1>
-		<div class="pt-14 h-[80%] overflow-auto">
+		<div class="pt-14 h-[80%] overflow-auto px-2">
 			<div class="flex flex-col gap-16 justify-between h-full">
 				<div class="flex flex-col gap-6">
 					<div class="flex flex-col gap-6">
@@ -629,12 +634,12 @@
 								placeholder="Choisissez une action à éxecuter"
 								onChange={(value) => {
 									nodeRegister.subService = value
-									nodeRegister.subServiceId = subServices["data"].find((subService) => subService["name"] === value)?.id
+									nodeRegister.subServiceId =  subServices["data"].find((subService) => subService["name"] === value)?.id
 								}}/>
 							<div>
 								{#if nodeRegister?.inputsData}
 									{#each nodeRegister.inputsData as inputData}
-										<InputData bind:inputD={inputData}/>
+										<InputData bind:inputD={inputData} nodeType={getSubeserviceid()} service={nodeRegister.type}/>
 									{/each}
 								{/if}
 							</div>
@@ -650,7 +655,6 @@
 					<button class={`${nodeRegister.service && ConnectedServices[nodeRegister.type][nodeRegister.service] ? "hidden" : "flex"} gap-6 font-SpaceGrotesk w-full bg-customWhite/[10%] font-medium text-[1.75rem] p-4 align-middle items-center justify-center rounded-[0.63rem]`}
 					on:click={() => {
 						if (nodeRegister?.service) {
-							console.log(ConnectedServices);
 							getOauthLink(getCookie("token"), nodeRegister.service).then((res) => {
 								const popup = window.open(res["url"], "popup", "width=600,height=600 popup=true");
 								const interval = setInterval(() => {
@@ -780,3 +784,25 @@ for (let i = 0; i < services.length; i++) {
 		}
 	];
 } -->
+
+<style>
+	/* width */
+	::-webkit-scrollbar {
+	  width: 6px;
+	}
+	
+	/* Track */
+	::-webkit-scrollbar-track {
+	  background: #f1f1f1; 
+	}
+	 
+	/* Handle */
+	::-webkit-scrollbar-thumb {
+	  background: #888; 
+	}
+	
+	/* Handle on hover */
+	::-webkit-scrollbar-thumb:hover {
+	  background: #555; 
+	}
+	</style>
