@@ -80,7 +80,7 @@ function saveFlux(id: number, title: string, actions: IAREAComponent[], reaction
                 nodeStartId: "node_" + i,
                 nodeEndId: "node_" + a,
                 inputIndex: -1 + i,
-                outputIndex: 0 + i,
+                outputIndex: i,
                 prevStartPos: startpos,
                 currStartPos: startpos,
                 prevEndPos: endpos,
@@ -124,6 +124,18 @@ export const Board: React.FC<{title?: string, setTitle?: React.Dispatch<React.Se
     const defaultReaction: IAREAComponent = {
         default: true,
         type: "reaction",
+    }
+
+    const deleteArea = () => {
+        if (selectedArea?.type == "action") {
+            const index = action.findIndex((item) => item == selectedArea);
+            setAction([...action.slice(0, index), ...action.slice(index + 1)]);
+            setAreaIsDefined({...areaIsDefined, action: false});
+        } else if (selectedArea?.type == "reaction") {
+            const index = reaction.findIndex((item) => item == selectedArea);
+            setReaction([...reaction.slice(0, index), ...reaction.slice(index + 1)]);
+            setAreaIsDefined({...areaIsDefined, reaction: false});
+        }
     }
 
     useEffect(() => {
@@ -210,13 +222,36 @@ export const Board: React.FC<{title?: string, setTitle?: React.Dispatch<React.Se
     }, [saveSelectedArea]);
 
     return (
-        <BottomSheetComponent ref={bottomSheetRef} setOpened={setBottomSheetOpened} opened={bottomSheetOpened} content={<AREABottomSheet currentArea={selectedArea} bottomSheetRef={bottomSheetRef} setSaveSelectedArea={setSaveSelectedArea} />}>
+        <BottomSheetComponent ref={bottomSheetRef} setOpened={setBottomSheetOpened} opened={bottomSheetOpened} content={<AREABottomSheet deleteArea={deleteArea} currentArea={selectedArea} bottomSheetRef={bottomSheetRef} setSaveSelectedArea={setSaveSelectedArea} />}>
             <View style={Styles.container}>
                 <AREAComponent data={{...defaultAction, name: "Actions", default: false}} inEditor={true} onPress={(data) => { setActionDropDown(!actionDropDown) }} customSvg={
                     <DropdownSVG style={{color: Theme.colors.White, transform: [{rotate: actionDropDown ? "180deg" : "0deg"}]}} />
                 } />
-                <ScrollView style={[Styles.dropdownContainer, {backgroundColor: Theme.colors.Black, display: actionDropDown ? "flex" : "none"}]}>
-                    {action.map((item, index) => {
+                <View style={{maxHeight: action.length == 0 ? "10%" : "25%"}}>
+                    <ScrollView style={[Styles.dropdownContainer, {backgroundColor: Theme.colors.Black, display: actionDropDown ? "flex" : "none"}]}>
+                        {action.map((item, index) => {
+                            return (
+                                <AREAComponent key={index} data={item} inEditor={true} onPress={(data) => {
+                                    bottomSheetRef.current?.expand();
+                                    setBottomSheetOpened(true);
+                                    setSelectedArea(data);
+                                }} />
+                            )
+                        })}
+                        <TouchableOpacity style={{bottom: 10}} onPress={() => {
+                            setAction([...action, defaultAction])
+                        }}>
+                            <AddSVG style={{alignSelf: "center", marginTop: 10, color: Theme.colors.White}} />
+                        </TouchableOpacity>
+                    </ScrollView>
+                </View>
+                <View style={Styles.line} />
+                <AREAComponent data={{...defaultReaction, name: "Reactions", default: false}} inEditor={true} onPress={(data) => { setReactionDropDown(!reactionDropDown) }} customSvg={
+                    <DropdownSVG style={{color: Theme.colors.Black, transform: [{rotate: reactionDropDown ? "180deg" : "0deg"}]}} />
+                } />
+                <View style={{maxHeight: reaction.length == 0 ? "17%" : "33%"}}>
+                    <ScrollView style={[Styles.dropdownContainer, {backgroundColor: Theme.colors.Primary, display: reactionDropDown ? "flex" : "none", marginBottom: 40}]}>
+                    {reaction.map((item, index) => {
                         return (
                             <AREAComponent key={index} data={item} inEditor={true} onPress={(data) => {
                                 bottomSheetRef.current?.expand();
@@ -226,31 +261,12 @@ export const Board: React.FC<{title?: string, setTitle?: React.Dispatch<React.Se
                         )
                     })}
                     <TouchableOpacity style={{bottom: 10}} onPress={() => {
-                        setAction([...action, defaultAction])
+                        setReaction([...reaction, defaultReaction])
                     }}>
-                        <AddSVG style={{alignSelf: "center", marginTop: 10, color: Theme.colors.White}} />
+                        <AddSVG style={{alignSelf: "center", marginTop: 10, color: Theme.colors.Black}} />
                     </TouchableOpacity>
-                </ScrollView>
-                <View style={Styles.line} />
-                <AREAComponent data={{...defaultReaction, name: "Reactions", default: false}} inEditor={true} onPress={(data) => { setReactionDropDown(!reactionDropDown) }} customSvg={
-                    <DropdownSVG style={{color: Theme.colors.Black, transform: [{rotate: reactionDropDown ? "180deg" : "0deg"}]}} />
-                } />
-                <ScrollView style={[Styles.dropdownContainer, {backgroundColor: Theme.colors.Primary, display: reactionDropDown ? "flex" : "none", marginBottom: 40}]}>
-                {reaction.map((item, index) => {
-                    return (
-                        <AREAComponent key={index} data={item} inEditor={true} onPress={(data) => {
-                            bottomSheetRef.current?.expand();
-                            setBottomSheetOpened(true);
-                            setSelectedArea(data);
-                        }} />
-                    )
-                })}
-                <TouchableOpacity style={{bottom: 10}} onPress={() => {
-                    setReaction([...reaction, defaultReaction])
-                }}>
-                    <AddSVG style={{alignSelf: "center", marginTop: 10, color: Theme.colors.Black}} />
-                </TouchableOpacity>
-                </ScrollView>
+                    </ScrollView>
+                </View>
                 {areaIsDefined.action && areaIsDefined.reaction &&
                     <View style={Styles.saveButton}>
                         <ButtonComponents onPress={
@@ -280,7 +296,8 @@ const styles = (Theme: ThemeTypeContext) => StyleSheet.create({
         paddingTop: 5,
         paddingBottom: 5,
         borderRadius: 20,
-        maxHeight: "25%",
+        maxHeight: "100%",
+        minWidth: "73%",
     },
     line: {
         width: 1,

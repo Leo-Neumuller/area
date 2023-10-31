@@ -123,7 +123,7 @@ export async function serviceSchemaGet (token: string, serviceId: string) {
 }
 
 export async function authorizeUrlGet (token: string, serviceId: string) {
-    const res = await fetch(process.env.API_URL + "/services/" + serviceId + "/authorize_url", {
+    const res = await fetch(process.env.API_URL + "/services/" + serviceId + "/authorize_url?redirect_uri=" + encodeURIComponent(process.env.API_URL!), {
         method: "GET",
         headers: {
             "accept" : "application/json",

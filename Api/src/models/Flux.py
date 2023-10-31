@@ -366,7 +366,7 @@ def recreate_flux_graph(flux: Flux, db: Session):
     print(data)
 
 
-def get_flux_by_id(fluxId: int, User: UserMe, db: Session):
+def get_flux_by_id(fluxId: int, User: UserMe, db: Session) -> Flux:
     """
     Get flux by id
     :param fluxId: Flux id
@@ -441,3 +441,17 @@ def get_all_fluxs(User: UserMe, db: Session) -> List[FluxBasicData]:
             active=flux.active
         ))
     return fluxs_basic_data
+
+
+def delete_flux(fluxId: int, User: UserMe, db: Session) -> None:
+    """
+    Delete flux
+    :param fluxId: Flux id
+    :param User: User
+    :param db: Session of database
+    :return: None
+    """
+    db.query(Flux).filter(Flux.id == fluxId, Flux.user_id == User.id).delete()
+    db.query(FluxGraph).filter(FluxGraph.flux_id == fluxId).delete()
+    db.commit()
+    return

@@ -28,6 +28,7 @@ type AREABottomSheetProps = {
     currentArea?: IAREAComponent,
     bottomSheetRef?:  React.RefObject<BottomSheetMethods> | undefined,
     setSaveSelectedArea?: React.Dispatch<React.SetStateAction<IAREAComponent | undefined>>
+    deleteArea: () => void;
 };
 
 async function getServices(): Promise<IService> {
@@ -51,9 +52,12 @@ async function getAuthorizeUrlFromApi(serviceId: string): Promise<{ url: string 
 }
 
 async function authService(url: string, serviceId: string): Promise<void> {
+    const newUrl = url.replace(/redirect_uri=.*services/, "redirect_uri=" + encodeURIComponent(process.env.API_URL!) + "%2Fservices");
+
+    console.log(newUrl)
     try {
         if (await InAppBrowser.isAvailable()) {
-            InAppBrowser.open(url, {
+            InAppBrowser.open(newUrl, {
                 // iOS Properties
                 ephemeralWebSession: false,
                 // Android Properties
@@ -65,17 +69,15 @@ async function authService(url: string, serviceId: string): Promise<void> {
                 .then((response) => {
                     console.log(response)
                 })
-            // InAppBrowser.openAuth(url, "http://localhost:8000", {
+            // InAppBrowser.openAuth(url, "localhost:8000", {
             //     // iOS Properties
             //     ephemeralWebSession: false,
             //     // Android Properties
             //     showTitle: false,
             //     enableUrlBarHiding: true,
             //     enableDefaultShare: false,
-            //     forceCloseOnRedirection: true
             //
             // }).then((response) => {
-            //     console.log("testttttttt")
             //     console.log(response)
             //     if (
             //         response.type === 'success' &&
@@ -84,7 +86,9 @@ async function authService(url: string, serviceId: string): Promise<void> {
             //         Linking.openURL(response.url)
             //     }
             // })
-        } else Linking.openURL(url)
+        } else {
+            Linking.openURL(url)
+        }
     } catch (error) {
         Linking.openURL(url)
     }
@@ -94,9 +98,10 @@ const AREAParamBottomSheet: React.FC<{
     setAREAParamOpened: React.Dispatch<React.SetStateAction<boolean>>,
     closeBottomSheet: Function,
     setSaveSelectedArea?: React.Dispatch<React.SetStateAction<IAREAComponent | undefined>>,
-    refetchSchema?: boolean
-    setRefetchSchema?: React.Dispatch<React.SetStateAction<boolean>>
-    }> = ({data, setAREAParamOpened, closeBottomSheet, setSaveSelectedArea, refetchSchema, setRefetchSchema}) => {
+    refetchSchema?: boolean,
+    setRefetchSchema?: React.Dispatch<React.SetStateAction<boolean>>,
+    deleteArea: () => void;
+    }> = ({data, setAREAParamOpened, closeBottomSheet, setSaveSelectedArea, refetchSchema, setRefetchSchema, deleteArea}) => {
     const Styles = useThemedStyles(styles);
     const Theme = useTheme();
     const [services, setServices] = React.useState<[IAREAServices]>([{"name": "", "id": "", "description": ""}]);
@@ -166,9 +171,17 @@ const AREAParamBottomSheet: React.FC<{
 
     return (
         <ScrollView style={[Styles.container]} persistentScrollbar={true}>
-            <Text style={[Theme.Title, {color: Theme.colors.White, paddingLeft: 20}]}>
-                Application
-            </Text>
+            <View style={{paddingLeft: 20, paddingRight: 20, width: "100%", flexDirection: "row", justifyContent: "space-between"}}>
+                <Text style={[Theme.Title, {color: Theme.colors.White, justifyContent: "center"}]}>
+                    Application
+                </Text>
+                <TouchableOpacity onPress={() => {
+                    deleteArea()
+                    closeBottomSheet()
+                }} style={{backgroundColor: Theme.colors.Red, justifyContent: "center", borderRadius: 20, paddingHorizontal: 15}}>
+                    <Text style={[Theme.Subtitle, {color: Theme.colors.Black}]}>Supprimer</Text>
+                </TouchableOpacity>
+            </View>
             <View style={Styles.areaContainer}>
                 <View style={Styles.areaContentContainer}>
                     <AREAComponent data={data} inEditor={false} onPress={(data) => {
@@ -299,7 +312,7 @@ const AREAParamBottomSheet: React.FC<{
     )
 }
 
-export const AREABottomSheet: React.FC<AREABottomSheetProps> = ({currentArea, bottomSheetRef, setSaveSelectedArea}) => {
+export const AREABottomSheet: React.FC<AREABottomSheetProps> = ({currentArea, bottomSheetRef, setSaveSelectedArea, deleteArea}) => {
     const Styles = useThemedStyles(styles);
     const Theme = useTheme();
     const [services, setServices] = React.useState<IService>({"action": [""], "reaction": [""]});
@@ -332,11 +345,19 @@ export const AREABottomSheet: React.FC<AREABottomSheetProps> = ({currentArea, bo
     }, [currentArea]);
 
     return (
-        actionParamOpened ? <AREAParamBottomSheet data={currentAreaParam!} setAREAParamOpened={setAREAParamOpened} closeBottomSheet={closeBottomSheet} setSaveSelectedArea={setSaveSelectedArea} refetchSchema={refetchSchema} setRefetchSchema={setRefetchSchema} /> :
+        actionParamOpened ? <AREAParamBottomSheet data={currentAreaParam!} setAREAParamOpened={setAREAParamOpened} closeBottomSheet={closeBottomSheet} setSaveSelectedArea={setSaveSelectedArea} refetchSchema={refetchSchema} setRefetchSchema={setRefetchSchema} deleteArea={deleteArea} /> :
         <View style={Styles.container}>
-            <Text style={[Theme.Title, {color: Theme.colors.White, paddingLeft: 20}]}>
-                {currentArea?.type == "action" ? "Action" : "Reaction"}
-            </Text>
+            <View style={{paddingLeft: 20, paddingRight: 20, width: "100%", flexDirection: "row", justifyContent: "space-between"}}>
+                <Text style={[Theme.Title, {color: Theme.colors.White, justifyContent: "center"}]}>
+                    {currentArea?.type == "action" ? "Action" : "Reaction"}
+                </Text>
+                <TouchableOpacity onPress={() => {
+                    deleteArea()
+                    closeBottomSheet()
+                }} style={{backgroundColor: Theme.colors.Red, justifyContent: "center", borderRadius: 20, paddingHorizontal: 15}}>
+                    <Text style={[Theme.Subtitle, {color: Theme.colors.Black}]}>Supprimer</Text>
+                </TouchableOpacity>
+            </View>
             <View style={Styles.areaContainer}>
                 <VirtualizedList
                     getItemCount={(data) => data.length}
