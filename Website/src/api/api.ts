@@ -9,6 +9,7 @@ export interface signupProps {
 }
 
 export async function signupPost(data: { [key: string]: string }) {
+    console.log("signupPost")
     const res = await fetch(import.meta.env.VITE_API_URL + "/user/signup", {
         method: 'POST',
         body: JSON.stringify(data),

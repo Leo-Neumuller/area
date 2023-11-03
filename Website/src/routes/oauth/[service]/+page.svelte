@@ -7,7 +7,6 @@
 
   onMount(() => {
     pushOauthData(data.service, window.location.search).then((us) => {
-      console.log(window.location.search)
       if (us.redirected) {
         window.location.href = us.url
       }
