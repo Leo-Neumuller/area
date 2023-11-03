@@ -59,7 +59,8 @@ class Calendar(BaseService):
             scopes=scopes,
             redirect=redirect,
         )
-        db.query(Service).filter(Service.name == Calendar.get_name(), Service.state == state).update({"refresh": refresh})
+        db.query(Service).filter(Service.name == Calendar.get_name(), Service.state == state).update(
+            {"refresh": refresh})
         db.commit()
 
     @staticmethod
@@ -141,8 +142,8 @@ class Calendar(BaseService):
             info(str(event))
         except Exception as e:
             warn(e)
-            return {"signal": False}
-        return {"signal": True, "event_url": event.get("htmlLink")}
+            return {"signal": False, "data": []}
+        return {"signal": True, "data": [{"event_url": event.get("htmlLink")}]}
 
     @add_metadata(ServiceMetadata(
         name="New Created Event",
@@ -195,7 +196,8 @@ class Calendar(BaseService):
                     "link": event["htmlLink"],
                 })
                 info(str(event))
-            prev_data["time"] = max([datetime.fromisoformat(event["updated"].replace("Z", "")).timestamp() for event in data["items"]])
+            prev_data["time"] = max(
+                [datetime.fromisoformat(event["updated"].replace("Z", "")).timestamp() for event in data["items"]])
         except Exception as e:
             warn(str(e))
             return prev_data, {"signal": False, "data": []}

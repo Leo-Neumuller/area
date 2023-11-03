@@ -18,7 +18,6 @@ class Spotify(BaseService):
 
     def __init__(self, User: UserMe | None = None, db: Session | None = None):
         super().__init__(User, db)
-        self.version = "v3"
 
     @staticmethod
     def get_name() -> str:
