@@ -443,7 +443,7 @@ def get_all_fluxs(User: UserMe, db: Session) -> List[FluxBasicData]:
     return fluxs_basic_data
 
 
-def delete_flux(fluxId: int, User: UserMe, db: Session) -> None:
+def delete_flux_with_id(fluxId: int, User: UserMe, db: Session) -> None:
     """
     Delete flux
     :param fluxId: Flux id
