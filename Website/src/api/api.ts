@@ -252,3 +252,19 @@ export async function deleteFlux(cookie: string, fluxId: any) {
     }
     return res.json();
 }
+
+export async function getOauthServices(cookie: string) {
+    const res = await fetch(import.meta.env.VITE_API_URL + `/services/services/oauth`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'access-token': cookie
+        }
+    })
+    if (res.status !== 200) {
+        let err = await res.json();
+
+        throw new Error(err.detail);
+    }
+    return res.json();
+}

@@ -10,7 +10,7 @@
 	import type Edge from "./EdgeInterface";
 	import Close from "../../SVGs/+Close";
 	import Modify from "../../SVGs/+Modify.svelte";
-	import {createFlux, getFlux, getServices, getSubServiceMetadata, getSubServices, getOauthLink, checkConnected, type CreateFlux} from "../../../api/api";
+	import {createFlux, getFlux, getServices, getSubServiceMetadata, getSubServices, getOauthLink, checkConnected, type CreateFlux, getOauthServices} from "../../../api/api";
 	import {getCookie} from "../../../api/helpers";
 	import Select from "../../Select/+select.svelte";
 	import InputData from "../InputData/+InputData.svelte"
@@ -31,6 +31,7 @@
 	let edges: Edge[] = [];
 	let newEdge: any = null;
 	let insideInput: { nodeId: string, inputIndex: number, pos: { x: number, y: number } } | null = null;
+	let OauthServices: string[] = [];
 
 	let nodeRegister: Node;
 	let modifyService: boolean = false;
@@ -208,6 +209,7 @@
 				outputEdgeIds: outputs,
 				title: type,
 				img: "test",
+				service: "",
 			}
 		];
 	}
@@ -363,6 +365,9 @@
 	}
 
 	onMount(() => {
+		getOauthServices(getCookie("token")).then((res) => {
+			OauthServices = res;
+		})
 		const interval = setInterval(() => {
 			if (!window.location.pathname.includes("flux-editor")) {
 				clearInterval(interval);
@@ -558,209 +563,219 @@
 		</div>
 
 	</div>
-  <button class={`absolute top-7 right-24 px-4 py-1 rounded z-40 text-[1.7rem] font-SpaceGrotesk  
-  				  font-bold border
-				  ${errorMessage !== "" ? "border-customWhite/50 text-customWhite/50" : "border-customWhite text-customWhite hover:text-gray hover:bg-customWhite"}`}
-		on:click={() => {
-			successCheckmark = false;
-			saveMenu = !saveMenu;
-		}} disabled={errorMessage !== "" ? true : false}>
-	Sauvegarder
-  </button>
-  <div class="">
-	<Addbutton showDelete={selectedNode === null} onCLickAdd={handleOnCLickAdd} onClickDelete={handleOnClickDelete} bind:open={newNodeMenu}/>
-  </div>
-  <div
-	class={`${modifyService ? "flex" : "hidden"} flex-col bg-gray rounded-[20px] absolute w-[60%] h-[80%] top-[60%] left-[50%] -translate-x-[50%] -translate-y-[55%] z-[21] p-10`}>
-	<div class="flex w-full justify-between items-center">
-		<div class="text-[3.125rem] font-medium text-customWhite">
-			{nodeRegister?.type}
-		</div>
-		<button on:click={() => {
-					modifyService = false;
-				}}>
-			<Close className="w-8 h-8" color="#F3F3F3"/>
-		</button>
-	</div>
-	<div class="flex flex-wrap gap-4 pt-4">
-		{#if Object.entries(services).length !== 0 && nodeRegister != null}
-			{#each services[nodeRegister.type.toLowerCase()] as service}
-				<button on:click={() => {
-							modifyService = false;
-							advancedModify = true
-							nodeRegister.service = service;
-							nodeRegister.title = service;
-							updateNodes();
-						}} class="text-customWhite bg-customWhite/10 p-4 rounded-xl text-[1.7rem] font-SpaceGrotesk flex justify-between gap-4 items-center">
-					<Icon name={service} className="w-8 h-8"/>
-					{service}
-				</button>
-			{/each}
-		{/if}
-	</div>
-  </div>
-  {#if (advancedModify)}
-	<div class="fixed top-26 right-0 w-screen md:w-[34rem] h-screen z-[100] bg-gray px-6 py-2">
-		<button class="absolute"
+	<button class={`absolute top-7 right-24 px-4 py-1 rounded z-40 text-[1.7rem] font-SpaceGrotesk  
+					font-bold border
+					${errorMessage !== "" ? "border-customWhite/50 text-customWhite/50" : "border-customWhite text-customWhite hover:text-gray hover:bg-customWhite"}`}
 			on:click={() => {
-				advancedModify = false;
-			}}>
-			<Close className="w-6 h-6" color="#F3F3F3"/>
-		</button>
-		<h1 class="text-[2.2rem] font-SpaceGrotesk text-customWhite font-semibold w-full text-center">
-			{nodeRegister.service}
-		</h1>
-		<div class="pt-14 h-[80%] overflow-auto px-2">
-			<div class="flex flex-col gap-16 justify-between h-full">
-				<div class="flex flex-col gap-6">
+				successCheckmark = false;
+				saveMenu = !saveMenu;
+			}} disabled={errorMessage !== "" ? true : false}>
+		Sauvegarder
+	</button>
+	<div class="">
+		<Addbutton showDelete={selectedNode === null} onCLickAdd={handleOnCLickAdd} onClickDelete={handleOnClickDelete} bind:open={newNodeMenu}/>
+	</div>
+	<div class={`${modifyService ? "flex" : "hidden"} flex-col bg-gray rounded-[20px] absolute w-[60%] h-[80%] top-[60%] left-[50%] -translate-x-[50%] -translate-y-[55%] z-[21] p-10`}>
+		<div class="flex w-full justify-between items-center">
+			<div class="text-[3.125rem] font-medium text-customWhite">
+				{nodeRegister?.type}
+			</div>
+			<button on:click={() => {
+						modifyService = false;
+					}}>
+				<Close className="w-8 h-8" color="#F3F3F3"/>
+			</button>
+		</div>
+		<div class="flex flex-wrap gap-4 pt-4">
+			{#if Object.entries(services).length !== 0 && nodeRegister != null}
+				{#each services[nodeRegister.type.toLowerCase()] as service}
+					<button on:click={() => {
+								modifyService = false;
+								advancedModify = true
+								nodeRegister.service = service;
+								nodeRegister.title = service;
+								nodeRegister.subServiceId = undefined;
+								nodeRegister.subService = undefined;
+								nodeRegister.inputsData = undefined;
+								nodeRegister.inputDataFromSubServiceId = undefined;
+								console.log(nodeRegister)
+								updateNodes();
+							}} class="text-customWhite bg-customWhite/10 p-4 rounded-xl text-[1.7rem] font-SpaceGrotesk flex justify-between gap-4 items-center">
+						<Icon name={service} className="w-8 h-8"/>
+						{service}
+					</button>
+				{/each}
+			{/if}
+		</div>
+	</div>
+	{#if (advancedModify)}
+		<div class="fixed top-26 right-0 w-screen md:w-[34rem] h-screen z-[100] bg-gray px-6 py-2">
+			<button class="absolute"
+				on:click={() => {
+					advancedModify = false;
+				}}>
+				<Close className="w-6 h-6" color="#F3F3F3"/>
+			</button>
+			<h1 class="text-[2.2rem] font-SpaceGrotesk text-customWhite font-semibold w-full text-center">
+				{nodeRegister.service}
+			</h1>
+			<div class="pt-14 h-[80%] overflow-auto px-2">
+				<div class="flex flex-col gap-16 justify-between h-full">
 					<div class="flex flex-col gap-6">
-						<h1 class="text-[2.2rem] font-SpaceGrotesk text-customWhite font-semibold">
-							Application
-						</h1>
-						<div class={`flex font-SpaceGrotesk w-full bg-customWhite/[10%] font-medium text-[1.75rem] p-4 align-middle items-center justify-between rounded-[0.63rem]`}>
-							<Icon name={nodeRegister.service} className="w-8 h-8"/>
-							<h1 class="text-customWhite">{nodeRegister.service}</h1>
-							<button class="bg-primary rounded-lg p-1 px-2" on:click={() => {
-								advancedModify = false;
-								modifyService = true;
-							}}>
-								<p class="text-gray">modifier</p>
-							</button>
+						<div class="flex flex-col gap-6">
+							<h1 class="text-[2.2rem] font-SpaceGrotesk text-customWhite font-semibold">
+								Application
+							</h1>
+							<div class={`flex font-SpaceGrotesk w-full bg-customWhite/[10%] font-medium text-[1.75rem] p-4 align-middle items-center justify-between rounded-[0.63rem]`}>
+								<Icon name={nodeRegister.service} className="w-8 h-8"/>
+								<h1 class="text-customWhite">{nodeRegister.service}</h1>
+								<button class="bg-primary rounded-lg p-1 px-2" on:click={() => {
+									advancedModify = false;
+									modifyService = true;
+								}}>
+									<p class="text-gray">modifier</p>
+								</button>
+							</div>
 						</div>
-					</div>
-					<div>
-						<h1 class="text-[2.2rem] font-SpaceGrotesk text-customWhite font-semibold">
-							{nodeRegister.type}
-						</h1>
-						<div class="">
-							<Select options={subServices["data"].map((subService) => subService["name"])}
-								value={subServices["data"].find((subService) => nodeRegister.subServiceId === subService["id"])?.name}
-								placeholder="Choisissez une action à éxecuter"
-								onChange={(value) => {
-									nodeRegister.subService = value
-									nodeRegister.subServiceId =  subServices["data"].find((subService) => subService["name"] === value)?.id
-								}}/>
-							<div>
-								{#if nodeRegister?.inputsData}
-									{#each nodeRegister.inputsData as inputData}
-										<InputData bind:inputD={inputData} nodeType={getSubeserviceid()} service={nodeRegister.type}/>
-									{/each}
-								{/if}
+						<div>
+							<h1 class="text-[2.2rem] font-SpaceGrotesk text-customWhite font-semibold">
+								{nodeRegister.type}
+							</h1>
+							<div class="">
+								<Select options={subServices["data"].map((subService) => subService["name"])}
+									value={subServices["data"].find((subService) => nodeRegister.subServiceId === subService["id"])?.name}
+									placeholder="Choisissez une action à éxecuter"
+									onChange={(value) => {
+										nodeRegister.subService = value
+										nodeRegister.subServiceId =  subServices["data"].find((subService) => subService["name"] === value)?.id
+									}}/>
+								<div>
+									{#if nodeRegister?.inputsData}
+										{#each nodeRegister.inputsData as inputData}
+											<InputData bind:inputD={inputData} nodeType={getSubeserviceid()} service={nodeRegister.type}/>
+										{/each}
+									{/if}
+								</div>
 							</div>
 						</div>
 					</div>
-				</div>
 
-				<div class="">
-					<div class={`${nodeRegister.service && ConnectedServices[nodeRegister.type][nodeRegister.service] ? "flex" : "hidden"} gap-6 font-SpaceGrotesk w-full bg-customWhite/[10%] font-medium text-[1.75rem] p-4 align-middle items-center justify-center rounded-[0.63rem]`}>
-						<h1 class="text-customWhite">Connecté</h1>
-						<Validate className="w-8 h-8" color="#D9C6F4"/>
-					</div>
-					<button class={`${nodeRegister.service && ConnectedServices[nodeRegister.type][nodeRegister.service] ? "hidden" : "flex"} gap-6 font-SpaceGrotesk w-full bg-customWhite/[10%] font-medium text-[1.75rem] p-4 align-middle items-center justify-center rounded-[0.63rem]`}
-					on:click={() => {
-						if (nodeRegister?.service) {
-							getOauthLink(getCookie("token"), nodeRegister.service).then((res) => {
-								const popup = window.open(res["url"], "popup", "width=600,height=600 popup=true");
-								const interval = setInterval(() => {
-									try {
-										if (popup?.window?.location.href) {
-											popup?.close();
-											clearInterval(interval);
-											ConnectedServices = {
-												...ConnectedServices,
-												"Action": {
-													...ConnectedServices["Action"],
-													[nodeRegister.service]: true,
-												},
-												"Reaction": {
-													...ConnectedServices["Reaction"],
-													[nodeRegister.service]: true,
-												},
-											};
+					<div class="">
+						{#if OauthServices.includes(nodeRegister.service)}
+							<div class={`${nodeRegister.service && ConnectedServices[nodeRegister.type][nodeRegister.service] ? "flex" : "hidden"} gap-6 font-SpaceGrotesk w-full bg-customWhite/[10%] font-medium text-[1.75rem] p-4 align-middle items-center justify-center rounded-[0.63rem]`}>
+								<h1 class="text-customWhite">Connecté</h1>
+								<Validate className="w-8 h-8" color="#D9C6F4"/>
+							</div>
+						{:else}
+							<h1 class="text-center text-customWhite/30">
+								Pas de connexion nécessaire
+							</h1>
+						{/if}
+						<button class={`${nodeRegister.service && ConnectedServices[nodeRegister.type][nodeRegister.service] ? "hidden" : "flex"} gap-6 font-SpaceGrotesk w-full bg-customWhite/[10%] font-medium text-[1.75rem] p-4 align-middle items-center justify-center rounded-[0.63rem]`}
+						on:click={() => {
+							if (nodeRegister?.service) {
+								getOauthLink(getCookie("token"), nodeRegister.service).then((res) => {
+									const popup = window.open(res["url"], "popup", "width=600,height=600 popup=true");
+									const interval = setInterval(() => {
+										try {
+											if (popup?.window?.location.href) {
+												popup?.close();
+												clearInterval(interval);
+												ConnectedServices = {
+													...ConnectedServices,
+													"Action": {
+														...ConnectedServices["Action"],
+														[nodeRegister.service]: true,
+													},
+													"Reaction": {
+														...ConnectedServices["Reaction"],
+														[nodeRegister.service]: true,
+													},
+												};
+											}
+										} catch {
+											return;
 										}
-									} catch {
-										return;
-									}
-								}, 1000);
-							});
-						}
-					}}>
-						<h1 class="text-customWhite">Se connecter</h1>
-						<Profile className="w-8 h-8" color="#F3F3F3"/>
-					</button>
+									}, 1000);
+								});
+							}
+						}}>
+							<h1 class="text-customWhite">Se connecter</h1>
+							<Profile className="w-8 h-8" color="#F3F3F3"/>
+						</button>
+					</div>
 				</div>
 			</div>
 		</div>
-	</div>
 
-  {/if}
-  {#if (modifyMenu)}
-	<div style="transform: translate(
-			{nodeRegister.currPosition.x}px,
-			{nodeRegister.currPosition.y}px)"
-		 class={`rounded-[20px] cursor-pointer flex flex-col ${nodeRegister.type === "Action" ? "bg-gray text-customWhite" : "bg-primary text-gray"} box-border absolute left-[430px] -top-[8px] z-[20] w-[14rem] font-SpaceGrotesk p-5 gap-2`}>
-	  <div class="flex w-full justify-between align-middle items-center">
-		<button on:click={handleModifyNode} class="text-[1.4rem] font-medium flex justify-between w-full">
-		  Modifier
-		  <Modify className="w-7 h-7" color={nodeRegister.type === "Action" ? "#F3F3F3" : "#373637"}/>
-		</button>
-	  </div>
-	  <div class="flex w-full justify-between align-middle items-center font-medium">
-		<button on:click={handleOnClickDelete} class="text-[1.4rem] flex justify-between w-full">
-		  Supprimer
-		  <Close className="w-6 h-6" color={nodeRegister.type === "Action" ? "#F3F3F3" : "#373637"}/>
-		</button>
-	  </div>
+	{/if}
+	{#if (modifyMenu)}
+		<div style="transform: translate(
+				{nodeRegister.currPosition.x}px,
+				{nodeRegister.currPosition.y}px)"
+			class={`rounded-[20px] cursor-pointer flex flex-col ${nodeRegister.type === "Action" ? "bg-gray text-customWhite" : "bg-primary text-gray"} box-border absolute left-[430px] -top-[8px] z-[20] w-[14rem] font-SpaceGrotesk p-5 gap-2`}>
+		<div class="flex w-full justify-between align-middle items-center">
+			<button on:click={handleModifyNode} class="text-[1.4rem] font-medium flex justify-between w-full">
+			Modifier
+			<Modify className="w-7 h-7" color={nodeRegister.type === "Action" ? "#F3F3F3" : "#373637"}/>
+			</button>
+		</div>
+		<div class="flex w-full justify-between align-middle items-center font-medium">
+			<button on:click={handleOnClickDelete} class="text-[1.4rem] flex justify-between w-full">
+			Supprimer
+			<Close className="w-6 h-6" color={nodeRegister.type === "Action" ? "#F3F3F3" : "#373637"}/>
+			</button>
+		</div>
+		</div>
+	{/if}
+	<div id="boardWrapper" class="fixed w-screen h-screen top-0 left-0 overflow-scroll">
+		<div class={`${grabbingBoard ? "boardDragging" : "board"}`} role="presentation" id="board"
+				on:mousedown={(e) => {handleMouseDown(e)}}
+				on:mouseup={(e) => {handleMouseUp(e)}}
+				on:mousemove={(e) => {handleMouseMove(e)}}>
+		{#each nodes as node}
+			<NodeComponent
+				id={node.id}
+				type={node.type}
+				pos={node.currPosition}
+				numberOfInputs={node.numberInputs}
+				numberOfOutputs={node.numberOutputs}
+				selected={node.id === selectedNode}
+				bind:modify={modifyMenu}
+				title={node.title}
+				onMouseDownNode={handleOnMouseDownNode}
+				onMouseDownOutput={handleOnMouseDownOutput}
+				onMouseEnterInput={handleOnMouseEnterInput}
+				onMouseLeaveInput={handleOnMouseLeaveInput}/>
+		{/each}
+		{#if (newEdge)}
+			<EdgeComponent
+			selected={false}
+			isNew={true}
+			position={{
+							x0: newEdge.currStartPos.x,
+							y0: newEdge.currStartPos.y,
+							x1: newEdge.currEndPos.x,
+							y1: newEdge.currEndPos.y
+						}}
+			onMouseDownEdge={() => {}}
+			onClickDeleteEdge={() => {}}/>
+		{/if}
+		{#each edges as edge}
+			<EdgeComponent
+			selected={selectedEdge === edge.id}
+			isNew={false}
+			position={{
+							x0: edge.currStartPos.x,
+							y0: edge.currStartPos.y,
+							x1: edge.currEndPos.x,
+							y1: edge.currEndPos.y
+						}}
+			onMouseDownEdge={() => {handleOnMouseDownEdge(edge.id)}}
+			onClickDeleteEdge={() => {HandleOnDeleteEdge(edge.id)}}/>
+		{/each}
+		</div>
 	</div>
-  {/if}
-  <div id="boardWrapper" class="fixed w-screen h-screen top-0 left-0 overflow-scroll">
-	<div class={`${grabbingBoard ? "boardDragging" : "board"}`} role="presentation" id="board"
-			on:mousedown={(e) => {handleMouseDown(e)}}
-			on:mouseup={(e) => {handleMouseUp(e)}}
-			on:mousemove={(e) => {handleMouseMove(e)}}>
-	  {#each nodes as node}
-		<NodeComponent
-			id={node.id}
-			type={node.type}
-			pos={node.currPosition}
-			numberOfInputs={node.numberInputs}
-			numberOfOutputs={node.numberOutputs}
-			selected={node.id === selectedNode}
-			bind:modify={modifyMenu}
-			title={node.title}
-			onMouseDownNode={handleOnMouseDownNode}
-			onMouseDownOutput={handleOnMouseDownOutput}
-			onMouseEnterInput={handleOnMouseEnterInput}
-			onMouseLeaveInput={handleOnMouseLeaveInput}/>
-	  {/each}
-	  {#if (newEdge)}
-		<EdgeComponent
-		  selected={false}
-		  isNew={true}
-		  position={{
-						x0: newEdge.currStartPos.x,
-						y0: newEdge.currStartPos.y,
-						x1: newEdge.currEndPos.x,
-						y1: newEdge.currEndPos.y
-					}}
-		  onMouseDownEdge={() => {}}
-		  onClickDeleteEdge={() => {}}/>
-	  {/if}
-	  {#each edges as edge}
-		<EdgeComponent
-		  selected={selectedEdge === edge.id}
-		  isNew={false}
-		  position={{
-						x0: edge.currStartPos.x,
-						y0: edge.currStartPos.y,
-						x1: edge.currEndPos.x,
-						y1: edge.currEndPos.y
-					}}
-		  onMouseDownEdge={() => {handleOnMouseDownEdge(edge.id)}}
-		  onClickDeleteEdge={() => {HandleOnDeleteEdge(edge.id)}}/>
-	  {/each}
-	</div>
-  </div>
 </div>
 
 
