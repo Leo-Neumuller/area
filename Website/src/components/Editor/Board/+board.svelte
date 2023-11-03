@@ -663,8 +663,7 @@
 								const popup = window.open(res["url"], "popup", "width=600,height=600 popup=true");
 								const interval = setInterval(() => {
 									try {
-										if (popup?.window?.location.href) {
-											popup?.close();
+										if (popup?.closed) {
 											clearInterval(interval);
 											ConnectedServices = {
 												...ConnectedServices,

@@ -27,7 +27,7 @@ class Calendar(BaseService):
         return "Google Calendar"
 
     @staticmethod
-    def get_authorization_url(User: UserMe, db: Session) -> str:
+    def get_authorization_url(User: UserMe, db: Session, redirect: str) -> str:
         """
         Get authorization url
         :param User: User
@@ -37,12 +37,13 @@ class Calendar(BaseService):
         authorization_url, state = Google.get_authorization_url(
             service=Calendar.get_name(),
             scopes=['https://www.googleapis.com/auth/calendar'],
+            redirect=redirect,
         )
         save_start_authorization(Calendar.get_name(), state, User, db)
         return authorization_url
 
     @staticmethod
-    def authorize(state: str, code: str, scopes: List[str], db: Session):
+    def authorize(state: str, code: str, scopes: List[str], db: Session, redirect: str):
         """
         Basic authorize with Google
         :param state: State
@@ -56,6 +57,7 @@ class Calendar(BaseService):
             state=state,
             code=code,
             scopes=scopes,
+            redirect=redirect,
         )
         db.query(Service).filter(Service.name == Calendar.get_name(), Service.state == state).update({"refresh": refresh})
         db.commit()

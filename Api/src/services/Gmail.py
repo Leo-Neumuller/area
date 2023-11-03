@@ -80,7 +80,7 @@ class Gmail(BaseService):
         return "Gmail"
 
     @staticmethod
-    def get_authorization_url(User: UserMe, db: Session) -> str:
+    def get_authorization_url(User: UserMe, db: Session, redirect: str) -> str:
         """
         Get authorization url
         :param User: User
@@ -88,14 +88,15 @@ class Gmail(BaseService):
         :return: Authorize URL
         """
         authorization_url, state = Google.get_authorization_url(
-            service="Gmail",
-            scopes=['https://mail.google.com/'],
+                "Gmail",
+            ['https://mail.google.com/'],
+            redirect,
         )
         save_start_authorization("Gmail", state, User, db)
         return authorization_url
 
     @staticmethod
-    def authorize(state: str, code: str, scopes: List[str], db: Session):
+    def authorize(state: str, code: str, scopes: List[str], db: Session, redirect: str):
         """
         Basic authorize with Google
         :param state: State
@@ -109,6 +110,7 @@ class Gmail(BaseService):
             state=state,
             code=code,
             scopes=scopes,
+            redirect=redirect,
         )
         db.query(Service).filter(Service.name == "Gmail", Service.state == state).update({"refresh": refresh})
         db.commit()

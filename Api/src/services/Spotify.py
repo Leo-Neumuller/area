@@ -29,7 +29,7 @@ class Spotify(BaseService):
         return "Spotify"
 
     @staticmethod
-    def get_authorization_url(User: UserMe, db: Session,
+    def get_authorization_url(User: UserMe, db: Session, redirect: str,
                               Env: Environment.Settings = Environment.Settings()) -> str:
         """
         Get authorization url
@@ -45,12 +45,12 @@ class Spotify(BaseService):
             warn("Spotify.json not found or invalid")
             raise Service.Exception.InvalidGrant(str(e))
         state = get_random_string(32)
-        redirect_uri = urllib.parse.quote(f"{Env.REDIRECT_URI}/services/{Spotify.get_name()}/authorize")
+        redirect_uri = urllib.parse.quote(f"{redirect}")
         save_start_authorization(Spotify.get_name(), state, User, db)
         return f"https://accounts.spotify.com/authorize?client_id={client_id}&response_type=code&redirect_uri={redirect_uri}&scope=user-modify-playback-state%20user-read-playback-state&state={state}"
 
     @staticmethod
-    def authorize(state: str, code: str, scopes: List[str] | None, db: Session,
+    def authorize(state: str, code: str, scopes: List[str] | None, db: Session, redirect: str,
                   Env: Environment.Settings = Environment.Settings()):
         """
         Basic authorize with Google
@@ -63,7 +63,7 @@ class Spotify(BaseService):
         param = {
             "grant_type": "authorization_code",
             "code": code,
-            "redirect_uri": f"{Env.REDIRECT_URI}/services/{Spotify.get_name()}/authorize",
+            "redirect_uri": redirect,
         }
         try:
             with open("secrets/Spotify.json") as f:
@@ -233,7 +233,8 @@ class Spotify(BaseService):
                             if artist["name"] == data["artist_name"]:
                                 return {"last_track_uri": data_spotify["item"]["uri"]}, {"signal": True, "data": [{
                                     "track_name": data_spotify["item"]["name"],
-                                    "artist_names": " - ".join([artist["name"] for artist in data_spotify["item"]["artists"]]),
+                                    "artist_names": " - ".join(
+                                        [artist["name"] for artist in data_spotify["item"]["artists"]]),
                                 }]}
         except Exception as e:
             warn(str(e))
@@ -263,10 +264,11 @@ class Spotify(BaseService):
                 return {"signal": False, "data": []}
             data_spotify = response.json()
             if data_spotify["is_playing"]:
-                response = requests.post(f"https://api.spotify.com/v1/me/player/next?device_id={data_spotify['device']['id']}", headers={
-                    "Content-Type": "application/json",
-                    "Authorization": f"Bearer {refresh['access_token']}"
-                })
+                response = requests.post(
+                    f"https://api.spotify.com/v1/me/player/next?device_id={data_spotify['device']['id']}", headers={
+                        "Content-Type": "application/json",
+                        "Authorization": f"Bearer {refresh['access_token']}"
+                    })
                 print(response.text)
                 if response.status_code == 204:
                     return {"signal": True, "data": []}
@@ -347,7 +349,8 @@ class Spotify(BaseService):
             data_spotify = response.json()
             if data_spotify["is_playing"]:
                 response = requests.put(
-                    f"https://api.spotify.com/v1/me/player/volume?device_id={data_spotify['device']['id']}&volume_percent={str(data['volume'])}", headers={
+                    f"https://api.spotify.com/v1/me/player/volume?device_id={data_spotify['device']['id']}&volume_percent={str(data['volume'])}",
+                    headers={
                         "Authorization": f"Bearer {refresh['access_token']}"
                     })
                 print(response.status_code)
@@ -357,6 +360,3 @@ class Spotify(BaseService):
             warn(str(e))
             return {"signal": False, "data": []}
         return {"signal": False, "data": []}
-
-
-
