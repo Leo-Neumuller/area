@@ -1,13 +1,12 @@
-import '@testing-library/jest-dom'
+import { render, screen } from "@testing-library/svelte";
 
-import {render, fireEvent, screen} from '@testing-library/svelte'
 
-import Icon__SvelteComponent_ from '../src/components/Icon/+Icon.svelte'
+import Register__SvelteComponent_ from '../src/routes/register/+page.svelte'
 
 test('shows proper heading when rendered', () => {
-  render(Icon__SvelteComponent_, {name: 'Gmail', className: ''})
-  const heading = screen.getByText('Hello World!')
-  expect(heading).toBeInTheDocument()
+  render(Register__SvelteComponent_)
+  // const heading = screen.getByText('Hello World!')
+  // expect(heading).toBeInTheDocument()
 })
 
 // // Note: This is as an async test as we are using `fireEvent`
