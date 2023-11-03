@@ -4,10 +4,13 @@
   import { signupPost } from "../../api/api";
   import Input from "../../components/Input/+input.svelte";
   import { onMount } from 'svelte';
+  import { logDOM } from "@testing-library/svelte";
+
 
   let errorMsg: string;
 
   onMount(() => {
+    document.cookie = 'g_state=; Max-Age=-99999999;'; 
     if (document.cookie.includes("token")) {
       goto("/dashboard");
     }
@@ -37,9 +40,18 @@
     })
 	}
 
+
 </script>
 
+
 <svelte:head>
+  <script src="https://accounts.google.com/gsi/client" async defer>
+  </script>
+  <script>
+    window.handleCredentialResponse = (response) => {
+      console.log(response);
+    }
+  </script>
   <title>S'inscrire</title>
   <meta name="description" content="AREA"/>
 </svelte:head>
@@ -82,5 +94,13 @@
         </div>
       </div>
     </form>
+  </div>
+  <div id="g_id_onload"
+    data-client_id="630431542437-08rct8rqgqvvtvdr5rtiq0dr0nh5j1cj.apps.googleusercontent.com"
+    data-callback="handleCredentialResponse"
+    >
+  </div>
+  <div class="hidden">
+    <div class="g_id_signin" data-type="standard"></div>
   </div>
 </section>

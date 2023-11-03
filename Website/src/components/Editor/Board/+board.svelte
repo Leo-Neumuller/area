@@ -10,7 +10,7 @@
 	import type Edge from "./EdgeInterface";
 	import Close from "../../SVGs/+Close";
 	import Modify from "../../SVGs/+Modify.svelte";
-	import {createFlux, getFlux, getServices, getSubServiceMetadata, getSubServices, getOauthLink, checkConnected} from "../../../api/api";
+	import {createFlux, getFlux, getServices, getSubServiceMetadata, getSubServices, getOauthLink, checkConnected, type CreateFlux} from "../../../api/api";
 	import {getCookie} from "../../../api/helpers";
 	import Select from "../../Select/+select.svelte";
 	import InputData from "../InputData/+InputData.svelte"
@@ -363,14 +363,16 @@
 	}
 
 	onMount(() => {
-		setInterval(() => {
+		const interval = setInterval(() => {
+			if (!window.location.pathname.includes("flux-editor")) {
+				clearInterval(interval);
+			}
 			if (!saveMenu && !advancedModify && !modifyMenu && !newNodeMenu) {
-				const data =  {
+				const data: CreateFlux =  {
 					"name": name,
 					"description": descr,
 					"nodes": nodes,
 					"edges": edges,
-					"id": 0,
 				};
 				if ($page.url.searchParams.get("FluxId")) {
 					data["id"] = Number($page.url.searchParams.get("FluxId"));
@@ -486,7 +488,8 @@
 	function getSubeserviceid() {
 		let parentNode = nodes.find((nodes) => nodes.id === nodeRegister.inputEdgeIds[0]?.slice(6, 30))
 		console.log(nodeRegister.inputEdgeIds[0]?.slice(6, 30), nodes, parentNode)
-		return parentNode?.subServiceId;
+		return {"subService": parentNode?.subServiceId,
+				"parent": nodeRegister.inputEdgeIds[0]?.slice(6, 30)};
 	}
 
 </script>
@@ -540,11 +543,10 @@
 					"description": descr,
 					"nodes": nodes,
 					"edges": edges,
-					"id": 0,
 				};
-				if ($page.url.searchParams.get("FluxId")) {
-					data["id"] = Number($page.url.searchParams.get("FluxId"));
-				}
+				// if ($page.url.searchParams.get("FluxId")) {
+				// 	data["id"] = Number($page.url.searchParams.get("FluxId"));
+				// }
 				createFlux(getCookie("token"), data, true).then((res) => {
 					$page.url.searchParams.set("FluxId", res["id"]);
 					goto(`?${$page.url.searchParams.toString()}`);
@@ -793,21 +795,21 @@ for (let i = 0; i < services.length; i++) {
 <style>
 	/* width */
 	::-webkit-scrollbar {
-	  width: 6px;
+		width: 6px;
 	}
-	
+
 	/* Track */
 	::-webkit-scrollbar-track {
-	  background: #f1f1f1; 
+		background: #f1f1f1; 
 	}
-	 
+		
 	/* Handle */
 	::-webkit-scrollbar-thumb {
-	  background: #888; 
+		background: #888; 
 	}
-	
+
 	/* Handle on hover */
 	::-webkit-scrollbar-thumb:hover {
-	  background: #555; 
+		background: #555; 
 	}
-	</style>
+</style>

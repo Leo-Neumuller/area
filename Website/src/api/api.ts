@@ -89,7 +89,7 @@ export async function getSubServiceMetadata(cookie: string, AREA_id: string) {
     return res.json();
 }
 
-interface CreateFlux {
+export interface CreateFlux {
     id?: number;
     name: string;
     description: string;
