@@ -38,9 +38,6 @@ export const Flux: React.FC<Props> = ({navigation}) => {
                 setUserFluxs(res);
             })
         })
-        fluxGet().then((res) => {
-            setUserFluxs(res);
-        })
         return function clean() {
             onFocus();
         }

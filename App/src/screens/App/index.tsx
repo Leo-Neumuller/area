@@ -52,8 +52,6 @@ export const App: React.FC<Props> = ({navigation}) => {
     useEffect(() => {
         getServices().then((res) => {
             setServicies(res);
-            data = splitDataForFlatlist(res.action)
-
         });
 
     }, []);

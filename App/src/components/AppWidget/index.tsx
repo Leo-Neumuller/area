@@ -10,7 +10,7 @@ interface Props {
     data?: string[];
 }
 
-export default function FluxOverview(Props: Props) {
+export default function AppWidget(Props: Props) {
     const Styles = useThemedStyles(styles);
     const Theme = useTheme();
 
