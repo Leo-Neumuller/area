@@ -356,7 +356,8 @@
 	}
 
 	function handleModifyNode() {
-		if (nodeRegister.service != null) {
+		console.log(nodeRegister)
+		if (nodeRegister.service != "") {
 			advancedModify = true;
 		} else {
 			modifyService = true;
@@ -368,31 +369,31 @@
 		getOauthServices(getCookie("token")).then((res) => {
 			OauthServices = res;
 		})
-		const interval = setInterval(() => {
-			if (!window.location.pathname.includes("flux-editor")) {
-				clearInterval(interval);
-			}
-			if (!saveMenu && !advancedModify && !modifyMenu && !newNodeMenu) {
-				const data: CreateFlux =  {
-					"name": name,
-					"description": descr,
-					"nodes": nodes,
-					"edges": edges,
-				};
-				if ($page.url.searchParams.get("FluxId")) {
-					data["id"] = Number($page.url.searchParams.get("FluxId"));
-				}
-				createFlux(getCookie("token"), data, true).then((res) => {
-					if (res && res?.detail && res?.detail[0] && res?.detail[0]?.error) {
-						errorMessage = res?.detail[0]?.error;
-						return;
-					}
-					errorMessage = "";
-					$page.url.searchParams.set("FluxId", res["id"]);
-					goto(`?${$page.url.searchParams.toString()}`);
-				})
-			}
-		}, 2000)
+		// const interval = setInterval(() => {
+		// 	if (!window.location.pathname.includes("flux-editor")) {
+		// 		clearInterval(interval);
+		// 	}
+		// 	if (!saveMenu && !advancedModify && !modifyMenu && !newNodeMenu) {
+		// 		const data: CreateFlux =  {
+		// 			"name": name,
+		// 			"description": descr,
+		// 			"nodes": nodes,
+		// 			"edges": edges,
+		// 		};
+		// 		if ($page.url.searchParams.get("FluxId")) {
+		// 			data["id"] = Number($page.url.searchParams.get("FluxId"));
+		// 		}
+		// 		createFlux(getCookie("token"), data, true).then((res) => {
+		// 			if (res && res?.detail && res?.detail[0] && res?.detail[0]?.error) {
+		// 				errorMessage = res?.detail[0]?.error;
+		// 				return;
+		// 			}
+		// 			errorMessage = "";
+		// 			$page.url.searchParams.set("FluxId", res["id"]);
+		// 			goto(`?${$page.url.searchParams.toString()}`);
+		// 		})
+		// 	}
+		// }, 2000)
 
 		const board = document.getElementById("board");
 		if (board) {
@@ -484,6 +485,7 @@
 			(nodeRegister.inputsData === undefined || nodeRegister.inputDataFromSubServiceId !== nodeRegister.subServiceId)) {
 			getSubServiceMetadata(getCookie("token"), nodeRegister.subServiceId).then((res) => {
 				nodeRegister.inputDataFromSubServiceId = nodeRegister.subServiceId;
+				res["inputsData"] = res["inputsData"].map((inputData: any) =>({...inputData, value: {value: "", "id": "Rien"}}))
 				nodeRegister.inputsData = res["inputsData"];
 			})
 		}
@@ -492,7 +494,6 @@
 	
 	function getSubeserviceid() {
 		let parentNode = nodes.find((nodes) => nodes.id === nodeRegister.inputEdgeIds[0]?.slice(6, 30))
-		console.log(nodeRegister.inputEdgeIds[0]?.slice(6, 30), nodes, parentNode)
 		return {"subService": parentNode?.subServiceId,
 				"parent": nodeRegister.inputEdgeIds[0]?.slice(6, 30)};
 	}
@@ -594,10 +595,19 @@
 								advancedModify = true
 								nodeRegister.service = service;
 								nodeRegister.title = service;
+
 								nodeRegister.subServiceId = undefined;
 								nodeRegister.subService = undefined;
 								nodeRegister.inputsData = undefined;
 								nodeRegister.inputDataFromSubServiceId = undefined;
+
+								getSubServices(getCookie("token"), nodeRegister.service, nodeRegister.type).then((res) => {
+									subServices = {
+										"data": res,
+										"nodeId": nodeRegister.id,
+									}
+								})
+
 								console.log(nodeRegister)
 								updateNodes();
 							}} class="text-customWhite bg-customWhite/10 p-4 rounded-xl text-[1.7rem] font-SpaceGrotesk flex justify-between gap-4 items-center">
@@ -642,12 +652,13 @@
 								{nodeRegister.type}
 							</h1>
 							<div class="">
-								<Select options={subServices["data"].map((subService) => subService["name"])}
+ 								<Select options={subServices["data"].map((subService) => subService["name"])}
 									value={subServices["data"].find((subService) => nodeRegister.subServiceId === subService["id"])?.name}
 									placeholder="Choisissez une action à éxecuter"
 									onChange={(value) => {
 										nodeRegister.subService = value
-										nodeRegister.subServiceId =  subServices["data"].find((subService) => subService["name"] === value)?.id
+										nodeRegister.subServiceId = subServices["data"].find((subService) => subService["name"] === value)?.id
+										updateNodes();
 									}}/>
 								<div>
 									{#if nodeRegister?.inputsData}
@@ -666,43 +677,43 @@
 								<h1 class="text-customWhite">Connecté</h1>
 								<Validate className="w-8 h-8" color="#D9C6F4"/>
 							</div>
+							<button class={`${nodeRegister.service && ConnectedServices[nodeRegister.type][nodeRegister.service] ? "hidden" : "flex"} gap-6 font-SpaceGrotesk w-full bg-customWhite/[10%] font-medium text-[1.75rem] p-4 align-middle items-center justify-center rounded-[0.63rem]`}
+							on:click={() => {
+								if (nodeRegister?.service) {
+									getOauthLink(getCookie("token"), nodeRegister.service).then((res) => {
+										const popup = window.open(res["url"], "popup", "width=600,height=600 popup=true");
+										const interval = setInterval(() => {
+											try {
+												if (popup?.window?.location.href) {
+													popup?.close();
+													clearInterval(interval);
+													ConnectedServices = {
+														...ConnectedServices,
+														"Action": {
+															...ConnectedServices["Action"],
+															[nodeRegister.service]: true,
+														},
+														"Reaction": {
+															...ConnectedServices["Reaction"],
+															[nodeRegister.service]: true,
+														},
+													};
+												}
+											} catch {
+												return;
+											}
+										}, 1000);
+									});
+								}
+							}}>
+								<h1 class="text-customWhite">Se connecter</h1>
+								<Profile className="w-8 h-8" color="#F3F3F3"/>
+							</button>
 						{:else}
 							<h1 class="text-center text-customWhite/30">
 								Pas de connexion nécessaire
 							</h1>
 						{/if}
-						<button class={`${nodeRegister.service && ConnectedServices[nodeRegister.type][nodeRegister.service] ? "hidden" : "flex"} gap-6 font-SpaceGrotesk w-full bg-customWhite/[10%] font-medium text-[1.75rem] p-4 align-middle items-center justify-center rounded-[0.63rem]`}
-						on:click={() => {
-							if (nodeRegister?.service) {
-								getOauthLink(getCookie("token"), nodeRegister.service).then((res) => {
-									const popup = window.open(res["url"], "popup", "width=600,height=600 popup=true");
-									const interval = setInterval(() => {
-										try {
-											if (popup?.window?.location.href) {
-												popup?.close();
-												clearInterval(interval);
-												ConnectedServices = {
-													...ConnectedServices,
-													"Action": {
-														...ConnectedServices["Action"],
-														[nodeRegister.service]: true,
-													},
-													"Reaction": {
-														...ConnectedServices["Reaction"],
-														[nodeRegister.service]: true,
-													},
-												};
-											}
-										} catch {
-											return;
-										}
-									}, 1000);
-								});
-							}
-						}}>
-							<h1 class="text-customWhite">Se connecter</h1>
-							<Profile className="w-8 h-8" color="#F3F3F3"/>
-						</button>
 					</div>
 				</div>
 			</div>
