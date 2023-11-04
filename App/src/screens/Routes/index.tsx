@@ -4,6 +4,8 @@ import {createStackNavigator} from "@react-navigation/stack";
 import {BottomBar} from "../../components/BottomBar";
 import RoutesList from "../../constants/Routes"
 import {ActivityIndicator, View} from "react-native";
+import Linking from "../../constants/Linking";
+import Oauth from "../Oauth";
 
 const Stack = createStackNavigator()
 
@@ -18,13 +20,14 @@ export const Routes: React.FC<{isLogged: boolean | null}> = ({isLogged}) => {
 
     }
     return (
-        <NavigationContainer>
+        <NavigationContainer linking={Linking}>
             <Stack.Navigator initialRouteName={isLogged? "BottomBar" : "HomeLogin"} screenOptions={{headerShown: false}}>
                 <Stack.Screen name='BottomBar' component={BottomBar} />
                 {RoutesList.map((value, index) => {
                     return (<Stack.Screen key={index} {...value}/>);
                 })
                 }
+                <Stack.Screen name='Oauth' component={Oauth}/>
             </Stack.Navigator>
         </NavigationContainer>
     )

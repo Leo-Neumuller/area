@@ -47,8 +47,7 @@ async function getServiceSchema(serviceId: string): Promise<IServiceSchema> {
 }
 
 async function getAuthorizeUrlFromApi(serviceId: string): Promise<{ url: string }> {
-    const token = await EncryptedStorage.getItem("userToken");
-    return await authorizeUrlGet(token as string, serviceId);
+    return await authorizeUrlGet(serviceId);
 }
 
 async function authService(url: string, serviceId: string): Promise<void> {
