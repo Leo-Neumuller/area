@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from src.models.Services import BaseService, save_start_authorization, Service, add_metadata, ServiceType, inputData, \
     DataConfigurationType, outputData, ServiceMetadata
 from src.models.User import UserMe
-from src.utils.Helper import warn
+from src.utils.Helper import warn, info
 from src.utils.Services import Google
 
 
@@ -27,7 +27,7 @@ class Calendar(BaseService):
         return "Google Calendar"
 
     @staticmethod
-    def get_authorization_url(User: UserMe, db: Session) -> str:
+    def get_authorization_url(User: UserMe, db: Session, redirect: str) -> str:
         """
         Get authorization url
         :param User: User
@@ -37,12 +37,13 @@ class Calendar(BaseService):
         authorization_url, state = Google.get_authorization_url(
             service=Calendar.get_name(),
             scopes=['https://www.googleapis.com/auth/calendar'],
+            redirect=redirect,
         )
         save_start_authorization(Calendar.get_name(), state, User, db)
         return authorization_url
 
     @staticmethod
-    def authorize(state: str, code: str, scopes: List[str], db: Session):
+    def authorize(state: str, code: str, scopes: List[str], db: Session, redirect: str):
         """
         Basic authorize with Google
         :param state: State
@@ -56,8 +57,10 @@ class Calendar(BaseService):
             state=state,
             code=code,
             scopes=scopes,
+            redirect=redirect,
         )
-        db.query(Service).filter(Service.name == Calendar.get_name(), Service.state == state).update({"refresh": refresh})
+        db.query(Service).filter(Service.name == Calendar.get_name(), Service.state == state).update(
+            {"refresh": refresh})
         db.commit()
 
     @staticmethod
@@ -68,12 +71,11 @@ class Calendar(BaseService):
             'description': data["description"],
             'start': {
                 # TODO parse datetime and timezone
-                'dateTime': datetime.fromtimestamp(data["start"]).astimezone(timezone.utc).isoformat(),
+                'dateTime': datetime.fromisoformat(data["start"].replace("Z", "")).astimezone(timezone.utc).isoformat(),
                 'timeZone': "Europe/Paris"
             },
             'end': {
-                # TODO parse datetime and timezone
-                'dateTime': datetime.fromtimestamp(data["end"]).astimezone(timezone.utc).isoformat(),
+                'dateTime': datetime.fromisoformat(data["end"].replace("Z", "")).astimezone(timezone.utc).isoformat(),
                 'timeZone': "Europe/Paris"
             },
         }
@@ -133,14 +135,15 @@ class Calendar(BaseService):
         :param data: Data
         :return: None
         """
-        service = Google.get_service(Calendar.get_name(), self.User, self.db, self.version)
+        service = Google.get_service("calendar", Calendar.get_name(), self.User, self.db, self.version)
         try:
             data = self.create_event_data(data)
             event = service.events().insert(calendarId='primary', body=data).execute()
+            info(str(event))
         except Exception as e:
-            warn(str(e))
-            return {"signal": False}
-        return {"signal": True, "event_url": event.get("htmlLink")}
+            warn(e)
+            return {"signal": False, "data": []}
+        return {"signal": True, "data": [{"event_url": event.get("htmlLink")}]}
 
     @add_metadata(ServiceMetadata(
         name="New Created Event",
@@ -177,7 +180,7 @@ class Calendar(BaseService):
         :param prev_data: Previous data
         :param data: Data
         """
-        service = Google.get_service(Calendar.get_name(), self.User, self.db, self.version)
+        service = Google.get_service("calendar", Calendar.get_name(), self.User, self.db, self.version)
         prev_time_fetch = prev_data["time"]
         prev_time_fetch = datetime.fromtimestamp(prev_time_fetch).astimezone(timezone.utc)
         parsed_data = []
@@ -192,7 +195,9 @@ class Calendar(BaseService):
                     "end": datetime.fromisoformat(event["end"]["dateTime"]).timestamp(),
                     "link": event["htmlLink"],
                 })
-            prev_data["time"] = max([datetime.fromisoformat(event["updated"]).timestamp() for event in data["items"]])
+                info(str(event))
+            prev_data["time"] = max(
+                [datetime.fromisoformat(event["updated"].replace("Z", "")).timestamp() for event in data["items"]])
         except Exception as e:
             warn(str(e))
             return prev_data, {"signal": False, "data": []}

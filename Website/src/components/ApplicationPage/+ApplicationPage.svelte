@@ -1,6 +1,7 @@
 <script lang="ts">
     import { getServices } from "../../api/api";
     import { getCookie } from "../../api/helpers";
+  import Icon from "../Icon/+Icon.svelte";
     import Instagram from "../SVGs/+Instagram.svelte";
 
     let actions: any = [];
@@ -19,7 +20,7 @@
         <div class="flex flex-wrap gap-8 text-[2.1rem] font-SpaceGrotesk font-semibold">
             {#each actions as action}
                 <div class="bg-gray/20 rounded-2xl p-6 justify-center items-center flex flex-col gap-6 min-w-[13rem]">
-                    <Instagram className="w-20 h-20" color="#373637"/>
+                    <Icon name={action} className="w-20 h-20"/>
                     <div style="text-align:center;
                         width: min-content;
                         white-space: break-space;
@@ -37,8 +38,8 @@
         </h1>
         <div class="flex flex-wrap gap-8 text-[2.1rem] font-SpaceGrotesk font-semibold">
             {#each reactions as reaction}
-                <div class="bg-gray/20 rounded-2xl p-6 justify-center items-center flex flex-col gap-6 min-w-[13rem]">
-                    <Instagram className="w-20 h-20" color="#373637"/>
+            <div class="bg-gray/20 rounded-2xl p-6 justify-center items-center flex flex-col gap-6 min-w-[13rem]">
+                    <Icon name={reaction} className="w-20 h-20"/>
                     <div style="text-align:center;
                         width: min-content;
                         white-space: break-space;

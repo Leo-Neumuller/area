@@ -154,6 +154,8 @@ class FluxBasicData(BaseModel):
     name: str
     description: str
     active: bool
+    reaction: str
+    action: str
 
 
 def check_iso_format(x):
@@ -366,7 +368,7 @@ def recreate_flux_graph(flux: Flux, db: Session):
     print(data)
 
 
-def get_flux_by_id(fluxId: int, User: UserMe, db: Session):
+def get_flux_by_id(fluxId: int, User: UserMe, db: Session) -> Flux:
     """
     Get flux by id
     :param fluxId: Flux id
@@ -434,10 +436,35 @@ def get_all_fluxs(User: UserMe, db: Session) -> List[FluxBasicData]:
     fluxs = db.query(Flux).filter(Flux.user_id == User.id).all()
     fluxs_basic_data = []
     for flux in fluxs:
+        action = ""
+        reaction = ""
+        for node in flux.frontEndData["nodes"]:
+            if action != "" and reaction != "":
+                break
+            if action == "" and node.type.lower() == "action":
+                action = node.service
+            if reaction == "" and node.type.lower() == "reaction":
+                reaction = node.service
         fluxs_basic_data.append(FluxBasicData(
             id=flux.id,
             name=flux.name,
             description=flux.description,
-            active=flux.active
+            active=flux.active,
+            action=action,
+            reaction=reaction
         ))
     return fluxs_basic_data
+
+
+def delete_flux_with_id(fluxId: int, User: UserMe, db: Session) -> None:
+    """
+    Delete flux
+    :param fluxId: Flux id
+    :param User: User
+    :param db: Session of database
+    :return: None
+    """
+    db.query(Flux).filter(Flux.id == fluxId, Flux.user_id == User.id).delete()
+    db.query(FluxGraph).filter(FluxGraph.flux_id == fluxId).delete()
+    db.commit()
+    return

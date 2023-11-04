@@ -3,7 +3,7 @@ enum inputType {
     "number" = "number",
     "textMultiline" = "textMultiline",
     "select" = "select",
-    "checkbox" = "checkbox"
+    "checkbox" = "checkbox",
     "date" = "date"
 }
 

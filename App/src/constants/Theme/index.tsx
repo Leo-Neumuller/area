@@ -50,6 +50,7 @@ const Theme: ThemeType = {
             "White": "#f3f3f3",
             "Black": "#373637",
             "Gray": "#D9C6F41A",
+            "Red": "#FF5733",
         },
         "Button": {
             fontSize: RFValue(25),

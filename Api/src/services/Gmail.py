@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from src.models.Services import save_start_authorization, Service, ServiceType, BaseService, add_metadata, \
     ServiceMetadata, DataConfigurationType, inputData, outputData
 from src.models.User import UserMe
-from src.utils.Helper import warn
+from src.utils.Helper import warn, info
 from src.utils.Services import Google
 
 input_mail = [
@@ -80,7 +80,7 @@ class Gmail(BaseService):
         return "Gmail"
 
     @staticmethod
-    def get_authorization_url(User: UserMe, db: Session) -> str:
+    def get_authorization_url(User: UserMe, db: Session, redirect: str) -> str:
         """
         Get authorization url
         :param User: User
@@ -88,14 +88,15 @@ class Gmail(BaseService):
         :return: Authorize URL
         """
         authorization_url, state = Google.get_authorization_url(
-            service="Gmail",
-            scopes=['https://mail.google.com/'],
+                "Gmail",
+            ['https://mail.google.com/'],
+            redirect,
         )
         save_start_authorization("Gmail", state, User, db)
         return authorization_url
 
     @staticmethod
-    def authorize(state: str, code: str, scopes: List[str], db: Session):
+    def authorize(state: str, code: str, scopes: List[str], db: Session, redirect: str):
         """
         Basic authorize with Google
         :param state: State
@@ -109,6 +110,7 @@ class Gmail(BaseService):
             state=state,
             code=code,
             scopes=scopes,
+            redirect=redirect,
         )
         db.query(Service).filter(Service.name == "Gmail", Service.state == state).update({"refresh": refresh})
         db.commit()
@@ -167,10 +169,11 @@ class Gmail(BaseService):
         :param data: Dict of data with keys: content, to, subject
         :return: dict of signal
         """
-        service = Google.get_service(self.service_name, self.User, self.db, self.version)
+        service = Google.get_service("gmail", self.service_name, self.User, self.db, self.version)
         try:
             emailRaw = self.create_email(data, service)
-            service.users().drafts().create(userId="me", body={"message": {"raw": emailRaw}}).execute()
+            event = service.users().drafts().create(userId="me", body={"message": {"raw": emailRaw}}).execute()
+            info(str(event))
         except Exception as e:
             warn(str(e))
             return {"signal": False}
@@ -189,10 +192,11 @@ class Gmail(BaseService):
         :param data: Dict of data with keys: content, to, subject
         :return: None
         """
-        service = Google.get_service(self.service_name, self.User, self.db, self.version)
+        service = Google.get_service("gmail", self.service_name, self.User, self.db, self.version)
         try:
             emailRaw = self.create_email(data, service)
-            service.users().messages().send(userId="me", body={"raw": emailRaw}).execute()
+            event = service.users().messages().send(userId="me", body={"raw": emailRaw}).execute()
+            info(str(event))
         except Exception as e:
             warn(str(e))
             return {"signal": False}
@@ -221,12 +225,13 @@ class Gmail(BaseService):
         :param data: Dict of data with keys: email
         :return: None
         """
-        service = Google.get_service(self.service_name, self.User, self.db, self.version)
+        service = Google.get_service("gmail", self.service_name, self.User, self.db, self.version)
         prev_time_fetch = datetime.fromtimestamp(prev_data["time"]).astimezone(timezone.utc)
         return_datas = []
         try:
             email_data = service.users().messages().list(userId="me",
                                                          q=f"from:{data['email']} after:{prev_time_fetch.timestamp()}").execute()
+            info(str(email_data))
             if email_data["resultSizeEstimate"] == 0:
                 return prev_data, {"signal": False, "data": []}
             self.parse_messages(email_data, return_datas, service)
@@ -260,12 +265,13 @@ class Gmail(BaseService):
         :param data: Dict of data with keys: subject
         :return: None
         """
-        service = Google.get_service(self.service_name, self.User, self.db, self.version)
+        service = Google.get_service("gmail", self.service_name, self.User, self.db, self.version)
         prev_time_fetch = datetime.fromtimestamp(prev_data["time"]).astimezone(timezone.utc)
         return_datas = []
         try:
             email_data = service.users().messages().list(userId="me",
                                                          q=f"subject:{data['subject']} after:{prev_time_fetch.timestamp()}").execute()
+            info(str(email_data))
             if email_data["resultSizeEstimate"] == 0:
                 return prev_data, {"signal": False, "data": []}
             self.parse_messages(email_data, return_datas, service)

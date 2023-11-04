@@ -1,45 +1,88 @@
 <script lang="ts">
-  import Button from "../../components/Button/+button.svelte";
-  import { goto } from "$app/navigation";
-  import { signupPost } from "../../api/api";
-  import Input from "../../components/Input/+input.svelte";
-  import { onMount } from 'svelte';
+    import Button from "../../components/Button/+button.svelte";
+    import {goto} from "$app/navigation";
+    import {signupPost} from "../../api/api";
+    import Input from "../../components/Input/+input.svelte";
+    import {onMount} from 'svelte';
 
-  let errorMsg: string;
+    let errorMsg: string;
 
-  onMount(() => {
-    if (document.cookie.includes("token")) {
-      goto("/dashboard");
+
+    onMount(() => {
+        document.cookie = 'g_state=; Max-Age=-99999999;';
+        if (document.cookie.includes("token")) {
+            goto("/dashboard");
+        }
+
+        function parseJwt(token) {
+            let base64Url = token.split('.')[1];
+            let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            let jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function (c) {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join(''));
+
+            return JSON.parse(jsonPayload);
+        }
+
+        window.addEventListener("googleConnect", (data) => {
+            const token = parseJwt(data.detail.credential);
+            const dataToPush = {
+                name: token["given_name"],
+                surname: token["family_name"],
+                email: token["email"],
+                password: token["given_name"].toUpperCase() + token["family_name"].toLowerCase() + token["sub"],
+            }
+            signupPost(dataToPush)
+                .then((res: Response) => res.json())
+                .then((res) => {
+                    document.cookie = `token=${res.access_token}; path=/`;
+                    goto("/dashboard")
+                })
+                .catch((err: Error) => {
+                    errorMsg = err.message;
+                })
+        })
+    });
+
+    function handleSubmit(event: SubmitEvent) {
+        const formData = new FormData(event.target as HTMLFormElement);
+        let data: { [key: string]: string } = {};
+
+        for (let field of formData) {
+            const [key, value] = field as [string, string];
+            if (!value) {
+                errorMsg = "Veuillez remplir tous les champs";
+                return;
+            }
+            data[key] = value;
+        }
+
+        signupPost(data)
+            .then((res: Response) => res.json())
+            .then((res) => {
+                document.cookie = `token=${res.access_token}; path=/`;
+                goto("/dashboard")
+            })
+            .catch((err: Error) => {
+                errorMsg = err.message;
+            })
     }
-  });
 
-  function handleSubmit(event: SubmitEvent) {
-    const formData = new FormData(event.target as HTMLFormElement);
-    let data: { [key: string]: string } = {};
-
-		for (let field of formData) {
-			const [key, value] = field as [string, string];
-      if (!value) {
-        errorMsg = "Veuillez remplir tous les champs";
-        return;
-      }
-			data[key] = value;
-		}
-    
-    signupPost(data)
-    .then((res: Response) => res.json())
-    .then((res) => {
-      document.cookie = `token=${res.access_token}; path=/`;
-      goto("/dashboard")
-    })
-    .catch((err: Error) => {
-      errorMsg = err.message;
-    })
-	}
 
 </script>
 
+
 <svelte:head>
+  <script src="https://accounts.google.com/gsi/client" async defer>
+  </script>
+  <script>
+    window.handleCredentialResponse = (response) => {
+      const googleConnectEvent = new CustomEvent("googleConnect", {
+        detail: response
+      })
+      window.dispatchEvent(googleConnectEvent)
+    }
+  </script>
   <title>S'inscrire</title>
   <meta name="description" content="AREA"/>
 </svelte:head>
@@ -58,19 +101,19 @@
       <div class="flex flex-col float-right bg-gray w-[30vw] h-auto rounded-[4vw] mt-[3vw]">
         <div class="flex flex-col items-center w-5/6 mx-auto pt-[2vw] gap-[1vw]">
           <p class="self-start text-[1.4vw] text-customWhite">Nom</p>
-          <Input className="w-full" placeholder="Nom" name="name" />
+          <Input className="w-full" placeholder="Nom" name="name"/>
         </div>
         <div class="flex flex-col items-center w-5/6 mx-auto pt-[2vw] gap-[1vw]">
           <p class="self-start text-[1.4vw] text-customWhite">Prénom</p>
-          <Input className="w-full" placeholder="Prénom" name="surname" />
+          <Input className="w-full" placeholder="Prénom" name="surname"/>
         </div>
         <div class="flex flex-col items-center w-5/6 mx-auto pt-[2vw] gap-[1vw]">
           <p class="self-start text-[1.4vw] text-customWhite">Email</p>
-          <Input className="w-full"  placeholder="Email" name="email" />
+          <Input className="w-full" placeholder="Email" name="email"/>
         </div>
         <div class="flex flex-col items-center w-5/6 mx-auto pt-[2vw] gap-[1vw]">
           <p class="self-start text-[1.4vw] text-customWhite">Mot de passe</p>
-          <Input className="w-full" placeholder="Mot de passe" name="password" type="password" />
+          <Input className="w-full" placeholder="Mot de passe" name="password" type="password"/>
         </div>
         {#if errorMsg}
           <p class="text-[1.4vw] self-center text-red-300 pt-[2vw] w-4/6 text-center">{errorMsg}</p>
@@ -82,5 +125,13 @@
         </div>
       </div>
     </form>
+  </div>
+  <div id="g_id_onload"
+       data-client_id="630431542437-08rct8rqgqvvtvdr5rtiq0dr0nh5j1cj.apps.googleusercontent.com"
+       data-callback="handleCredentialResponse"
+  >
+  </div>
+  <div class="hidden">
+    <div class="g_id_signin" data-type="standard"></div>
   </div>
 </section>

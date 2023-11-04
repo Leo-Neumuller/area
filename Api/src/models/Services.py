@@ -18,6 +18,8 @@ class Service(Base):
     name = Column(String, index=True)
     state = Column(String)
     refresh = Column(PickleType)
+    redirect_uri = Column(String)
+    end_redirect = Column(String)
     user_id = Column(Integer, ForeignKey("users.id"))
 
     user = relationship("User", back_populates="services")
@@ -216,6 +218,50 @@ def save_start_authorization(service_name: str, state: str, User: UserMe, db: Se
     db.add(service)
     db.commit()
     db.refresh(service)
+
+
+def add_redirect_uri(service_name: str, User: UserMe, db: Session, redirect: str, end_redirect: str):
+    """
+    Add redirect uri
+    :param service_name: Service name
+    :param User: User
+    :param db: Session of database
+    :return: None
+    """
+    service = db.query(Service).filter(Service.name == service_name, Service.user_id == User.id).first()
+    service.redirect_uri = redirect
+    service.end_redirect = end_redirect
+    db.commit()
+    db.refresh(service)
+
+
+def get_redirect_uri(service_name: str, state: str, db: Session) -> Optional[str]:
+    """
+    Get redirect uri
+    :param service_name: Service name
+    :param state: State
+    :param db: Session of database
+    :return: Redirect URI
+    """
+    service = db.query(Service).filter(Service.name == service_name, Service.state == state).first()
+    if service is None:
+        return None
+    return service.redirect_uri
+
+
+def get_end_redirect_uri(service_name: str, state: str, db: Session) -> Optional[str]:
+    """
+    Get redirect uri
+    :param service_name: Service name
+    :param state: State
+    :param db: Session of database
+    :return: Redirect URI
+    """
+    service = db.query(Service).filter(Service.name == service_name, Service.state == state).first()
+    db.query(Service).filter(Service.name == service_name, Service.state == state).update({"state": ""})
+    if service is None:
+        return None
+    return service.end_redirect
 
 
 def check_if_service_exist(service_name: str, User: UserMe, db: Session):

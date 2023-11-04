@@ -1,15 +1,17 @@
 import React, {useEffect, useState} from "react";
-import {Button, Dimensions, FlatList, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {Button, Dimensions, Switch, FlatList, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {StackNavigationProp} from "@react-navigation/stack";
 import useThemedStyles from "../../hooks/Theme/useThemedStyle";
 import useTheme from "../../hooks/Theme/useTheme";
-import {ThemeTypeContext} from "../../constants/Theme";
+import theme, {ThemeTypeContext} from "../../constants/Theme";
 import EditSVG from "../../../assets/formkit_arrowright.svg";
 import AddSVG from "../../../assets/AddComponent.svg";
 import FluxOverview from "../../components/fluxOverviewComponent"
 import {fluxGet, fluxIdGet} from "../../api/api";
 import EncryptedStorage from "react-native-encrypted-storage";
 import DashboardFluxOverview from "../../components/dashboardFluxoverview";
+import window from "@react-navigation/native/lib/typescript/src/__mocks__/window";
+import ActiveComponent from "../../components/activeComponent";
 
 
 type RootStackParamList = {
@@ -31,33 +33,39 @@ interface flux {
 function sortActiveFlux(data: flux[]): flux[] {
     const res: flux[] = []
     for (let i: number = 0; i < data.length; i += 1) {
-        if (data.at(i) != undefined)
+        if (data.at(i) != undefined) {
             if (data.at(i)!.active) {
                 res.push(data.at(i)!);
-                console.log(data.at(i)!.name)
             }
+        }
 
     }
     return (res)
 }
+
 
 export const Dashboard: React.FC<Props> = ({navigation}) => {
     const Styles = useThemedStyles(styles);
     const Theme = useTheme();
     const [userFluxs, setUserFluxs] = useState<flux[]>([])
     const [activeUserFluxs, setActiveUserFluxs] = useState<flux[]>([])
+    const [activeFlux, setActiveFlux] = useState(sortActiveFlux(userFluxs))
 
+
+    function refreshFlux() {
+        fluxGet().then((res) => {
+            setUserFluxs(res);
+            setActiveFlux(sortActiveFlux(res))
+        })
+    }
 
     useEffect(() => {
         fluxGet().then((res) => {
             setUserFluxs(res);
-            console.log(userFluxs);
-            setActiveUserFluxs(sortActiveFlux(userFluxs));
+            setActiveFlux(sortActiveFlux(res));
         })
 
     }, [])
-
-    console.log(activeUserFluxs)
 
     return (
         <ScrollView>
@@ -86,7 +94,7 @@ export const Dashboard: React.FC<Props> = ({navigation}) => {
                     alignContent: "space-around"
                 }}
                           horizontal={true}
-                          data={activeUserFluxs} renderItem={({item}) => {
+                          data={activeFlux} renderItem={({item}) => {
                     return (
                         <DashboardFluxOverview name={item.name}
                                                desc={item.description}
@@ -112,6 +120,35 @@ export const Dashboard: React.FC<Props> = ({navigation}) => {
                         Tous les flux
                     </Text>
                 </View>
+            </View>
+            <View style={{
+                backgroundColor: Theme.colors.Black,
+                width: "90%",
+                alignSelf: "center",
+                borderRadius: 30
+            }}>
+                {userFluxs.map((value, index) => {
+                    return (
+                        <View>
+                            <ActiveComponent id={value.id}
+                                             name={value.name}
+                                             active={value.active}
+                                             desc={value.description}
+                                             refresh={refreshFlux}/>
+                            {index < userFluxs.length - 1 ?
+                                <View style={{
+                                    alignSelf: "center",
+                                    width: "90%",
+                                    height: 1,
+                                    backgroundColor: Theme.colors.Primary
+                                }}>
+
+                                </View> : null}
+                        </View>
+                    )
+                })}
+
+
             </View>
 
         </ScrollView>

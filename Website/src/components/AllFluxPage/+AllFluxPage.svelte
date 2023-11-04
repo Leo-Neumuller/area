@@ -24,7 +24,7 @@
                 <div>Loading...</div>
             {:then flux}
                 {#each flux as f}
-                    <FluxCard flux={f}/>
+                    <FluxCard flux={f} deleteButton/>
                 {/each}
             {/await}
         </div>

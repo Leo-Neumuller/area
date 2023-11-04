@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from src.middleware.User import MiddlewareUser
 from src.models.Flux import FluxCreateOrModify, create_or_modify_flux, FluxSend, Flux, get_flux_by_id, check_flux, \
-    get_all_fluxs, FluxBasicData, recreate_flux_graph, FluxToggleSend
+    get_all_fluxs, FluxBasicData, recreate_flux_graph, FluxToggleSend, delete_flux_with_id
 from src.models.User import UserMe
 from src.utils.Database import get_db
 from src.utils.Helper import DefaultErrorResponse
@@ -47,6 +47,28 @@ async def create_flux(CreateFlux: FluxCreateOrModify, verify: bool = False,
     if verify:
         recreate_flux_graph(flux, db)
     return FluxSend(id=flux.id)
+
+
+@FluxRouters.delete("/{fluxId}",
+                    summary="Delete flux",
+                    description="Delete flux",
+                    response_description="Flux",
+                    response_model=FluxSend,
+                    status_code=status.HTTP_200_OK,
+                    dependencies=[Depends(MiddlewareUser.check)],
+                    responses={**MiddlewareUser.responses(),
+                               status.HTTP_404_NOT_FOUND: {"description": "Flux not found",
+                                                           **DefaultErrorResponse()}})
+async def delete_flux(fluxId: int, User: UserMe = Depends(MiddlewareUser.check), db: Session = Depends(get_db)):
+    """
+    Delete flux
+    :return: Flux
+    """
+    try:
+        delete_flux_with_id(fluxId, User, db)
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+    return FluxSend(id=fluxId)
 
 
 @FluxRouters.get("/fluxs",

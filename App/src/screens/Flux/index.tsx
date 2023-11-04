@@ -92,7 +92,7 @@ export const Flux: React.FC<Props> = ({navigation}) => {
                         Ajouter un flux
                     </Text>
                 </View> : null}
-            {userFluxs.map((value, index) => {
+            {userFluxs.map((value , index) => {
                 return (
                     <FluxOverview key={index}
                                   desc={value.description}
