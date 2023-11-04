@@ -5,7 +5,8 @@ from fastapi import APIRouter, HTTPException, status, Depends
 
 from src.middleware.User import MiddlewareUser
 from src.models.Services import save_start_authorization, check_if_service_exist, AuthorizationUrl, Service, \
-    ServicesType, ServiceType, AREADataSmall, ServiceMetadata, ServiceMetadataSend, add_redirect_uri, get_redirect_uri
+    ServicesType, ServiceType, AREADataSmall, ServiceMetadata, ServiceMetadataSend, add_redirect_uri, get_redirect_uri, \
+    get_end_redirect_uri
 from src.models.User import UserMe
 from src.services import services
 from src.utils.Database import get_db
@@ -37,6 +38,22 @@ async def get_services():
         reaction=[service for service in services.keys() if
                   ServiceType.reaction in services[service]().get_interface().keys()]
     )
+
+
+@ServicesRouter.get("/services/oauth",
+                    summary="Services",
+                    description="Get services",
+                    response_description="Services",
+                    status_code=status.HTTP_200_OK,
+                    response_model=List[str],
+                    dependencies=[Depends(MiddlewareUser.check)],
+                    responses={**MiddlewareUser.responses()})
+async def get_services_with_oauth():
+    """
+    Get services with oauth
+    :return: Services
+    """
+    return [service for service in services.keys() if "authorize" in dir(services[service])]
 
 
 @ServicesRouter.get("/metadata/{areaId}",
@@ -83,7 +100,7 @@ async def get_action_or_reaction(areaId: str, User: UserMe = Depends(MiddlewareU
                                                            **DefaultErrorResponse()},
                                status.HTTP_409_CONFLICT: {"description": "Service already exist",
                                                           **DefaultErrorResponse()}})
-async def authorize_url(service: str, redirect_uri: str | None = None, User: UserMe = Depends(MiddlewareUser.check),
+async def authorize_url(service: str, redirect: str, end_redirect: str, User: UserMe = Depends(MiddlewareUser.check),
                         db=Depends(get_db)):
     """
     Get authorization url
@@ -93,10 +110,8 @@ async def authorize_url(service: str, redirect_uri: str | None = None, User: Use
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Service not found")
     if check_if_service_exist(service, User, db):
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Service already exist")
-    if redirect_uri is None:
-        redirect_uri = "http://localhost:5173/redirected"
-    authorization_url = services[service].get_authorization_url(User, db)
-    add_redirect_uri(service, redirect_uri, User, db)
+    authorization_url = services[service].get_authorization_url(User, db, redirect)
+    add_redirect_uri(service, User, db, redirect, end_redirect)
     return AuthorizationUrl(url=authorization_url)
 
 
@@ -105,7 +120,8 @@ async def authorize_url(service: str, redirect_uri: str | None = None, User: Use
                     description="Authorize",
                     response_description="Authorize",
                     status_code=200)
-async def authorize(service: str, state: str = None, code: str = None, scope: str = None, error: str = None, db=Depends(get_db)):
+async def authorize(service: str, state: str = None, code: str = None, scope: str = None, error: str = None,
+                    db=Depends(get_db)):
     """
     Authorize
     :return: Authorize
@@ -117,10 +133,11 @@ async def authorize(service: str, state: str = None, code: str = None, scope: st
     if scope is not None:
         scope = scope.split()
     try:
-        services[service].authorize(state, code, scope, db)
+        redirect = get_redirect_uri(service, state, db)
+        services[service].authorize(state, code, scope, db, redirect)
     except Service.Exception.InvalidGrant as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid grant")
-    redirect_uri = get_redirect_uri(service, state, db)
+    redirect_uri = get_end_redirect_uri(service, state, db)
     return RedirectResponse(url=redirect_uri)
 
 

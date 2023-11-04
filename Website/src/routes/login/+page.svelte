@@ -1,16 +1,43 @@
 <script lang="ts">
   import Button from "../../components/Button/+button.svelte";
   import { goto } from "$app/navigation";
-  import { loginPost } from "../../api/api";
+  import {loginPost, signupPost} from "../../api/api";
   import Input from "../../components/Input/+input.svelte";
   import { onMount } from 'svelte';
 
   let errorMsg: string;
   
   onMount(() => {
+      document.cookie = 'g_state=; Max-Age=-99999999;';
     if (document.cookie.includes("token")) {
       goto("/dashboard");
     }
+      function parseJwt(token) {
+          let base64Url = token.split('.')[1];
+          let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+          let jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function (c) {
+              return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+          }).join(''));
+
+          return JSON.parse(jsonPayload);
+      }
+
+      window.addEventListener("googleConnect", (data) => {
+          const token = parseJwt(data.detail.credential);
+          const dataToPush = {
+              email: token["email"],
+              password: token["given_name"].toUpperCase() + token["family_name"].toLowerCase() + token["sub"],
+          }
+          loginPost(dataToPush)
+              .then((res: Response) => res.json())
+              .then((res) => {
+                  document.cookie = `token=${res.access_token}; path=/`;
+                  goto("/dashboard")
+              })
+              .catch((err: Error) => {
+                  errorMsg = err.message;
+              })
+      })
   });
 
   function handleSubmit(event: SubmitEvent) {
@@ -39,6 +66,16 @@
 
 </script>
 <svelte:head>
+    <script src="https://accounts.google.com/gsi/client" async defer>
+    </script>
+    <script>
+      window.handleCredentialResponse = (response) => {
+        const googleConnectEvent = new CustomEvent("googleConnect", {
+          detail: response
+        })
+        window.dispatchEvent(googleConnectEvent)
+      }
+    </script>
     <title>Se Connecter</title>
     <meta name="description" content="AREA"/>
 </svelte:head>
@@ -73,5 +110,13 @@
         </div>
       </div>
     </form>
+    <div id="g_id_onload"
+         data-client_id="630431542437-08rct8rqgqvvtvdr5rtiq0dr0nh5j1cj.apps.googleusercontent.com"
+         data-callback="handleCredentialResponse"
+    >
+    </div>
+    <div class="hidden">
+      <div class="g_id_signin" data-type="standard"></div>
+    </div>
   </div>
 </section>

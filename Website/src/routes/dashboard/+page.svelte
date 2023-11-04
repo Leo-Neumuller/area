@@ -44,7 +44,7 @@
         {/if}
     </button>
     {#if toggleMenu}
-        <div class="fixed h-[90%] w-[24rem] bg-gray top-[10%] left-0 flex flex-col p-5 justify-between">
+        <div class="fixed h-[90%] w-screen md:w-[24rem] bg-gray top-[10%] left-0 flex flex-col p-5 justify-between">
             <div>
                 <button class="flex bg-primary w-full rounded-3xl py-4 items-center align-middle justify-between pl-8 pr-14"
                     on:click={() => {

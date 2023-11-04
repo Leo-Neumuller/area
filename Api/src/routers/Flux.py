@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from src.middleware.User import MiddlewareUser
 from src.models.Flux import FluxCreateOrModify, create_or_modify_flux, FluxSend, Flux, get_flux_by_id, check_flux, \
-    get_all_fluxs, FluxBasicData, recreate_flux_graph, FluxToggleSend
+    get_all_fluxs, FluxBasicData, recreate_flux_graph, FluxToggleSend, delete_flux_with_id
 from src.models.User import UserMe
 from src.utils.Database import get_db
 from src.utils.Helper import DefaultErrorResponse
@@ -65,7 +65,7 @@ async def delete_flux(fluxId: int, User: UserMe = Depends(MiddlewareUser.check),
     :return: Flux
     """
     try:
-        delete_flux(fluxId, User, db)
+        delete_flux_with_id(fluxId, User, db)
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     return FluxSend(id=fluxId)

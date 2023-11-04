@@ -154,6 +154,8 @@ class FluxBasicData(BaseModel):
     name: str
     description: str
     active: bool
+    reaction: str
+    action: str
 
 
 def check_iso_format(x):
@@ -434,16 +436,27 @@ def get_all_fluxs(User: UserMe, db: Session) -> List[FluxBasicData]:
     fluxs = db.query(Flux).filter(Flux.user_id == User.id).all()
     fluxs_basic_data = []
     for flux in fluxs:
+        action = ""
+        reaction = ""
+        for node in flux.frontEndData["nodes"]:
+            if action != "" and reaction != "":
+                break
+            if action == "" and node.type.lower() == "action":
+                action = node.service
+            if reaction == "" and node.type.lower() == "reaction":
+                reaction = node.service
         fluxs_basic_data.append(FluxBasicData(
             id=flux.id,
             name=flux.name,
             description=flux.description,
-            active=flux.active
+            active=flux.active,
+            action=action,
+            reaction=reaction
         ))
     return fluxs_basic_data
 
 
-def delete_flux(fluxId: int, User: UserMe, db: Session) -> None:
+def delete_flux_with_id(fluxId: int, User: UserMe, db: Session) -> None:
     """
     Delete flux
     :param fluxId: Flux id

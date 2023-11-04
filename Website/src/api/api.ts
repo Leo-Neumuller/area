@@ -9,6 +9,7 @@ export interface signupProps {
 }
 
 export async function signupPost(data: { [key: string]: string }) {
+    console.log("signupPost")
     const res = await fetch(import.meta.env.VITE_API_URL + "/user/signup", {
         method: 'POST',
         body: JSON.stringify(data),
@@ -89,7 +90,7 @@ export async function getSubServiceMetadata(cookie: string, AREA_id: string) {
     return res.json();
 }
 
-interface CreateFlux {
+export interface CreateFlux {
     id?: number;
     name: string;
     description: string;
@@ -115,17 +116,16 @@ export async function createFlux(cookie: string, flux: CreateFlux, verify: boole
         },
     })
     if (res.status !== 201) {
-        let err = await res.json();
-        console.log(err);
-        alert(err.detail[0].error);
-        throw new Error(err.detail);
+        return res.json();
     }
     return res.json();
 }
 
 export async function getOauthLink(cookie: string, service: string) {
     const redirect_uri = window.location.origin + "/redirected";
-    const res = await fetch(import.meta.env.VITE_API_URL + `/services/` + service + `/authorize_url?redirect_uri=${redirect_uri}`, {
+    const pre_redirect_uri = window.location.origin + "/oauth/" + encodeURI(service);
+    console.log(pre_redirect_uri);
+    const res = await fetch(import.meta.env.VITE_API_URL + `/services/` + service + `/authorize_url?end_redirect=${redirect_uri}&redirect=${pre_redirect_uri}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -221,4 +221,44 @@ export async function toggleFlux(cookie: string, id: number) {
         throw new Error(err.detail);
     }
     return res.json();
+}
+
+
+export async function disconnectService(cookie: string, service: number) {
+    const res = await fetch(import.meta.env.VITE_API_URL + `/services/${service}/disconnect`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'access-token': cookie,
+        }
+    })
+    if (res.status !== 200) {
+        let err = await res.json();
+
+        throw new Error(err.detail);
+    }
+    return res.json();
+}
+
+export async function deleteFlux(cookie: string, fluxId: any) {
+    const res = await fetch(import.meta.env.VITE_API_URL + `/flux/${fluxId}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'access-token': cookie
+        }
+    })
+    if (res.status !== 200) {
+        let err = await res.json();
+
+        throw new Error(err.detail);
+    }
+    return res.json();
+}
+
+export async function pushOauthData(service: string,data: string) {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/services/${service}/authorize${data}` , {
+        method: 'GET',
+    })
+    return res;
 }

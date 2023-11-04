@@ -10,15 +10,17 @@
 	import type Edge from "./EdgeInterface";
 	import Close from "../../SVGs/+Close";
 	import Modify from "../../SVGs/+Modify.svelte";
-	import {createFlux, getFlux, getServices, getSubServiceMetadata, getSubServices, getOauthLink, checkConnected} from "../../../api/api";
+	import {createFlux, getFlux, getServices, getSubServiceMetadata, getSubServices, getOauthLink, checkConnected, type CreateFlux} from "../../../api/api";
 	import {getCookie} from "../../../api/helpers";
 	import Select from "../../Select/+select.svelte";
 	import InputData from "../InputData/+InputData.svelte"
 
 	import Validate from "../../SVGs/+Validate.svelte";
 	import Profile from "../../SVGs/+Profile.svelte";
-  import TextInput from "../../TextInput/+TextInput.svelte";
+  	import TextInput from "../../TextInput/+TextInput.svelte";
 	import { browser } from '$app/environment';
+    import Warning from "../../SVGs/+Warning.svelte";
+    import Icon from "../../Icon/+Icon.svelte";
 
 	let grabbingBoard: boolean = false;
 	let scale: number = 1;
@@ -35,8 +37,10 @@
 	let modifyServiceType: string = "";
 
 	let modifyMenu: boolean = false;
+	let newNodeMenu: boolean = false;
 	let advancedModify: boolean = false;
 	let saveMenu: boolean = false;
+	let successCheckmark: boolean = false;
 	let subServices: {"data" : { [key: string]: string }[], "nodeId" : string | undefined} = {
 		"data": [{}],
 		"nodeId": undefined,
@@ -44,8 +48,10 @@
 
 	let services: { [key: string]: string } = {};
 	let ConnectedServices: { [key: string]: {[key: string] : boolean} } = {};
-	let name: string = "";
-	let descr: string = "";
+	let name: string = "Non définit";
+	let descr: string = "Non définit";
+
+	let errorMessage: string = "";
 
 	function updateNodes() {
 		nodes = [...nodes];
@@ -82,7 +88,6 @@
 						}
 					}
 
-					console.log(nodes, edges, edgeId)
 					edges.forEach((edge) => {
 						if (edge.outputIndex === newEdge.outputIndex && edge.nodeEndId === nodeEnd.id) {
 							newEdge = null;
@@ -136,14 +141,14 @@
 				const node = nodes.find((node) => node.id === selectedNode);
 				if (node) {
 					nodeRegister = node;
-					node.currPosition = {x: (node.currPosition.x + deltaX) * scale, y: (node.currPosition.y + deltaY) * scale};
+					node.currPosition = {x: (node.currPosition.x + deltaX), y: (node.currPosition.y + deltaY)};
 					clickedPosition = {x: e.x, y: e.y};
 					for (let i = 0; i < node.inputEdgeIds.length; i++) {
 						const edge = edges.find((edge) => edge.id === node.inputEdgeIds[i]);
 						if (edge) {
 							edge.currEndPos = {
-								x: (edge.currEndPos.x + deltaX) * scale,
-								y: (edge.currEndPos.y + deltaY) * scale,
+								x: (edge.currEndPos.x + deltaX),
+								y: (edge.currEndPos.y + deltaY),
 							}
 						}
 					}
@@ -152,8 +157,8 @@
 						const edge = edges.find((edge) => edge.id === node.outputEdgeIds[i]);
 						if (edge) {
 							edge.currStartPos = {
-								x: (edge.currStartPos.x + deltaX) * scale,
-								y: (edge.currStartPos.y + deltaY) * scale,
+								x: (edge.currStartPos.x + deltaX),
+								y: (edge.currStartPos.y + deltaY),
 							}
 						}
 					}
@@ -358,6 +363,32 @@
 	}
 
 	onMount(() => {
+		const interval = setInterval(() => {
+			if (!window.location.pathname.includes("flux-editor")) {
+				clearInterval(interval);
+			}
+			if (!saveMenu && !advancedModify && !modifyMenu && !newNodeMenu) {
+				const data: CreateFlux =  {
+					"name": name,
+					"description": descr,
+					"nodes": nodes,
+					"edges": edges,
+				};
+				if ($page.url.searchParams.get("FluxId")) {
+					data["id"] = Number($page.url.searchParams.get("FluxId"));
+				}
+				createFlux(getCookie("token"), data, true).then((res) => {
+					if (res && res?.detail && res?.detail[0] && res?.detail[0]?.error) {
+						errorMessage = res?.detail[0]?.error;
+						return;
+					}
+					errorMessage = "";
+					$page.url.searchParams.set("FluxId", res["id"]);
+					goto(`?${$page.url.searchParams.toString()}`);
+				})
+			}
+		}, 2000)
+
 		const board = document.getElementById("board");
 		if (board) {
 			board.addEventListener("wheel", (e) => {
@@ -371,6 +402,8 @@
 		}
 		if ($page.url.searchParams.get("FluxId")) {
 			getFlux(getCookie("token"), $page.url.searchParams.get("FluxId")).then((res) => {
+				name = res["name"];
+				descr = res["description"];
 				nodes = res["nodes"];
 				edges = res["edges"];
 				getServices(getCookie("token")).then((res) => {
@@ -451,54 +484,91 @@
 		}
 	}
 
+	
+	function getSubeserviceid() {
+		let parentNode = nodes.find((nodes) => nodes.id === nodeRegister.inputEdgeIds[0]?.slice(6, 30))
+		console.log(nodeRegister.inputEdgeIds[0]?.slice(6, 30), nodes, parentNode)
+		return {"subService": parentNode?.subServiceId,
+				"parent": nodeRegister.inputEdgeIds[0]?.slice(6, 30)};
+	}
+
 </script>
 
 <div>
+	{#if errorMessage !== ""}
+		<div class="group absolute top-[13%] left-4 w-16 h-16 bg-gray rounded-lg flex items-center hover:w-[18rem] z-[100] pl-2 ease-in-out duration-500">
+			<Warning className="w-12 h-12" color="#d1c71a"/>
+			<h1 class="opacity-0 group-hover:opacity-100 ease-in-out duration-700 text-[#d1c71a] text-lg font-SpaceGrotesk absolute top-[6%] left-16 w-[13rem]">
+				{errorMessage}
+			</h1>
+		</div>
+	{/if}
 	<div class={`${saveMenu ? "flex" : "hidden"} gap-3 rounded-xl flex-col absolute top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%] z-[30] bg-gray border border-black p-6`}>
-		<div class="flex justify-between items-center align-middle">
-			<div></div>
+		<div class={`${successCheckmark ? "flex" : "hidden"}  flex-col`}>
 			<button on:click={() => {
 				saveMenu = false;
 			}}>
 				<Close className="w-4 h-4" color="#F3F3F3"/>
 			</button>
+			<div class="px-12 pr-14">
+				<div class="success-checkmark">
+					<div class="check-icon">
+						<span class="icon-line line-tip"></span>
+						<span class="icon-line line-long"></span>
+						<div class="icon-circle"></div>
+						<div class="icon-fix"></div>
+					</div>
+				</div>
+			</div>
+			</div>
+		<div class={`${successCheckmark ? "hidden" : "flex"} flex-col gap-3`}>			
+			<div class="flex justify-between items-center align-middle">
+				<button on:click={() => {
+					saveMenu = false;
+				}}>
+					<Close className="w-4 h-4" color="#F3F3F3"/>
+				</button>
+			</div>
+			<TextInput label="Nom du flux" type="text" placeholder="Nom du flux" value={name} deactivated={false}
+				onInput={(e) => {
+					name = e.target.value;
+				}}/>
+			<TextInput label="Description du flux" type="text" placeholder="Description du flux" value={descr} deactivated={false}
+				onInput={(e) => {
+					descr = e.target.value;
+				}}/>
+			<button class="text-customWhite rounded border border-customWhite mt-2" on:click={() => {
+				const data =  {
+					"name": name,
+					"description": descr,
+					"nodes": nodes,
+					"edges": edges,
+				};
+				if ($page.url.searchParams.get("FluxId")) {
+					data["id"] = Number($page.url.searchParams.get("FluxId"));
+				}
+				createFlux(getCookie("token"), data, true).then((res) => {
+					$page.url.searchParams.set("FluxId", res["id"]);
+					goto(`?${$page.url.searchParams.toString()}`);
+					successCheckmark = true;
+				})
+			}}>
+				Sauvergarder le flux
+			</button>
 		</div>
-		<TextInput label="Nom du flux" type="text" placeholder="Nom du flux" value={name} deactivated={false}
-			onInput={(e) => {
-				name = e.target.value;
-			}}/>
-		<TextInput label="Description du flux" type="text" placeholder="Description du flux" value={descr} deactivated={false}
-			onInput={(e) => {
-				descr = e.target.value;
-			}}/>
-		<button class="text-customWhite rounded border border-customWhite mt-2" on:click={() => {
-			const data =  {
-				"name": name,
-				"description": descr,
-				"nodes": nodes,
-				"edges": edges,
-				"id": 0,
-			};
-			if ($page.url.searchParams.get("FluxId")) {
-				data["id"] = Number($page.url.searchParams.get("FluxId"));
-			}
-			createFlux(getCookie("token"), data, true).then((res) => {
-				$page.url.searchParams.set("FluxId", res["id"]);
-				goto(`?${$page.url.searchParams.toString()}`);
-				alert("Ouais mon gars")
-			})
-		}}>
-			Sauvergarder le flux
-		</button>
+
 	</div>
-  <button class="absolute top-7 right-24 px-4 py-1 rounded z-40 text-[1.7rem] font-SpaceGrotesk text-customWhite font-bold border border-customWhite hover:text-gray hover:bg-customWhite"
+  <button class={`absolute top-7 right-24 px-4 py-1 rounded z-40 text-[1.7rem] font-SpaceGrotesk  
+  				  font-bold border
+				  ${errorMessage !== "" ? "border-customWhite/50 text-customWhite/50" : "border-customWhite text-customWhite hover:text-gray hover:bg-customWhite"}`}
 		on:click={() => {
+			successCheckmark = false;
 			saveMenu = !saveMenu;
-		}}>
+		}} disabled={errorMessage !== "" ? true : false}>
 	Sauvegarder
   </button>
   <div class="">
-	<Addbutton showDelete={selectedNode === null} onCLickAdd={handleOnCLickAdd} onClickDelete={handleOnClickDelete}/>
+	<Addbutton showDelete={selectedNode === null} onCLickAdd={handleOnCLickAdd} onClickDelete={handleOnClickDelete} bind:open={newNodeMenu}/>
   </div>
   <div
 	class={`${modifyService ? "flex" : "hidden"} flex-col bg-gray rounded-[20px] absolute w-[60%] h-[80%] top-[60%] left-[50%] -translate-x-[50%] -translate-y-[55%] z-[21] p-10`}>
@@ -512,7 +582,7 @@
 			<Close className="w-8 h-8" color="#F3F3F3"/>
 		</button>
 	</div>
-	<div class="flex flex-wrap gap-4">
+	<div class="flex flex-wrap gap-4 pt-4">
 		{#if Object.entries(services).length !== 0 && nodeRegister != null}
 			{#each services[nodeRegister.type.toLowerCase()] as service}
 				<button on:click={() => {
@@ -521,7 +591,8 @@
 							nodeRegister.service = service;
 							nodeRegister.title = service;
 							updateNodes();
-						}} class="text-customWhite bg-customWhite/10 p-4 rounded-xl text-[1.7rem] font-SpaceGrotesk">
+						}} class="text-customWhite bg-customWhite/10 p-4 rounded-xl text-[1.7rem] font-SpaceGrotesk flex justify-between gap-4 items-center">
+					<Icon name={service} className="w-8 h-8"/>
 					{service}
 				</button>
 			{/each}
@@ -529,7 +600,7 @@
 	</div>
   </div>
   {#if (advancedModify)}
-	<div class="fixed top-26 right-0 w-[30%] h-screen z-[100] bg-gray px-6 py-2">
+	<div class="fixed top-26 right-0 w-screen md:w-[34rem] h-screen z-[100] bg-gray px-6 py-2">
 		<button class="absolute"
 			on:click={() => {
 				advancedModify = false;
@@ -539,7 +610,7 @@
 		<h1 class="text-[2.2rem] font-SpaceGrotesk text-customWhite font-semibold w-full text-center">
 			{nodeRegister.service}
 		</h1>
-		<div class="pt-14 h-[80%] overflow-auto">
+		<div class="pt-14 h-[80%] overflow-auto px-2">
 			<div class="flex flex-col gap-16 justify-between h-full">
 				<div class="flex flex-col gap-6">
 					<div class="flex flex-col gap-6">
@@ -547,6 +618,7 @@
 							Application
 						</h1>
 						<div class={`flex font-SpaceGrotesk w-full bg-customWhite/[10%] font-medium text-[1.75rem] p-4 align-middle items-center justify-between rounded-[0.63rem]`}>
+							<Icon name={nodeRegister.service} className="w-8 h-8"/>
 							<h1 class="text-customWhite">{nodeRegister.service}</h1>
 							<button class="bg-primary rounded-lg p-1 px-2" on:click={() => {
 								advancedModify = false;
@@ -566,12 +638,12 @@
 								placeholder="Choisissez une action à éxecuter"
 								onChange={(value) => {
 									nodeRegister.subService = value
-									nodeRegister.subServiceId = subServices["data"].find((subService) => subService["name"] === value)?.id
+									nodeRegister.subServiceId =  subServices["data"].find((subService) => subService["name"] === value)?.id
 								}}/>
 							<div>
 								{#if nodeRegister?.inputsData}
 									{#each nodeRegister.inputsData as inputData}
-										<InputData bind:inputD={inputData}/>
+										<InputData bind:inputD={inputData} nodeType={getSubeserviceid()} service={nodeRegister.type}/>
 									{/each}
 								{/if}
 							</div>
@@ -587,20 +659,22 @@
 					<button class={`${nodeRegister.service && ConnectedServices[nodeRegister.type][nodeRegister.service] ? "hidden" : "flex"} gap-6 font-SpaceGrotesk w-full bg-customWhite/[10%] font-medium text-[1.75rem] p-4 align-middle items-center justify-center rounded-[0.63rem]`}
 					on:click={() => {
 						if (nodeRegister?.service) {
-							console.log(ConnectedServices);
 							getOauthLink(getCookie("token"), nodeRegister.service).then((res) => {
 								const popup = window.open(res["url"], "popup", "width=600,height=600 popup=true");
 								const interval = setInterval(() => {
 									try {
-										if (popup?.window?.location.href) {
-											popup?.close();
+										if (popup?.closed) {
 											clearInterval(interval);
 											ConnectedServices = {
 												...ConnectedServices,
-												[nodeRegister.type]: {
-													...ConnectedServices[nodeRegister.type],
+												"Action": {
+													...ConnectedServices["Action"],
 													[nodeRegister.service]: true,
-												}
+												},
+												"Reaction": {
+													...ConnectedServices["Reaction"],
+													[nodeRegister.service]: true,
+												},
 											};
 										}
 									} catch {
@@ -653,7 +727,6 @@
 			selected={node.id === selectedNode}
 			bind:modify={modifyMenu}
 			title={node.title}
-			img={node.img}
 			onMouseDownNode={handleOnMouseDownNode}
 			onMouseDownOutput={handleOnMouseDownOutput}
 			onMouseEnterInput={handleOnMouseEnterInput}
@@ -717,3 +790,25 @@ for (let i = 0; i < services.length; i++) {
 		}
 	];
 } -->
+
+<style>
+	/* width */
+	::-webkit-scrollbar {
+		width: 6px;
+	}
+
+	/* Track */
+	::-webkit-scrollbar-track {
+		background: #f1f1f1; 
+	}
+		
+	/* Handle */
+	::-webkit-scrollbar-thumb {
+		background: #888; 
+	}
+
+	/* Handle on hover */
+	::-webkit-scrollbar-thumb:hover {
+		background: #555; 
+	}
+</style>

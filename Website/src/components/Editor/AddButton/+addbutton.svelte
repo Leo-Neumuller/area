@@ -6,8 +6,8 @@
     export let showDelete: boolean;
     export let onCLickAdd: (numberInputs: number, numberOutputs: number, type: string) => void;
     export let onClickDelete: () => void;
-
-    let open: boolean = false;
+    export let open: boolean;
+    
     let numberOfInput: number = 1;
     let numberOfOutput: number = 1;
     let type: string = "";

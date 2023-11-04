@@ -1,6 +1,7 @@
 <script lang="ts">
     import './style.css'
     import Modify from "../../SVGs/+Modify.svelte";
+    import Icon from '../../Icon/+Icon.svelte';
 
     export let id: string;
     export let type: string;
@@ -15,8 +16,6 @@
     export let modify: boolean;
     export let title: string;
 
-
-    export let img: string;
     
     let refBinder: any = [];
     let refBinderOutput: any = [];
@@ -58,14 +57,17 @@
         onMouseDownNode(id, e);
     }}>
     <div class="flex h-full align-middle justify-between items-center px-6">
-        <div>
-            <h1 class={`text-[2.1rem] font-SpaceGrotesk ${type === "Action" ? "text-customWhite" : "text-gray"} text-customWhite font-semibold`}>{title}</h1>
+        <div class="flex items-center w-full justify-between">
+            <Icon className="w-10 h-10" name={title} />
+            <h1 class={`text-[2.1rem] font-SpaceGrotesk ${type === "Action" ? "text-customWhite" : "text-gray"} text-customWhite font-semibold`}>
+                {title}
+            </h1>
+            <button on:click={() => {
+                modify = !modify;
+            }}>
+                <Modify className="w-10 h-10" color={type === "Action" ? "white" : "#373637"} />
+            </button>
         </div>
-        <button on:click={() => {
-            modify = !modify;
-        }}>
-            <Modify className="w-10 h-10" color={type === "Action" ? "white" : "#373637"} />
-        </button>
     </div>
     <div class="inputsWrapper">
         {#each {length: Number(numberOfInputs)} as _, index}
