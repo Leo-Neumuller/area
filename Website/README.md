@@ -23,6 +23,15 @@ npm i
 npm run test
 ```
 
+### Run Docs
+
+Needed:
+- NodeJS
+
+```bash
+./run.sh doc
+```
+
 ## Components 
 |       Names    |Description                    |Arguments                    |
 |----------------|-------------------------------|-----------------------------|

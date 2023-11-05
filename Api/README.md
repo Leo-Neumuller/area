@@ -38,7 +38,7 @@ Needed:
 - NodeJS
 
 ```bash
-./run.sh docs
+./run.sh doc
 ```
 
 ## Documentation

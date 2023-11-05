@@ -181,696 +181,6 @@ Client apk
 This operation does not require authentication
 </aside>
 
-<h1 id="area-api-flux">Flux</h1>
-
-## Create/Modify flux
-
-<a id="opIdcreate_flux_flux_post"></a>
-
-> Code samples
-
-```shell
-# You can also use wget
-curl -X POST /flux \
-  -H 'Content-Type: application/json' \
-  -H 'Accept: application/json' \
-  -H 'access-token: string'
-
-```
-
-```javascript
-const inputBody = '{
-  "id": 0,
-  "name": "string",
-  "description": "string",
-  "nodes": [
-    {
-      "id": "string",
-      "numberInputs": 0,
-      "numberOutputs": 0,
-      "service": "string",
-      "subService": "string",
-      "subServiceId": "string",
-      "inputDataFromSubServiceId": "string",
-      "inputsData": [],
-      "prevPosition": {
-        "x": 0,
-        "y": 0
-      },
-      "currPosition": {
-        "x": 0,
-        "y": 0
-      },
-      "type": "string",
-      "inputEdgeIds": [
-        "string"
-      ],
-      "outputEdgeIds": [
-        "string"
-      ],
-      "title": "string",
-      "img": "string"
-    }
-  ],
-  "edges": [
-    {
-      "id": "string",
-      "nodeStartId": "string",
-      "nodeEndId": "string",
-      "inputIndex": 0,
-      "outputIndex": 0,
-      "prevStartPos": {
-        "x": 0,
-        "y": 0
-      },
-      "currStartPos": {
-        "x": 0,
-        "y": 0
-      },
-      "prevEndPos": {
-        "x": 0,
-        "y": 0
-      },
-      "currEndPos": {
-        "x": 0,
-        "y": 0
-      }
-    }
-  ]
-}';
-const headers = {
-  'Content-Type':'application/json',
-  'Accept':'application/json',
-  'access-token':'string'
-};
-
-fetch('/flux',
-{
-  method: 'POST',
-  body: inputBody,
-  headers: headers
-})
-.then(function(res) {
-    return res.json();
-}).then(function(body) {
-    console.log(body);
-});
-
-```
-
-`POST /flux`
-
-Create/Modify flux
-
-> Body parameter
-
-```json
-{
-  "id": 0,
-  "name": "string",
-  "description": "string",
-  "nodes": [
-    {
-      "id": "string",
-      "numberInputs": 0,
-      "numberOutputs": 0,
-      "service": "string",
-      "subService": "string",
-      "subServiceId": "string",
-      "inputDataFromSubServiceId": "string",
-      "inputsData": [],
-      "prevPosition": {
-        "x": 0,
-        "y": 0
-      },
-      "currPosition": {
-        "x": 0,
-        "y": 0
-      },
-      "type": "string",
-      "inputEdgeIds": [
-        "string"
-      ],
-      "outputEdgeIds": [
-        "string"
-      ],
-      "title": "string",
-      "img": "string"
-    }
-  ],
-  "edges": [
-    {
-      "id": "string",
-      "nodeStartId": "string",
-      "nodeEndId": "string",
-      "inputIndex": 0,
-      "outputIndex": 0,
-      "prevStartPos": {
-        "x": 0,
-        "y": 0
-      },
-      "currStartPos": {
-        "x": 0,
-        "y": 0
-      },
-      "prevEndPos": {
-        "x": 0,
-        "y": 0
-      },
-      "currEndPos": {
-        "x": 0,
-        "y": 0
-      }
-    }
-  ]
-}
-```
-
-<h3 id="create/modify-flux-parameters">Parameters</h3>
-
-|Name|In|Type|Required|Description|
-|---|---|---|---|---|
-|verify|query|boolean|false|none|
-|access-token|header|string|false|none|
-|body|body|[FluxCreateOrModify-Input](#schemafluxcreateormodify-input)|true|none|
-|» id|body|any|false|none|
-|»» *anonymous*|body|integer|false|none|
-|»» *anonymous*|body|null|false|none|
-|» name|body|string|true|none|
-|» description|body|string|true|none|
-|» nodes|body|[[FluxNode-Input](#schemafluxnode-input)]|true|[Flux Node Model]|
-|»» FluxNode|body|[FluxNode-Input](#schemafluxnode-input)|false|Flux Node Model|
-|»»» id|body|string|true|none|
-|»»» numberInputs|body|any|true|none|
-|»»»» *anonymous*|body|integer|false|none|
-|»»»» *anonymous*|body|string|false|none|
-|»»» numberOutputs|body|any|true|none|
-|»»»» *anonymous*|body|integer|false|none|
-|»»»» *anonymous*|body|string|false|none|
-|»»» service|body|any|false|none|
-|»»»» *anonymous*|body|string|false|none|
-|»»»» *anonymous*|body|null|false|none|
-|»»» subService|body|any|false|none|
-|»»»» *anonymous*|body|string|false|none|
-|»»»» *anonymous*|body|null|false|none|
-|»»» subServiceId|body|any|false|none|
-|»»»» *anonymous*|body|string|false|none|
-|»»»» *anonymous*|body|null|false|none|
-|»»» inputDataFromSubServiceId|body|any|false|none|
-|»»»» *anonymous*|body|string|false|none|
-|»»»» *anonymous*|body|null|false|none|
-|»»» inputsData|body|any|false|none|
-|»»»» *anonymous*|body|[[FluxInputData-Input](#schemafluxinputdata-input)]|false|[Flux Input Data Model]|
-|»»»»» FluxInputData|body|[FluxInputData-Input](#schemafluxinputdata-input)|false|Flux Input Data Model|
-|»»»»»» id|body|string|true|none|
-|»»»»»» name|body|string|true|none|
-|»»»»»» data|body|[string]|true|none|
-|»»»»»» inputType|body|string|true|none|
-|»»»»»» type|body|string|true|none|
-|»»»»»» required|body|boolean|true|none|
-|»»»»»» value|body|any|false|none|
-|»»»»»»» *anonymous*|body|any|false|none|
-|»»»»»»» *anonymous*|body|null|false|none|
-|»»»» *anonymous*|body|null|false|none|
-|»»» prevPosition|body|[FluxPos](#schemafluxpos)|true|Flux Position Model|
-|»»»» x|body|number|true|none|
-|»»»» y|body|number|true|none|
-|»»» currPosition|body|[FluxPos](#schemafluxpos)|true|Flux Position Model|
-|»»» type|body|string|true|none|
-|»»» inputEdgeIds|body|[string]|true|none|
-|»»» outputEdgeIds|body|[string]|true|none|
-|»»» title|body|string|true|none|
-|»»» img|body|string|true|none|
-|» edges|body|[[FluxEdge](#schemafluxedge)]|true|[Flux Edge Model]|
-|»» FluxEdge|body|[FluxEdge](#schemafluxedge)|false|Flux Edge Model|
-|»»» id|body|string|true|none|
-|»»» nodeStartId|body|string|true|none|
-|»»» nodeEndId|body|string|true|none|
-|»»» inputIndex|body|integer|true|none|
-|»»» outputIndex|body|integer|true|none|
-|»»» prevStartPos|body|[FluxPos](#schemafluxpos)|true|Flux Position Model|
-|»»» currStartPos|body|[FluxPos](#schemafluxpos)|true|Flux Position Model|
-|»»» prevEndPos|body|[FluxPos](#schemafluxpos)|true|Flux Position Model|
-|»»» currEndPos|body|[FluxPos](#schemafluxpos)|true|Flux Position Model|
-
-> Example responses
-
-> 201 Response
-
-```json
-{
-  "id": 0
-}
-```
-
-> 400 Response
-
-```json
-{
-  "detail": "string"
-}
-```
-
-> 401 Response
-
-```json
-{
-  "detail": "string"
-}
-```
-
-<h3 id="create/modify-flux-responses">Responses</h3>
-
-|Status|Meaning|Description|Schema|
-|---|---|---|---|
-|201|[Created](https://tools.ietf.org/html/rfc7231#section-6.3.2)|Flux|[FluxSend](#schemafluxsend)|
-|400|[Bad Request](https://tools.ietf.org/html/rfc7231#section-6.5.1)|Bad Request|None|
-|401|[Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)|Unauthorized|None|
-|422|[Unprocessable Entity](https://tools.ietf.org/html/rfc2518#section-10.3)|Validation Error|[HTTPValidationError](#schemahttpvalidationerror)|
-
-<h3 id="create/modify-flux-responseschema">Response Schema</h3>
-
-<aside class="success">
-This operation does not require authentication
-</aside>
-
-## Delete flux
-
-<a id="opIddelete_flux_flux__fluxId__delete"></a>
-
-> Code samples
-
-```shell
-# You can also use wget
-curl -X DELETE /flux/{fluxId} \
-  -H 'Accept: application/json' \
-  -H 'access-token: string'
-
-```
-
-```javascript
-
-const headers = {
-  'Accept':'application/json',
-  'access-token':'string'
-};
-
-fetch('/flux/{fluxId}',
-{
-  method: 'DELETE',
-
-  headers: headers
-})
-.then(function(res) {
-    return res.json();
-}).then(function(body) {
-    console.log(body);
-});
-
-```
-
-`DELETE /flux/{fluxId}`
-
-Delete flux
-
-<h3 id="delete-flux-parameters">Parameters</h3>
-
-|Name|In|Type|Required|Description|
-|---|---|---|---|---|
-|fluxId|path|integer|true|none|
-|access-token|header|string|false|none|
-
-> Example responses
-
-> 200 Response
-
-```json
-{
-  "id": 0
-}
-```
-
-> 401 Response
-
-```json
-{
-  "detail": "string"
-}
-```
-
-> 404 Response
-
-```json
-{
-  "detail": "string"
-}
-```
-
-<h3 id="delete-flux-responses">Responses</h3>
-
-|Status|Meaning|Description|Schema|
-|---|---|---|---|
-|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Flux|[FluxSend](#schemafluxsend)|
-|401|[Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)|Unauthorized|None|
-|404|[Not Found](https://tools.ietf.org/html/rfc7231#section-6.5.4)|Flux not found|None|
-|422|[Unprocessable Entity](https://tools.ietf.org/html/rfc2518#section-10.3)|Validation Error|[HTTPValidationError](#schemahttpvalidationerror)|
-
-<h3 id="delete-flux-responseschema">Response Schema</h3>
-
-<aside class="success">
-This operation does not require authentication
-</aside>
-
-## Get flux
-
-<a id="opIdget_flux_flux__fluxId__get"></a>
-
-> Code samples
-
-```shell
-# You can also use wget
-curl -X GET /flux/{fluxId} \
-  -H 'Accept: application/json' \
-  -H 'access-token: string'
-
-```
-
-```javascript
-
-const headers = {
-  'Accept':'application/json',
-  'access-token':'string'
-};
-
-fetch('/flux/{fluxId}',
-{
-  method: 'GET',
-
-  headers: headers
-})
-.then(function(res) {
-    return res.json();
-}).then(function(body) {
-    console.log(body);
-});
-
-```
-
-`GET /flux/{fluxId}`
-
-Get flux
-
-<h3 id="get-flux-parameters">Parameters</h3>
-
-|Name|In|Type|Required|Description|
-|---|---|---|---|---|
-|fluxId|path|integer|true|none|
-|access-token|header|string|false|none|
-
-> Example responses
-
-> 200 Response
-
-```json
-{
-  "id": 0,
-  "name": "string",
-  "description": "string",
-  "nodes": [
-    {
-      "id": "string",
-      "numberInputs": 0,
-      "numberOutputs": 0,
-      "service": "string",
-      "subService": "string",
-      "subServiceId": "string",
-      "inputDataFromSubServiceId": "string",
-      "inputsData": [],
-      "prevPosition": {
-        "x": 0,
-        "y": 0
-      },
-      "currPosition": {
-        "x": 0,
-        "y": 0
-      },
-      "type": "string",
-      "inputEdgeIds": [
-        "string"
-      ],
-      "outputEdgeIds": [
-        "string"
-      ],
-      "title": "string",
-      "img": "string"
-    }
-  ],
-  "edges": [
-    {
-      "id": "string",
-      "nodeStartId": "string",
-      "nodeEndId": "string",
-      "inputIndex": 0,
-      "outputIndex": 0,
-      "prevStartPos": {
-        "x": 0,
-        "y": 0
-      },
-      "currStartPos": {
-        "x": 0,
-        "y": 0
-      },
-      "prevEndPos": {
-        "x": 0,
-        "y": 0
-      },
-      "currEndPos": {
-        "x": 0,
-        "y": 0
-      }
-    }
-  ]
-}
-```
-
-> 401 Response
-
-```json
-{
-  "detail": "string"
-}
-```
-
-> 404 Response
-
-```json
-{
-  "detail": "string"
-}
-```
-
-<h3 id="get-flux-responses">Responses</h3>
-
-|Status|Meaning|Description|Schema|
-|---|---|---|---|
-|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Flux|[FluxCreateOrModify-Output](#schemafluxcreateormodify-output)|
-|401|[Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)|Unauthorized|None|
-|404|[Not Found](https://tools.ietf.org/html/rfc7231#section-6.5.4)|Flux not found|None|
-|422|[Unprocessable Entity](https://tools.ietf.org/html/rfc2518#section-10.3)|Validation Error|[HTTPValidationError](#schemahttpvalidationerror)|
-
-<h3 id="get-flux-responseschema">Response Schema</h3>
-
-<aside class="success">
-This operation does not require authentication
-</aside>
-
-## Toggle active flux
-
-<a id="opIdtoggle_flux_flux__fluxId__patch"></a>
-
-> Code samples
-
-```shell
-# You can also use wget
-curl -X PATCH /flux/{fluxId} \
-  -H 'Accept: application/json' \
-  -H 'access-token: string'
-
-```
-
-```javascript
-
-const headers = {
-  'Accept':'application/json',
-  'access-token':'string'
-};
-
-fetch('/flux/{fluxId}',
-{
-  method: 'PATCH',
-
-  headers: headers
-})
-.then(function(res) {
-    return res.json();
-}).then(function(body) {
-    console.log(body);
-});
-
-```
-
-`PATCH /flux/{fluxId}`
-
-Toggle active flux
-
-<h3 id="toggle-active-flux-parameters">Parameters</h3>
-
-|Name|In|Type|Required|Description|
-|---|---|---|---|---|
-|fluxId|path|integer|true|none|
-|access-token|header|string|false|none|
-
-> Example responses
-
-> 200 Response
-
-```json
-{
-  "id": 0,
-  "active": true
-}
-```
-
-> 401 Response
-
-```json
-{
-  "detail": "string"
-}
-```
-
-> 404 Response
-
-```json
-{
-  "detail": "string"
-}
-```
-
-<h3 id="toggle-active-flux-responses">Responses</h3>
-
-|Status|Meaning|Description|Schema|
-|---|---|---|---|
-|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Toggle works|[FluxToggleSend](#schemafluxtogglesend)|
-|401|[Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)|Unauthorized|None|
-|404|[Not Found](https://tools.ietf.org/html/rfc7231#section-6.5.4)|Flux not found|None|
-|422|[Unprocessable Entity](https://tools.ietf.org/html/rfc2518#section-10.3)|Validation Error|[HTTPValidationError](#schemahttpvalidationerror)|
-
-<h3 id="toggle-active-flux-responseschema">Response Schema</h3>
-
-<aside class="success">
-This operation does not require authentication
-</aside>
-
-## Get all fluxs
-
-<a id="opIdget_fluxs_flux_fluxs_get"></a>
-
-> Code samples
-
-```shell
-# You can also use wget
-curl -X GET /flux/fluxs \
-  -H 'Accept: application/json' \
-  -H 'access-token: string'
-
-```
-
-```javascript
-
-const headers = {
-  'Accept':'application/json',
-  'access-token':'string'
-};
-
-fetch('/flux/fluxs',
-{
-  method: 'GET',
-
-  headers: headers
-})
-.then(function(res) {
-    return res.json();
-}).then(function(body) {
-    console.log(body);
-});
-
-```
-
-`GET /flux/fluxs`
-
-Get all fluxs
-
-<h3 id="get-all-fluxs-parameters">Parameters</h3>
-
-|Name|In|Type|Required|Description|
-|---|---|---|---|---|
-|access-token|header|string|false|none|
-
-> Example responses
-
-> 200 Response
-
-```json
-[
-  {
-    "id": 0,
-    "name": "string",
-    "description": "string",
-    "active": true,
-    "reaction": "string",
-    "action": "string"
-  }
-]
-```
-
-> 401 Response
-
-```json
-{
-  "detail": "string"
-}
-```
-
-<h3 id="get-all-fluxs-responses">Responses</h3>
-
-|Status|Meaning|Description|Schema|
-|---|---|---|---|
-|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|List of fluxs|Inline|
-|401|[Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)|Unauthorized|None|
-|422|[Unprocessable Entity](https://tools.ietf.org/html/rfc2518#section-10.3)|Validation Error|[HTTPValidationError](#schemahttpvalidationerror)|
-
-<h3 id="get-all-fluxs-responseschema">Response Schema</h3>
-
-Status Code **200**
-
-*Response Get Fluxs Flux Fluxs Get*
-
-|Name|Type|Required|Restrictions|Description|
-|---|---|---|---|---|
-|Response Get Fluxs Flux Fluxs Get|[[FluxBasicData](#schemafluxbasicdata)]|false|none|[Flux Basic Data Model]|
-|» FluxBasicData|[FluxBasicData](#schemafluxbasicdata)|false|none|Flux Basic Data Model|
-|»» id|integer|true|none|none|
-|»» name|string|true|none|none|
-|»» description|string|true|none|none|
-|»» active|boolean|true|none|none|
-|»» reaction|string|true|none|none|
-|»» action|string|true|none|none|
-
-<aside class="success">
-This operation does not require authentication
-</aside>
-
 <h1 id="area-api-user">User</h1>
 
 ## Create user
@@ -1828,6 +1138,696 @@ null
 |422|[Unprocessable Entity](https://tools.ietf.org/html/rfc2518#section-10.3)|Validation Error|[HTTPValidationError](#schemahttpvalidationerror)|
 
 <h3 id="test-action-or-reaction-responseschema">Response Schema</h3>
+
+<aside class="success">
+This operation does not require authentication
+</aside>
+
+<h1 id="area-api-flux">Flux</h1>
+
+## Create/Modify flux
+
+<a id="opIdcreate_flux_flux_post"></a>
+
+> Code samples
+
+```shell
+# You can also use wget
+curl -X POST /flux \
+  -H 'Content-Type: application/json' \
+  -H 'Accept: application/json' \
+  -H 'access-token: string'
+
+```
+
+```javascript
+const inputBody = '{
+  "id": 0,
+  "name": "string",
+  "description": "string",
+  "nodes": [
+    {
+      "id": "string",
+      "numberInputs": 0,
+      "numberOutputs": 0,
+      "service": "string",
+      "subService": "string",
+      "subServiceId": "string",
+      "inputDataFromSubServiceId": "string",
+      "inputsData": [],
+      "prevPosition": {
+        "x": 0,
+        "y": 0
+      },
+      "currPosition": {
+        "x": 0,
+        "y": 0
+      },
+      "type": "string",
+      "inputEdgeIds": [
+        "string"
+      ],
+      "outputEdgeIds": [
+        "string"
+      ],
+      "title": "string",
+      "img": "string"
+    }
+  ],
+  "edges": [
+    {
+      "id": "string",
+      "nodeStartId": "string",
+      "nodeEndId": "string",
+      "inputIndex": 0,
+      "outputIndex": 0,
+      "prevStartPos": {
+        "x": 0,
+        "y": 0
+      },
+      "currStartPos": {
+        "x": 0,
+        "y": 0
+      },
+      "prevEndPos": {
+        "x": 0,
+        "y": 0
+      },
+      "currEndPos": {
+        "x": 0,
+        "y": 0
+      }
+    }
+  ]
+}';
+const headers = {
+  'Content-Type':'application/json',
+  'Accept':'application/json',
+  'access-token':'string'
+};
+
+fetch('/flux',
+{
+  method: 'POST',
+  body: inputBody,
+  headers: headers
+})
+.then(function(res) {
+    return res.json();
+}).then(function(body) {
+    console.log(body);
+});
+
+```
+
+`POST /flux`
+
+Create/Modify flux
+
+> Body parameter
+
+```json
+{
+  "id": 0,
+  "name": "string",
+  "description": "string",
+  "nodes": [
+    {
+      "id": "string",
+      "numberInputs": 0,
+      "numberOutputs": 0,
+      "service": "string",
+      "subService": "string",
+      "subServiceId": "string",
+      "inputDataFromSubServiceId": "string",
+      "inputsData": [],
+      "prevPosition": {
+        "x": 0,
+        "y": 0
+      },
+      "currPosition": {
+        "x": 0,
+        "y": 0
+      },
+      "type": "string",
+      "inputEdgeIds": [
+        "string"
+      ],
+      "outputEdgeIds": [
+        "string"
+      ],
+      "title": "string",
+      "img": "string"
+    }
+  ],
+  "edges": [
+    {
+      "id": "string",
+      "nodeStartId": "string",
+      "nodeEndId": "string",
+      "inputIndex": 0,
+      "outputIndex": 0,
+      "prevStartPos": {
+        "x": 0,
+        "y": 0
+      },
+      "currStartPos": {
+        "x": 0,
+        "y": 0
+      },
+      "prevEndPos": {
+        "x": 0,
+        "y": 0
+      },
+      "currEndPos": {
+        "x": 0,
+        "y": 0
+      }
+    }
+  ]
+}
+```
+
+<h3 id="create/modify-flux-parameters">Parameters</h3>
+
+|Name|In|Type|Required|Description|
+|---|---|---|---|---|
+|verify|query|boolean|false|none|
+|access-token|header|string|false|none|
+|body|body|[FluxCreateOrModify-Input](#schemafluxcreateormodify-input)|true|none|
+|» id|body|any|false|none|
+|»» *anonymous*|body|integer|false|none|
+|»» *anonymous*|body|null|false|none|
+|» name|body|string|true|none|
+|» description|body|string|true|none|
+|» nodes|body|[[FluxNode-Input](#schemafluxnode-input)]|true|[Flux Node Model]|
+|»» FluxNode|body|[FluxNode-Input](#schemafluxnode-input)|false|Flux Node Model|
+|»»» id|body|string|true|none|
+|»»» numberInputs|body|any|true|none|
+|»»»» *anonymous*|body|integer|false|none|
+|»»»» *anonymous*|body|string|false|none|
+|»»» numberOutputs|body|any|true|none|
+|»»»» *anonymous*|body|integer|false|none|
+|»»»» *anonymous*|body|string|false|none|
+|»»» service|body|any|false|none|
+|»»»» *anonymous*|body|string|false|none|
+|»»»» *anonymous*|body|null|false|none|
+|»»» subService|body|any|false|none|
+|»»»» *anonymous*|body|string|false|none|
+|»»»» *anonymous*|body|null|false|none|
+|»»» subServiceId|body|any|false|none|
+|»»»» *anonymous*|body|string|false|none|
+|»»»» *anonymous*|body|null|false|none|
+|»»» inputDataFromSubServiceId|body|any|false|none|
+|»»»» *anonymous*|body|string|false|none|
+|»»»» *anonymous*|body|null|false|none|
+|»»» inputsData|body|any|false|none|
+|»»»» *anonymous*|body|[[FluxInputData-Input](#schemafluxinputdata-input)]|false|[Flux Input Data Model]|
+|»»»»» FluxInputData|body|[FluxInputData-Input](#schemafluxinputdata-input)|false|Flux Input Data Model|
+|»»»»»» id|body|string|true|none|
+|»»»»»» name|body|string|true|none|
+|»»»»»» data|body|[string]|true|none|
+|»»»»»» inputType|body|string|true|none|
+|»»»»»» type|body|string|true|none|
+|»»»»»» required|body|boolean|true|none|
+|»»»»»» value|body|any|false|none|
+|»»»»»»» *anonymous*|body|any|false|none|
+|»»»»»»» *anonymous*|body|null|false|none|
+|»»»» *anonymous*|body|null|false|none|
+|»»» prevPosition|body|[FluxPos](#schemafluxpos)|true|Flux Position Model|
+|»»»» x|body|number|true|none|
+|»»»» y|body|number|true|none|
+|»»» currPosition|body|[FluxPos](#schemafluxpos)|true|Flux Position Model|
+|»»» type|body|string|true|none|
+|»»» inputEdgeIds|body|[string]|true|none|
+|»»» outputEdgeIds|body|[string]|true|none|
+|»»» title|body|string|true|none|
+|»»» img|body|string|true|none|
+|» edges|body|[[FluxEdge](#schemafluxedge)]|true|[Flux Edge Model]|
+|»» FluxEdge|body|[FluxEdge](#schemafluxedge)|false|Flux Edge Model|
+|»»» id|body|string|true|none|
+|»»» nodeStartId|body|string|true|none|
+|»»» nodeEndId|body|string|true|none|
+|»»» inputIndex|body|integer|true|none|
+|»»» outputIndex|body|integer|true|none|
+|»»» prevStartPos|body|[FluxPos](#schemafluxpos)|true|Flux Position Model|
+|»»» currStartPos|body|[FluxPos](#schemafluxpos)|true|Flux Position Model|
+|»»» prevEndPos|body|[FluxPos](#schemafluxpos)|true|Flux Position Model|
+|»»» currEndPos|body|[FluxPos](#schemafluxpos)|true|Flux Position Model|
+
+> Example responses
+
+> 201 Response
+
+```json
+{
+  "id": 0
+}
+```
+
+> 400 Response
+
+```json
+{
+  "detail": "string"
+}
+```
+
+> 401 Response
+
+```json
+{
+  "detail": "string"
+}
+```
+
+<h3 id="create/modify-flux-responses">Responses</h3>
+
+|Status|Meaning|Description|Schema|
+|---|---|---|---|
+|201|[Created](https://tools.ietf.org/html/rfc7231#section-6.3.2)|Flux|[FluxSend](#schemafluxsend)|
+|400|[Bad Request](https://tools.ietf.org/html/rfc7231#section-6.5.1)|Bad Request|None|
+|401|[Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)|Unauthorized|None|
+|422|[Unprocessable Entity](https://tools.ietf.org/html/rfc2518#section-10.3)|Validation Error|[HTTPValidationError](#schemahttpvalidationerror)|
+
+<h3 id="create/modify-flux-responseschema">Response Schema</h3>
+
+<aside class="success">
+This operation does not require authentication
+</aside>
+
+## Delete flux
+
+<a id="opIddelete_flux_flux__fluxId__delete"></a>
+
+> Code samples
+
+```shell
+# You can also use wget
+curl -X DELETE /flux/{fluxId} \
+  -H 'Accept: application/json' \
+  -H 'access-token: string'
+
+```
+
+```javascript
+
+const headers = {
+  'Accept':'application/json',
+  'access-token':'string'
+};
+
+fetch('/flux/{fluxId}',
+{
+  method: 'DELETE',
+
+  headers: headers
+})
+.then(function(res) {
+    return res.json();
+}).then(function(body) {
+    console.log(body);
+});
+
+```
+
+`DELETE /flux/{fluxId}`
+
+Delete flux
+
+<h3 id="delete-flux-parameters">Parameters</h3>
+
+|Name|In|Type|Required|Description|
+|---|---|---|---|---|
+|fluxId|path|integer|true|none|
+|access-token|header|string|false|none|
+
+> Example responses
+
+> 200 Response
+
+```json
+{
+  "id": 0
+}
+```
+
+> 401 Response
+
+```json
+{
+  "detail": "string"
+}
+```
+
+> 404 Response
+
+```json
+{
+  "detail": "string"
+}
+```
+
+<h3 id="delete-flux-responses">Responses</h3>
+
+|Status|Meaning|Description|Schema|
+|---|---|---|---|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Flux|[FluxSend](#schemafluxsend)|
+|401|[Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)|Unauthorized|None|
+|404|[Not Found](https://tools.ietf.org/html/rfc7231#section-6.5.4)|Flux not found|None|
+|422|[Unprocessable Entity](https://tools.ietf.org/html/rfc2518#section-10.3)|Validation Error|[HTTPValidationError](#schemahttpvalidationerror)|
+
+<h3 id="delete-flux-responseschema">Response Schema</h3>
+
+<aside class="success">
+This operation does not require authentication
+</aside>
+
+## Get flux
+
+<a id="opIdget_flux_flux__fluxId__get"></a>
+
+> Code samples
+
+```shell
+# You can also use wget
+curl -X GET /flux/{fluxId} \
+  -H 'Accept: application/json' \
+  -H 'access-token: string'
+
+```
+
+```javascript
+
+const headers = {
+  'Accept':'application/json',
+  'access-token':'string'
+};
+
+fetch('/flux/{fluxId}',
+{
+  method: 'GET',
+
+  headers: headers
+})
+.then(function(res) {
+    return res.json();
+}).then(function(body) {
+    console.log(body);
+});
+
+```
+
+`GET /flux/{fluxId}`
+
+Get flux
+
+<h3 id="get-flux-parameters">Parameters</h3>
+
+|Name|In|Type|Required|Description|
+|---|---|---|---|---|
+|fluxId|path|integer|true|none|
+|access-token|header|string|false|none|
+
+> Example responses
+
+> 200 Response
+
+```json
+{
+  "id": 0,
+  "name": "string",
+  "description": "string",
+  "nodes": [
+    {
+      "id": "string",
+      "numberInputs": 0,
+      "numberOutputs": 0,
+      "service": "string",
+      "subService": "string",
+      "subServiceId": "string",
+      "inputDataFromSubServiceId": "string",
+      "inputsData": [],
+      "prevPosition": {
+        "x": 0,
+        "y": 0
+      },
+      "currPosition": {
+        "x": 0,
+        "y": 0
+      },
+      "type": "string",
+      "inputEdgeIds": [
+        "string"
+      ],
+      "outputEdgeIds": [
+        "string"
+      ],
+      "title": "string",
+      "img": "string"
+    }
+  ],
+  "edges": [
+    {
+      "id": "string",
+      "nodeStartId": "string",
+      "nodeEndId": "string",
+      "inputIndex": 0,
+      "outputIndex": 0,
+      "prevStartPos": {
+        "x": 0,
+        "y": 0
+      },
+      "currStartPos": {
+        "x": 0,
+        "y": 0
+      },
+      "prevEndPos": {
+        "x": 0,
+        "y": 0
+      },
+      "currEndPos": {
+        "x": 0,
+        "y": 0
+      }
+    }
+  ]
+}
+```
+
+> 401 Response
+
+```json
+{
+  "detail": "string"
+}
+```
+
+> 404 Response
+
+```json
+{
+  "detail": "string"
+}
+```
+
+<h3 id="get-flux-responses">Responses</h3>
+
+|Status|Meaning|Description|Schema|
+|---|---|---|---|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Flux|[FluxCreateOrModify-Output](#schemafluxcreateormodify-output)|
+|401|[Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)|Unauthorized|None|
+|404|[Not Found](https://tools.ietf.org/html/rfc7231#section-6.5.4)|Flux not found|None|
+|422|[Unprocessable Entity](https://tools.ietf.org/html/rfc2518#section-10.3)|Validation Error|[HTTPValidationError](#schemahttpvalidationerror)|
+
+<h3 id="get-flux-responseschema">Response Schema</h3>
+
+<aside class="success">
+This operation does not require authentication
+</aside>
+
+## Toggle active flux
+
+<a id="opIdtoggle_flux_flux__fluxId__patch"></a>
+
+> Code samples
+
+```shell
+# You can also use wget
+curl -X PATCH /flux/{fluxId} \
+  -H 'Accept: application/json' \
+  -H 'access-token: string'
+
+```
+
+```javascript
+
+const headers = {
+  'Accept':'application/json',
+  'access-token':'string'
+};
+
+fetch('/flux/{fluxId}',
+{
+  method: 'PATCH',
+
+  headers: headers
+})
+.then(function(res) {
+    return res.json();
+}).then(function(body) {
+    console.log(body);
+});
+
+```
+
+`PATCH /flux/{fluxId}`
+
+Toggle active flux
+
+<h3 id="toggle-active-flux-parameters">Parameters</h3>
+
+|Name|In|Type|Required|Description|
+|---|---|---|---|---|
+|fluxId|path|integer|true|none|
+|access-token|header|string|false|none|
+
+> Example responses
+
+> 200 Response
+
+```json
+{
+  "id": 0,
+  "active": true
+}
+```
+
+> 401 Response
+
+```json
+{
+  "detail": "string"
+}
+```
+
+> 404 Response
+
+```json
+{
+  "detail": "string"
+}
+```
+
+<h3 id="toggle-active-flux-responses">Responses</h3>
+
+|Status|Meaning|Description|Schema|
+|---|---|---|---|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Toggle works|[FluxToggleSend](#schemafluxtogglesend)|
+|401|[Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)|Unauthorized|None|
+|404|[Not Found](https://tools.ietf.org/html/rfc7231#section-6.5.4)|Flux not found|None|
+|422|[Unprocessable Entity](https://tools.ietf.org/html/rfc2518#section-10.3)|Validation Error|[HTTPValidationError](#schemahttpvalidationerror)|
+
+<h3 id="toggle-active-flux-responseschema">Response Schema</h3>
+
+<aside class="success">
+This operation does not require authentication
+</aside>
+
+## Get all fluxs
+
+<a id="opIdget_fluxs_flux_fluxs_get"></a>
+
+> Code samples
+
+```shell
+# You can also use wget
+curl -X GET /flux/fluxs \
+  -H 'Accept: application/json' \
+  -H 'access-token: string'
+
+```
+
+```javascript
+
+const headers = {
+  'Accept':'application/json',
+  'access-token':'string'
+};
+
+fetch('/flux/fluxs',
+{
+  method: 'GET',
+
+  headers: headers
+})
+.then(function(res) {
+    return res.json();
+}).then(function(body) {
+    console.log(body);
+});
+
+```
+
+`GET /flux/fluxs`
+
+Get all fluxs
+
+<h3 id="get-all-fluxs-parameters">Parameters</h3>
+
+|Name|In|Type|Required|Description|
+|---|---|---|---|---|
+|access-token|header|string|false|none|
+
+> Example responses
+
+> 200 Response
+
+```json
+[
+  {
+    "id": 0,
+    "name": "string",
+    "description": "string",
+    "active": true,
+    "reaction": "string",
+    "action": "string"
+  }
+]
+```
+
+> 401 Response
+
+```json
+{
+  "detail": "string"
+}
+```
+
+<h3 id="get-all-fluxs-responses">Responses</h3>
+
+|Status|Meaning|Description|Schema|
+|---|---|---|---|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|List of fluxs|Inline|
+|401|[Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)|Unauthorized|None|
+|422|[Unprocessable Entity](https://tools.ietf.org/html/rfc2518#section-10.3)|Validation Error|[HTTPValidationError](#schemahttpvalidationerror)|
+
+<h3 id="get-all-fluxs-responseschema">Response Schema</h3>
+
+Status Code **200**
+
+*Response Get Fluxs Flux Fluxs Get*
+
+|Name|Type|Required|Restrictions|Description|
+|---|---|---|---|---|
+|Response Get Fluxs Flux Fluxs Get|[[FluxBasicData](#schemafluxbasicdata)]|false|none|[Flux Basic Data Model]|
+|» FluxBasicData|[FluxBasicData](#schemafluxbasicdata)|false|none|Flux Basic Data Model|
+|»» id|integer|true|none|none|
+|»» name|string|true|none|none|
+|»» description|string|true|none|none|
+|»» active|boolean|true|none|none|
+|»» reaction|string|true|none|none|
+|»» action|string|true|none|none|
 
 <aside class="success">
 This operation does not require authentication
