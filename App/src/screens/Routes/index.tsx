@@ -9,6 +9,11 @@ import Oauth from "../Oauth";
 
 const Stack = createStackNavigator()
 
+/**
+ * Function to return the routes of the app
+ * @param isLogged the state of the user
+ * @constructor
+ */
 export const Routes: React.FC<{isLogged: boolean | null}> = ({isLogged}) => {
 
     if (isLogged == null) {

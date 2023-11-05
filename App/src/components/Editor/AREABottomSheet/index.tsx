@@ -33,6 +33,14 @@ import { InAppBrowser } from 'react-native-inappbrowser-reborn'
 import DatePicker from "react-native-date-picker";
 import IService from "../../../interfaces/IService";
 
+/**
+ * Props for the bottom sheet component.
+ * @type currentArea current area.
+ * @type bottomSheetRef ref to the bottom sheet.
+ * @type setSaveSelectedArea save the selected area.
+ * @type deleteArea function to delete the area.
+ * @constructor
+ */
 type AREABottomSheetProps = {
     currentArea?: IAREAComponent,
     bottomSheetRef?:  React.RefObject<BottomSheetMethods> | undefined,
@@ -59,6 +67,12 @@ async function getAuthorizeUrlFromApi(serviceId: string): Promise<{ url: string 
     return await authorizeUrlGet(serviceId);
 }
 
+/**
+ * Open the oauth url in the in app browser.
+ * @param url url to open.
+ * @return {Promise<void>} void.
+ * @constructor
+ */
 const oauthAuthorize = async (url: string) => {
     try {
         if (await InAppBrowser.isAvailable()) {
@@ -79,6 +93,17 @@ const oauthAuthorize = async (url: string) => {
     }
 }
 
+/**
+ * Page in the bottom sheet to define action/reaction parameters.
+ * @param data data of the area.
+ * @param setAREAParamOpened boolean to set the opened state.
+ * @param closeBottomSheet function to close the bottom sheet.
+ * @param setSaveSelectedArea function to save the selected area state.
+ * @param refetchSchema boolean to refetch the schema.
+ * @param setRefetchSchema boolean to refetch the schema state.
+ * @param deleteArea function to delete the area.
+ * @constructor
+ */
 const AREAParamBottomSheet: React.FC<{
     data: IAREAComponent,
     setAREAParamOpened: React.Dispatch<React.SetStateAction<boolean>>,
@@ -97,6 +122,13 @@ const AREAParamBottomSheet: React.FC<{
     const [error, setError] = React.useState<string>("");
     const [oauthServices, setOauthSevices] = useState<{ [key: string]: any }>({});
 
+    /**
+     * Set the schema data.
+     * @param id id of the schema data.
+     * @param value value of the schema data.
+     * @return {void} void.
+     * @constructor
+     */
     const setSchemaData = (id: string, value: string | Date) => {
         let schemaData: IServiceSchema = schema!;
         let indexItem = 0;
@@ -298,6 +330,7 @@ const AREAParamBottomSheet: React.FC<{
                                 })
                             } else {
                                 authorizeUrlGet(data.name!).then((urlGet) => {
+                                    console.log(urlGet)
                                     oauthAuthorize(urlGet.url).then((res) => {
 
                                     })
@@ -352,6 +385,14 @@ const AREAParamBottomSheet: React.FC<{
     )
 }
 
+/**
+ * Bottom sheet component to select the action/reaction.
+ * @param currentArea current area.
+ * @param bottomSheetRef ref to the bottom sheet.
+ * @param setSaveSelectedArea save the selected area.
+ * @param deleteArea function to delete the area.
+ * @constructor
+ */
 export const AREABottomSheet: React.FC<AREABottomSheetProps> = ({currentArea, bottomSheetRef, setSaveSelectedArea, deleteArea}) => {
     const Styles = useThemedStyles(styles);
     const Theme = useTheme();
