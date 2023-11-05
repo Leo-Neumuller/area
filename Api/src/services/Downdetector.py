@@ -18,7 +18,7 @@ class Downdetector(BaseService):
         Get name of service
         :return: Name of service
         """
-        return "DownDetector"
+        return "Down Detector"
 
     @add_metadata(ServiceMetadata(
         name="Vérifie si le site Web est en panne",
@@ -53,8 +53,8 @@ class Downdetector(BaseService):
     ))
     def check_website(self, prev_data: dict, data: dict) -> Tuple[dict, dict]:
         """
-        [Action] Create draft
-        :param data: Dict of data with keys: content, to, subject
+        [Reaction] Check if website is down
+        :param data: Dict of data with keys: status, url
         :return: dict of signal
         """
         try:
