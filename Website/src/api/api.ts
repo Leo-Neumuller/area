@@ -175,8 +175,8 @@ export async function createFlux(cookie: string, flux: CreateFlux, verify: boole
     // formater for api
     for (let node of flux.nodes) {
         for (let inputData of node.inputsData ?? []) {
-            if (inputData.inputType === "date" && inputData.value["value"]) {
-                inputData.value["value"] = new Date(inputData.value).toISOString();
+            if (inputData.inputType === "date" && inputData.value["value"] && inputData.value["id"] == "Rien") {
+                inputData.value["value"] = new Date(inputData.value["value"]).toISOString();
             }
         }
     }

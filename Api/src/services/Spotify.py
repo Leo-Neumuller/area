@@ -4,7 +4,7 @@ Spotify service
 
 import json
 import urllib
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Tuple
 
 import requests
@@ -93,7 +93,7 @@ class Spotify(BaseService):
         db.commit()
         return
 
-    def check_refresh_token(self):
+    def check_refresh_token(self, force_refresh: bool = False):
         """
         Check refresh token
         :return: Refresh token
@@ -102,8 +102,8 @@ class Spotify(BaseService):
             refresh = self.db.query(Service).filter(Service.name == self.get_name(),
                                                     Service.user_id == self.User.id).first().refresh
             refresh_token = refresh["refresh_token"]
-            if "last_refresh" not in refresh or refresh["last_refresh"] + refresh[
-                "expires_in"] < datetime.now().timestamp() - 1000:
+            if force_refresh or ("last_refresh" not in refresh or refresh["last_refresh"] + refresh[
+                "expires_in"] < (datetime.now().timestamp() - 1000)):
                 param = {
                     "grant_type": "refresh_token",
                     "refresh_token": refresh_token,
@@ -171,6 +171,12 @@ class Spotify(BaseService):
                 "Content-Type": "application/json",
                 "Authorization": f"Bearer {refresh['access_token']}"
             })
+            if response.status_code == 401:
+                refresh = self.check_refresh_token(True)
+                response = requests.get("https://api.spotify.com/v1/me/player?market=FR", headers={
+                    "Content-Type": "application/json",
+                    "Authorization": f"Bearer {refresh['access_token']}"
+                })
             if response.status_code == 204:
                 return {"last_track_uri": ""}, {"signal": False, "data": []}
             elif response.status_code == 200:
@@ -226,6 +232,12 @@ class Spotify(BaseService):
                 "Content-Type": "application/json",
                 "Authorization": f"Bearer {refresh['access_token']}"
             })
+            if response.status_code == 401:
+                refresh = self.check_refresh_token(True)
+                response = requests.get("https://api.spotify.com/v1/me/player?market=FR", headers={
+                    "Content-Type": "application/json",
+                    "Authorization": f"Bearer {refresh['access_token']}"
+                })
             if response.status_code == 204:
                 return {"last_track_uri": ""}, {"signal": False, "data": []}
             elif response.status_code == 200:
@@ -264,6 +276,12 @@ class Spotify(BaseService):
                 "Content-Type": "application/json",
                 "Authorization": f"Bearer {refresh['access_token']}"
             })
+            if response.status_code == 401:
+                refresh = self.check_refresh_token(True)
+                response = requests.get("https://api.spotify.com/v1/me/player?market=FR", headers={
+                    "Content-Type": "application/json",
+                    "Authorization": f"Bearer {refresh['access_token']}"
+                })
             if response.status_code != 200:
                 return {"signal": False, "data": []}
             data_spotify = response.json()
@@ -273,7 +291,6 @@ class Spotify(BaseService):
                         "Content-Type": "application/json",
                         "Authorization": f"Bearer {refresh['access_token']}"
                     })
-                print(response.text)
                 if response.status_code == 204:
                     return {"signal": True, "data": []}
         except Exception as e:
@@ -300,6 +317,12 @@ class Spotify(BaseService):
                 "Content-Type": "application/json",
                 "Authorization": f"Bearer {refresh['access_token']}"
             })
+            if response.status_code == 401:
+                refresh = self.check_refresh_token(True)
+                response = requests.get("https://api.spotify.com/v1/me/player?market=FR", headers={
+                    "Content-Type": "application/json",
+                    "Authorization": f"Bearer {refresh['access_token']}"
+                })
             if response.status_code != 200:
                 return {"signal": False, "data": []}
             data_spotify = response.json()
@@ -309,7 +332,6 @@ class Spotify(BaseService):
                         "Content-Type": "application/json",
                         "Authorization": f"Bearer {refresh['access_token']}"
                     })
-                print(response.text)
                 if response.status_code == 204:
                     return {"signal": True, "data": []}
         except Exception as e:
@@ -357,7 +379,6 @@ class Spotify(BaseService):
                     headers={
                         "Authorization": f"Bearer {refresh['access_token']}"
                     })
-                print(response.status_code)
                 if response.status_code == 204:
                     return {"signal": True, "data": []}
         except Exception as e:

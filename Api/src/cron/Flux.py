@@ -7,7 +7,7 @@ from src.models.Services import ServiceType
 from src.models.User import UserMe
 from src.services import services
 from src.utils.Database import get_db
-from src.utils.Helper import info
+from src.utils.Helper import info, warn
 
 
 def check_signals(flux_graph: FluxGraph, datas: dict):
@@ -34,11 +34,13 @@ def run_reaction(User, already_executed, datas, db, flux_graph):
     :param flux_graph:
     :return:
     """
+    info(f"Running Reaction {flux_graph.service_id}")
     splitted_service_id = flux_graph.service_id.split('_')
     interface = \
         services[splitted_service_id[0]](User, db).get_interface()[ServiceType(splitted_service_id[1])][
             flux_graph.service_id]
     config = {key: value["value"] for key, value in flux_graph.config.items() if value["id"] == "Rien"}
+    info(f"PreConfig {config} {flux_graph.config}")
     configs = []
     if len(config.keys()) != len(flux_graph.config.keys()):
         for key in flux_graph.config.keys():
@@ -49,7 +51,6 @@ def run_reaction(User, already_executed, datas, db, flux_graph):
                             if len(configs) <= i:
                                 configs.append(config.copy())
                             configs[i][key] = datas[flux_graph_prev]["data"][i][flux_graph.config[key]["id"]]
-
     if len(configs) != 0:
         index = 0
         for i in range(len(configs)):
@@ -59,10 +60,12 @@ def run_reaction(User, already_executed, datas, db, flux_graph):
         configs = configs[:index + 1]
         for config in configs:
             datas[flux_graph.id] = interface.function(config)
+        info(f"Reaction {flux_graph.service_id} executed with {len(configs)} configs end datas {datas[flux_graph.id]}")
         already_executed.add(flux_graph.id)
         return already_executed
 
     datas[flux_graph.id] = interface.function(config)
+    info(f"Reaction {flux_graph.service_id} executed with {config} end datas {datas[flux_graph.id]}")
     already_executed.add(flux_graph.id)
     return already_executed
 
@@ -79,37 +82,18 @@ def run_dependent_flux(flux_graph: FluxGraph, datas: dict, already_executed: set
     :param db:
     :return:
     """
+    info(f"Running Dependent flux {flux_graph.service_id}")
     if flux_graph.id in already_executed:
         return
     if not check_signals(flux_graph, datas):
-        datas[flux_graph.id] = {"signal": False}
+        datas[flux_graph.id] = {"signal": False, "data": []}
         already_executed.add(flux_graph.id)
         return
     for flux_graph_prev in flux_graph.prev_flux_graph_ids:
         run_dependent_flux(all_AREA_by_id[flux_graph_prev], datas, already_executed, User, all_AREA_by_id, db)
     run_reaction(User, already_executed, datas, db, flux_graph)
-    return
-
-
-def run_next_flux(flux_graph: FluxGraph, datas: dict, already_executed: set, User: UserMe, all_AREA_by_id: dict,
-                  db=next(get_db())):
-    """
-    Run next flux
-    :param flux_graph:
-    :param datas:
-    :param already_executed:
-    :param User:
-    :param db:
-    :return:
-    """
-    if flux_graph.id in already_executed:
-        return
-    run_dependent_flux(flux_graph, datas, already_executed, User, all_AREA_by_id, db)
-    if not datas[flux_graph.id]["signal"] or flux_graph.id in already_executed:
-        return
     for flux_graph_next in flux_graph.next_flux_graph_ids:
-        run_next_flux(all_AREA_by_id[flux_graph_next], datas, already_executed, User, all_AREA_by_id, db)
-    run_reaction(User, already_executed, datas, db, flux_graph)
+        run_dependent_flux(all_AREA_by_id[flux_graph_next], datas, already_executed, User, all_AREA_by_id, db)
     return
 
 
@@ -144,6 +128,9 @@ def execute_flux(db=next(get_db())):
                     prev_data, datas[AREA.id] = interface.function(AREA.prev_data, config)
                 except Exception as e:
                     error = True
+                    warn(str(e))
+
+
                     break
                 db.query(FluxGraph).filter(FluxGraph.id == AREA.id).update({"prev_data": prev_data})
                 already_executed.add(AREA.id)
@@ -153,7 +140,8 @@ def execute_flux(db=next(get_db())):
         db.commit()
         for action_id in AREA_actions_ids:
             for REA in all_AREA_by_id[action_id].next_flux_graph_ids:
-                run_next_flux(all_AREA_by_id[REA], datas, already_executed, User, all_AREA_by_id, db)
+                run_dependent_flux(all_AREA_by_id[REA], datas, already_executed, User, all_AREA_by_id, db)
         print(f"Flux {flux_id} executed")
+
 
     print("All flux executed")
