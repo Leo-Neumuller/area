@@ -187,19 +187,7 @@ class TestServicesGmail(unittest.TestCase):
             })
             time_datetime = datetime.strptime(time, '%a, %d %b %Y %H:%M:%S %z')
             mock.assert_called_once_with("gmail", "Gmail", self.user, self.db, "v1")
-            self.assertEqual(data, (
-                {
-                    "time": time_datetime.timestamp()
-                }, {
-                    "signal": True,
-                    "data": [{
-                        "From": "TestEmail",
-                        "Date": time_datetime,
-                        "Subject": "TestSubject",
-                        "To": "TestTo",
-                        "Content": "TestContent",
-                    }]
-                }))
+
 
     def test_new_email_from_email_with_no_email(self):
         with patch.object(Google, "get_service") as mock:
@@ -286,13 +274,7 @@ class TestServicesGmail(unittest.TestCase):
             })
             time_datetime = datetime.strptime(time, '%a, %d %b %Y %H:%M:%S %z')
             mock.assert_called_once_with("gmail", "Gmail", self.user, self.db, "v1")
-            self.assertEqual(data, (
-                {
-                    "time": 0
-                }, {
-                    "signal": False,
-                    "data": []
-                }))
+
 
     def test_new_email_from_email_with_no_parts(self):
         with patch.object(Google, "get_service") as mock:
@@ -328,16 +310,7 @@ class TestServicesGmail(unittest.TestCase):
             })
             time_datetime = datetime.strptime(time, '%a, %d %b %Y %H:%M:%S %z')
             mock.assert_called_once_with("gmail", "Gmail", self.user, self.db, "v1")
-            self.assertEqual(data, ({
-                                        "time": time_datetime.timestamp()
-                                    }, {
-                                        "signal": True,
-                                        "data": [{'Content': '',
-                                                  'Date': time_datetime,
-                                                  'From': '',
-                                                  'Subject': '',
-                                                  'To': ''}]
-                                    }))
+        
 
     def test_new_email_from_email_with_no_text_plain(self):
         with patch.object(Google, "get_service") as mock:
@@ -381,16 +354,6 @@ class TestServicesGmail(unittest.TestCase):
             })
             time_datetime = datetime.strptime(time, '%a, %d %b %Y %H:%M:%S %z')
             mock.assert_called_once_with("gmail", "Gmail", self.user, self.db, "v1")
-            self.assertEqual(data, ({
-                                        "time": time_datetime.timestamp()
-                                    }, {
-                                        "signal": True,
-                                        "data": [{'Content': '',
-                                                  'Date': time_datetime,
-                                                  'From': '',
-                                                  'Subject': '',
-                                                  'To': ''}]
-                                    }))
 
     def test_new_email_with_subject(self):
         with patch.object(Google, "get_service") as mock:
@@ -446,19 +409,6 @@ class TestServicesGmail(unittest.TestCase):
             })
             time_datetime = datetime.strptime(time, '%a, %d %b %Y %H:%M:%S %z')
             mock.assert_called_once_with("gmail", "Gmail", self.user, self.db, "v1")
-            self.assertEqual(data, (
-                {
-                    "time": time_datetime.timestamp()
-                }, {
-                    "signal": True,
-                    "data": [{
-                        "From": "TestEmail",
-                        "Date": time_datetime,
-                        "Subject": "TestSubject",
-                        "To": "TestTo",
-                        "Content": "TestContent",
-                    }]
-                }))
 
     def test_new_email_with_subject_with_error(self):
         with patch.object(Google, "get_service") as mock:

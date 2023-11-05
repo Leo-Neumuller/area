@@ -9,7 +9,7 @@ import os
 
 if "DOC" not in os.environ:
     scheduler = BackgroundScheduler()
-    scheduler.add_job(func=execute_flux, trigger="interval", seconds=30)
+    scheduler.add_job(func=execute_flux, trigger="interval", seconds=10)
     execute_flux()
     scheduler.start()
 
