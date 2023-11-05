@@ -12,6 +12,19 @@ interface Props {
 
 }
 
+
+/**
+ * A custom button component with an onPress action.
+ *
+ * @param Props.text The text in the button.
+ * @param Props.onPress The action when we press the button.
+ * @param Props.bgColor The color of the button.
+ * @param Props.textColor The color of the text in the button.
+ * @param Props.hei The height of the button.
+ * @param Props.wid The width of the button.
+ *
+ * @returns A button as jsx.
+ */
 export default function ButtonComponents(Props: Props) {
     const Styles = useThemedStyles(styles);
     return (

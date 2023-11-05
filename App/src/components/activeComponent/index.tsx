@@ -26,6 +26,17 @@ interface Props {
     refresh: Function;
 }
 
+
+/**
+ * This component display a flux (name, description) and activate or deactivate the flux
+ *
+ * @param Props.name The name of the flux.
+ * @param Props.desc The description of the flux.
+ * @param Props.active To know if it is active or no.
+ * @param Props.id The id of the flux.
+ * @param Props.refresh a function to refresh the user flux list after activation or deactivation.
+ * @returns The component to activate or deactivate the flux.
+ */
 export default function ActiveComponent(Props: Props) {
     const Styles = useThemedStyles(styles);
     const Theme = useTheme();
@@ -80,17 +91,13 @@ export default function ActiveComponent(Props: Props) {
                     trackColor={{false: '#767577', true: '#767577'}}
                     thumbColor={Props.active ? Theme.colors.Primary : Theme.colors.White}
                     ios_backgroundColor="#3e3e3e"
-                    onTouchEnd={() => {
-
+                    onChange={() => {
 
                     }}
-                    onChange={() => {
+                    onValueChange={() => {
                         changeActive(Props.id).then(() => {
                             Props.refresh();
                         });
-                    }}
-                    onValueChange={() => {
-
                     }}
                     value={Props.active}
                 />

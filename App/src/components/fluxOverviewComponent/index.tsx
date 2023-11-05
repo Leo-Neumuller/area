@@ -1,18 +1,36 @@
 import EditSVG from "../../../assets/formkit_arrowright.svg";
+import CrossSVG from "../../../assets/cross-23.svg";
+
 import AddSVG from "../../../assets/AddComponent.svg";
 import React, {useEffect, useState} from "react";
 import {Button, Dimensions, DimensionValue, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import useThemedStyles from "../../hooks/Theme/useThemedStyle";
 import useTheme from "../../hooks/Theme/useTheme";
 import {ThemeTypeContext} from "../../constants/Theme";
+import {deleteFlux} from "../../api/api";
 
 
 interface Props {
     desc?: string;
     onPress?: (e: any) => void;
     name?: string;
+    refresh: Function;
+    id: number;
 }
 
+/**
+ * This component display an active flux on the map of the Flux page.
+ * With this component we can edit and delete the flux.
+ *
+ * @param Props.name The name of the flux.
+ * @param Props.desc The desc of the flux.
+ * @param Props.onPress The action when we press the arrow.
+ * @param Props.refresh The function to refresh the list after deleting a flux.
+ * @param Props.id The flux id.
+ *
+ *
+ * @returns a flux overview.
+ */
 export default function FluxOverview(Props: Props) {
     const Styles = useThemedStyles(styles);
     const Theme = useTheme();
@@ -32,7 +50,28 @@ export default function FluxOverview(Props: Props) {
 
             }}>
                 <View style={{
-                    height: "75%",
+                    height: "18%",
+                }}>
+                    <View style={{
+                        width: "15%",
+                        marginTop: 5,
+                        marginRight: 5,
+                        alignSelf: "flex-end",
+                    }}>
+                        <TouchableOpacity onPress={() => {
+                            deleteFlux(Props.id).then(() => {
+                                Props.refresh();
+                            })
+                        }}>
+                            <CrossSVG style={{color: Theme.colors.Grey}}/>
+                        </TouchableOpacity>
+
+
+                    </View>
+
+                </View>
+                <View style={{
+                    height: "57%",
                     justifyContent: "center",
                 }}>
                     <View style={{

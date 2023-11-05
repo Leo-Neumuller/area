@@ -18,6 +18,14 @@ import {ThemeTypeContext} from "../../../constants/Theme";
 import EncryptedStorage from "react-native-encrypted-storage";
 
 
+
+/**
+ * Route for login page.
+ *
+ * @param navigation the navigation prop.
+ * @returns The login page as jsx.
+ */
+// @ts-ignore
 export default function Login({navigation}) {
     const Styles = useThemedStyles(styles);
     const Theme = useTheme();
@@ -28,7 +36,6 @@ export default function Login({navigation}) {
     })
 
     const [error, setError] = useState<string>();
-
 
 
     return (
@@ -63,14 +70,27 @@ export default function Login({navigation}) {
                         backgroundColor: Theme.colors.Black,
                         borderRadius: 20,
                     }}>
-                        <View style={{margin: "7%"}}>
-                            <View style={{margin: 5}}>
-                                <Text style={{
-                                    ...Theme.Subtitle,
-                                    color: Theme.colors.White,
-                                }
-                                }> Email </Text>
-                                <View style={{...Styles.styleInput}}>
+                        <View style={{
+                            height: "60%"
+                        }}>
+                            <View style={{
+                                height: "50%",
+                                justifyContent: "space-evenly"
+                            }}>
+                                <View style={{
+                                    marginLeft: "5%",
+                                }}>
+                                    <Text style={{
+                                        ...Theme.Subtitle,
+                                        color: Theme.colors.White,
+                                    }
+                                    }> Email </Text>
+                                </View>
+                                <View style={{
+                                    ...Styles.styleInput,
+                                    width: "90%",
+                                    alignSelf: "center"
+                                }}>
                                     <TextInput
                                         style={{
                                             ...Theme.Text,
@@ -85,13 +105,21 @@ export default function Login({navigation}) {
                                     />
                                 </View>
                             </View>
-                            <View style={{margin: 5}}>
-                                <Text style={{
-                                    ...Theme.Subtitle,
-                                    color: Theme.colors.White,
-                                }
-                                }> Mot de passe </Text>
-                                <View style={{...Styles.styleInput}}>
+                            <View style={{
+                                height: "50%"
+                            }}>
+                                <View style={{
+                                    marginLeft: "5%"
+                                }}>
+                                    <Text style={{
+                                        ...Theme.Subtitle,
+                                        color: Theme.colors.White,
+                                    }
+                                    }> Mot de passe </Text>
+                                </View>
+                                <View style={{...Styles.styleInput,
+                                    width: "90%",
+                                    alignSelf: "center"}}>
                                     <TextInput
                                         style={{
                                             ...Theme.Text,
@@ -108,7 +136,8 @@ export default function Login({navigation}) {
                                 </View>
                             </View>
                         </View>
-                        <View style={{ height: "10%",
+                        <View style={{
+                            height: "10%",
                             width: "90%",
                             marginHorizontal: "8%"
                         }}>
@@ -116,13 +145,15 @@ export default function Login({navigation}) {
                                 {error ? <Text style={{
                                     color: 'red',
                                     flexWrap: "wrap",
-                                    position:"absolute",
+                                    position: "absolute",
                                     textAlign: "center"
                                 }}>
                                     {error}
                                 </Text> : null}
                             </View>
                         </View>
+
+
                         <View>
                             <View style={{
                                 height: "30%",
@@ -148,8 +179,9 @@ export default function Login({navigation}) {
                                 />
                             </View>
 
-                            <View style={{margin: "5%",
-                            alignItems: "center"}}>
+                            <View style={{
+                                alignItems: "center"
+                            }}>
                                 <Text style={{
                                     ...Theme.Text,
                                     color: Theme.colors.White,
@@ -157,7 +189,8 @@ export default function Login({navigation}) {
                                     Première fois sur Flux ?
                                 </Text>
                                 <TouchableOpacity onPress={() => navigation.push('Signup')}>
-                                    <Text style={{...Theme.Text,
+                                    <Text style={{
+                                        ...Theme.Text,
                                         color: Theme.colors.White,
                                         textDecorationLine: "underline"
                                     }}>
@@ -165,6 +198,8 @@ export default function Login({navigation}) {
                                     </Text>
                                 </TouchableOpacity>
                             </View>
+
+
                         </View>
 
                     </View>

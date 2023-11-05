@@ -288,3 +288,18 @@ export async function changeActive(id: number) {
     });
     return res
 }
+
+export async function deleteFlux(id: number) {
+    const token = await EncryptedStorage.getItem("userToken") as string;
+    const res = await fetch(process.env.API_URL + "/flux/" + id, {
+        method: "DELETE",
+        headers: {
+            "accept" : "application/json",
+            "Content-Type" : "application/json",
+            "access-token" : token,
+        }}).then((res) => {
+        console.log("flux deleted");
+        return res;
+    });
+    return res
+}

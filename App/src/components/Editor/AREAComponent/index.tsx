@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import {View, Text, TouchableOpacity, Image} from 'react-native';
 import useThemedStyles from '../../../hooks/Theme/useThemedStyle';
 import useTheme from '../../../hooks/Theme/useTheme';
 import { StyleSheet } from 'react-native';
@@ -7,6 +7,7 @@ import EditSVG from "../../../../assets/pepicons-pop_pen.svg";
 import FluxSVG from "../../../../assets/logos_flux.svg"
 import { ThemeTypeContext } from '../../../constants/Theme';
 import IAREAComponent from "../../../interfaces/IAREAComponent";
+import getUrlImg from "../../../hooks/getIcon";
 
 type Props = {
     inEditor: boolean,
@@ -27,9 +28,15 @@ export const AREAComponent: React.FC<Props> = ({inEditor, onPress, data, customS
                 setSelected(!selected)
             }}>
                 <View style={inEditor ? Styles.editorContentContainer : Styles.contentContainer}>
-                    <View style={[Styles.svgBackground, {backgroundColor: (data.type == 'action' ? Theme.colors.Primary : Theme.colors.Black)}]}>
-                        <FluxSVG style={[{color: data.type == 'action' ? Theme.colors.Black : Theme.colors.Primary}, Styles.svgDefault]} />
-                    </View>
+                    {!data.default && data.name != "Actions" && data.name != "Reactions" ?
+                        <View style={[Styles.svgBackground]}>
+                            <Image source={getUrlImg(data.name)} style={{width: 50, height: 40, alignSelf: "center"}} ></Image>
+                        </View>
+                        :
+                        <View style={[Styles.svgBackground, {backgroundColor: (data.type == 'action' ? Theme.colors.Primary : Theme.colors.Black)}]}>
+                            <FluxSVG style={[{color: data.type == 'action' ? Theme.colors.Black : Theme.colors.Primary}, Styles.svgDefault]}/>
+                        </View>
+                    }
                     <View style={{justifyContent: "center", width: "50%"}}>
                         <Text numberOfLines={1} style={[Theme.Title, inEditor ? Styles.textEditor : Styles.textDefault, {color: data.type ==  'action' || !inEditor ? Theme.colors.White : Theme.colors.Black}]}>
                             {data.default ? (data.type == 'action' ? "Action" : "Reaction") : data.name!}

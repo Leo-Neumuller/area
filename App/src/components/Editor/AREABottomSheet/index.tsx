@@ -13,8 +13,15 @@ import useThemedStyles from "../../../hooks/Theme/useThemedStyle";
 import useTheme from "../../../hooks/Theme/useTheme";
 import {ThemeTypeContext} from "../../../constants/Theme";
 import {AREAComponent} from "../AREAComponent";
-import React, {useEffect} from "react";
-import {authorizeUrlGet, servicesAREAGet, serviceSchemaGet, servicesGet} from "../../../api/api";
+import React, {useEffect, useState} from "react";
+import {
+    authorizeUrlGet, getIsConnected,
+    getOauthService,
+    oauthDisconnect,
+    servicesAREAGet,
+    serviceSchemaGet,
+    servicesGet
+} from "../../../api/api";
 import {IAREAComponent} from "../../../interfaces/IAREAComponent";
 import {IAREAServices} from "../../../interfaces/IAREAServices";
 import {Picker} from "@react-native-picker/picker";
@@ -23,6 +30,8 @@ import ButtonComponents from "../../ButtonLogin";
 import EncryptedStorage from "react-native-encrypted-storage";
 import {BottomSheetMethods} from "@gorhom/bottom-sheet/lib/typescript/types";
 import { InAppBrowser } from 'react-native-inappbrowser-reborn'
+import DatePicker from "react-native-date-picker";
+import IService from "../../../interfaces/IService";
 
 type AREABottomSheetProps = {
     currentArea?: IAREAComponent,
@@ -50,13 +59,10 @@ async function getAuthorizeUrlFromApi(serviceId: string): Promise<{ url: string 
     return await authorizeUrlGet(serviceId);
 }
 
-async function authService(url: string, serviceId: string): Promise<void> {
-    const newUrl = url.replace(/redirect_uri=.*services/, "redirect_uri=" + encodeURIComponent(process.env.API_URL!) + "%2Fservices");
-
-    console.log(newUrl)
+const oauthAuthorize = async (url: string) => {
     try {
         if (await InAppBrowser.isAvailable()) {
-            InAppBrowser.open(newUrl, {
+            InAppBrowser.open(url, {
                 // iOS Properties
                 ephemeralWebSession: false,
                 // Android Properties
@@ -64,34 +70,15 @@ async function authService(url: string, serviceId: string): Promise<void> {
                 enableUrlBarHiding: true,
                 enableDefaultShare: false,
                 forceCloseOnRedirection: true
+            }).then((response) => {
+                console.log(response)
             })
-                .then((response) => {
-                    console.log(response)
-                })
-            // InAppBrowser.openAuth(url, "localhost:8000", {
-            //     // iOS Properties
-            //     ephemeralWebSession: false,
-            //     // Android Properties
-            //     showTitle: false,
-            //     enableUrlBarHiding: true,
-            //     enableDefaultShare: false,
-            //
-            // }).then((response) => {
-            //     console.log(response)
-            //     if (
-            //         response.type === 'success' &&
-            //         response.url
-            //     ) {
-            //         Linking.openURL(response.url)
-            //     }
-            // })
-        } else {
-            Linking.openURL(url)
         }
     } catch (error) {
-        Linking.openURL(url)
+
     }
 }
+
 const AREAParamBottomSheet: React.FC<{
     data: IAREAComponent,
     setAREAParamOpened: React.Dispatch<React.SetStateAction<boolean>>,
@@ -107,8 +94,10 @@ const AREAParamBottomSheet: React.FC<{
     const [selectedService, setSelectedService] = React.useState<IAREAServices>();
     const [schema, setSchema] = React.useState<IServiceSchema>();
     const [authUrl, setAuthUrl] = React.useState<string>("");
+    const [error, setError] = React.useState<string>("");
+    const [oauthServices, setOauthSevices] = useState<{ [key: string]: any }>({});
 
-    const setSchemaData = (id: string, value: string) => {
+    const setSchemaData = (id: string, value: string | Date) => {
         let schemaData: IServiceSchema = schema!;
         let indexItem = 0;
 
@@ -127,6 +116,7 @@ const AREAParamBottomSheet: React.FC<{
     }
 
     useEffect(() => {
+        setError("");
         if ((!data.default && data.serviceSchema == undefined)) {
             getAREAServices(data.type!, data.name!)
                 .then((res: [IAREAServices]) => {
@@ -137,6 +127,21 @@ const AREAParamBottomSheet: React.FC<{
                     console.error(err);
                 })
         }
+        getOauthService().then((res) => {
+            for (let i = 0; i < res.length; i++) {
+                getIsConnected(res[i]).then((isConnected) => {
+
+                    setOauthSevices((prevState) => {
+                        return {
+                            ...prevState,
+                            [res[i]]: {
+                                ...isConnected,
+                            }
+                        }
+                    })
+                })
+            }
+        });
     }, []);
 
     useEffect(() => {
@@ -212,7 +217,7 @@ const AREAParamBottomSheet: React.FC<{
                     >
                         {services.map((item, index) => {
                             return (
-                                <Picker.Item key={index} label={item.name} value={item.id} color={Theme.colors.White} />
+                                <Picker.Item key={index} style={{backgroundColor: "#46444a"}} label={item.name} value={item.id} color={Theme.colors.White} />
                             )
                         })}
                     </Picker>
@@ -227,20 +232,28 @@ const AREAParamBottomSheet: React.FC<{
                                     height: item.inputType == "textMultiline" ? 100 : "10%",
                                 }}>
                                     {item.inputType == "textMultiline" &&
-                                        <TextInput style={[Styles.input, {color: Theme.colors.White, paddingLeft: 20}]} placeholder={item.name} placeholderTextColor={Theme.colors.Gray} onChangeText={
+                                        <TextInput style={[Styles.input, {color: Theme.colors.White, paddingLeft: 20}]} placeholder={item.name + (item.required && "*")} placeholderTextColor={Theme.colors.Gray} onChangeText={
                                             (text: string) => {
                                                 setSchemaData(item.id, text);
                                             }}
-                                            defaultValue={item.value}
+                                            defaultValue={item.value as string}
                                         />
                                     }
                                     {item.inputType == "text" &&
-                                        <TextInput style={[Styles.input, {color: Theme.colors.White, paddingLeft: 20}]} placeholder={item.name} placeholderTextColor={Theme.colors.Gray} onChangeText={
+                                        <TextInput style={[Styles.input, {color: Theme.colors.White, paddingLeft: 20}]} placeholder={item.name + (item.required && "*")} placeholderTextColor={Theme.colors.Gray} onChangeText={
                                             (text: string) => {
                                                 setSchemaData(item.id, text);
                                             }}
-                                            defaultValue={item.value}
+                                            defaultValue={item.value as string}
                                         />
+                                    }
+                                    {item.inputType == "date" &&
+                                        <View>
+                                            <Text style={[Styles.input, {color: Theme.colors.Gray, paddingLeft: 20, alignSelf: "center"}]}>{item.name + (item.required && "*")}</Text>
+                                            <DatePicker date={item.value != undefined ? new Date(item.value as string) as Date : new Date()} style={[Styles.input, {paddingLeft: 20, alignSelf: "center"}]} androidVariant={"nativeAndroid"} onDateChange={(date) => {
+                                                setSchemaData(item.id, date);
+                                            }} />
+                                        </View>
                                     }
                                 </View>
                             )
@@ -265,43 +278,71 @@ const AREAParamBottomSheet: React.FC<{
                         style={{
                             width: "100%",
                             height: "100%",
-                            backgroundColor: Theme.colors.Gray,
+                            backgroundColor: data.name && oauthServices[data.name] && oauthServices[data.name!].is_connected ? Theme.colors.Gray : Theme.colors.Primary,
                             justifyContent: "center",
                             alignItems: "center",
                             borderRadius: 20,
                         }}
                         onPress={() => {
-                            getAuthorizeUrlFromApi(data.name!)
-                                .then((res: any) => {
-                                    authService(res.url, selectedService!.id!)
-                                        .then((res) => {
-                                            console.log(res);
-                                        })
-                                        .catch((err) => {
-                                            console.error(err);
-                                        })
+                            if (oauthServices[data.name!].is_connected) {
+                                oauthDisconnect(data.name!).then((res) => {
+                                    setOauthSevices((prevState) => {
+                                        return {
+                                            ...prevState,
+                                            [data.name!]: {
+                                                ...prevState[data.name!],
+                                                is_connected: false
+                                            }
+                                        }
+                                    })
                                 })
-                                .catch((err) => {
-                                    console.error(err);
+                            } else {
+                                authorizeUrlGet(data.name!).then((urlGet) => {
+                                    oauthAuthorize(urlGet.url).then((res) => {
+
+                                    })
                                 })
+                            }
                         }}
                     >
-                        <Text style={[Theme.Subtitle, { color: Theme.colors.White }]}>
-                            Se connecter
-                        </Text>
+                        {data.name != undefined && oauthServices[data.name] && <Text style={[Theme.Subtitle, {color: oauthServices[data.name!].is_connected ? Theme.colors.White : Theme.colors.Black}]}>
+                            { oauthServices[data.name!].is_connected ? "Disconnect" : "Connect"}
+                        </Text>}
                     </TouchableOpacity>
                 </View>
             </View>
+            {error &&
+                <Text style={{
+                    color: 'red',
+                    flexWrap: "wrap",
+                    textAlign: "center"
+                }}>
+                    {error}
+                </Text>
+            }
             <View style={{
                 height: "40%",
                 width: "100%",
                 flex: 1,
                 justifyContent: "center",
                 alignItems: "center",
-                paddingTop: 20
+                paddingTop: 20,
             }}>
                 <ButtonComponents onPress={
                     () => {
+                        if (oauthServices[data.name!] && !oauthServices[data.name!].is_connected) {
+                            setError("Vous devez connecter l'application avant de pouvoir l'utiliser");
+                            return;
+                        } else {
+                            setError("");
+                        }
+                        if (schema?.inputsData.filter((item) => (item.value == undefined || item.value == "") && item.required).length != 0) {
+                            setError("Les champs requis (*) ne sont pas complété");
+                            return;
+                        } else {
+                            setError("");
+                        }
+
                         setSaveSelectedArea!({...data, serviceSchema: schema, subService: selectedService});
                         closeBottomSheet();
                     }
