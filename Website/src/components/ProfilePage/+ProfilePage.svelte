@@ -99,11 +99,9 @@
 								const popup = window.open(res["url"], "popup", "width=600,height=600 popup=true");
 								const interval = setInterval(() => {
 									try {
-										if (popup?.window?.location.href) {
-											popup?.close();
-                                            res = true;
+										if (popup?.closed) {
 											clearInterval(interval);
-                                            dic = {...dic, [service]: true};
+                      dic = {...dic, [service]: true};
 										}
 									} catch {
 										return;

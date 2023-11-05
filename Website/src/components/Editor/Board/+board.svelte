@@ -550,9 +550,9 @@
 					"nodes": nodes,
 					"edges": edges,
 				};
-				// if ($page.url.searchParams.get("FluxId")) {
-				// 	data["id"] = Number($page.url.searchParams.get("FluxId"));
-				// }
+				if ($page.url.searchParams.get("FluxId")) {
+					data["id"] = Number($page.url.searchParams.get("FluxId"));
+				}
 				createFlux(getCookie("token"), data, true).then((res) => {
 					$page.url.searchParams.set("FluxId", res["id"]);
 					goto(`?${$page.url.searchParams.toString()}`);
@@ -564,7 +564,7 @@
 		</div>
 
 	</div>
-	<button class={`absolute top-7 right-24 px-4 py-1 rounded z-40 text-[1.7rem] font-SpaceGrotesk  
+	<button class={`absolute top-7 right-24 px-4 py-1 rounded z-40 text-[1.7rem] font-SpaceGrotesk
 					font-bold border
 					${errorMessage !== "" ? "border-customWhite/50 text-customWhite/50" : "border-customWhite text-customWhite hover:text-gray hover:bg-customWhite"}`}
 			on:click={() => {
@@ -671,53 +671,52 @@
 						</div>
 					</div>
 
-					<div class="">
-						{#if OauthServices.includes(nodeRegister.service)}
-							<div class={`${nodeRegister.service && ConnectedServices[nodeRegister.type][nodeRegister.service] ? "flex" : "hidden"} gap-6 font-SpaceGrotesk w-full bg-customWhite/[10%] font-medium text-[1.75rem] p-4 align-middle items-center justify-center rounded-[0.63rem]`}>
-								<h1 class="text-customWhite">Connecté</h1>
-								<Validate className="w-8 h-8" color="#D9C6F4"/>
-							</div>
-							<button class={`${nodeRegister.service && ConnectedServices[nodeRegister.type][nodeRegister.service] ? "hidden" : "flex"} gap-6 font-SpaceGrotesk w-full bg-customWhite/[10%] font-medium text-[1.75rem] p-4 align-middle items-center justify-center rounded-[0.63rem]`}
-							on:click={() => {
-								if (nodeRegister?.service) {
-									getOauthLink(getCookie("token"), nodeRegister.service).then((res) => {
-										const popup = window.open(res["url"], "popup", "width=600,height=600 popup=true");
-										const interval = setInterval(() => {
-											try {
-												if (popup?.window?.location.href) {
-													popup?.close();
-													clearInterval(interval);
-													ConnectedServices = {
-														...ConnectedServices,
-														"Action": {
-															...ConnectedServices["Action"],
-															[nodeRegister.service]: true,
-														},
-														"Reaction": {
-															...ConnectedServices["Reaction"],
-															[nodeRegister.service]: true,
-														},
-													};
-												}
-											} catch {
-												return;
-											}
-										}, 1000);
-									});
-								}
-							}}>
-								<h1 class="text-customWhite">Se connecter</h1>
-								<Profile className="w-8 h-8" color="#F3F3F3"/>
-							</button>
-						{:else}
+				<div class="">
+				{#if OauthServices.includes(nodeRegister.service)}
+					<div class={`${nodeRegister.service && ConnectedServices[nodeRegister.type][nodeRegister.service] ? "flex" : "hidden"} gap-6 font-SpaceGrotesk w-full bg-customWhite/[10%] font-medium text-[1.75rem] p-4 align-middle items-center justify-center rounded-[0.63rem]`}>
+						<h1 class="text-customWhite">Connecté</h1>
+						<Validate className="w-8 h-8" color="#D9C6F4"/>
+					</div>
+					<button class={`${nodeRegister.service && ConnectedServices[nodeRegister.type][nodeRegister.service] ? "hidden" : "flex"} gap-6 font-SpaceGrotesk w-full bg-customWhite/[10%] font-medium text-[1.75rem] p-4 align-middle items-center justify-center rounded-[0.63rem]`}
+					on:click={() => {
+						if (nodeRegister?.service) {
+							getOauthLink(getCookie("token"), nodeRegister.service).then((res) => {
+								const popup = window.open(res["url"], "popup", "width=600,height=600 popup=true");
+								const interval = setInterval(() => {
+									try {
+										if (popup?.closed) {
+											clearInterval(interval);
+											ConnectedServices = {
+												...ConnectedServices,
+												"Action": {
+													...ConnectedServices["Action"],
+													[nodeRegister.service]: true,
+												},
+												"Reaction": {
+													...ConnectedServices["Reaction"],
+													[nodeRegister.service]: true,
+												},
+											};
+										}
+									} catch {
+										return;
+									}
+								}, 1000);
+							});
+						}
+					}}>
+						<h1 class="text-customWhite">Se connecter</h1>
+						<Profile className="w-8 h-8" color="#F3F3F3"/>
+					</button>
+					{:else}
 							<h1 class="text-center text-customWhite/30">
 								Pas de connexion nécessaire
 							</h1>
 						{/if}
-					</div>
 				</div>
 			</div>
 		</div>
+	</div>
 
 	{/if}
 	{#if (modifyMenu)}
