@@ -19,7 +19,7 @@
 
 </script>
 
-<div class="rounded-3xl border border-gray/20 pt-4 min-w-[27rem] min-h-[14rem] flex flex-col justify-between">
+<div class="rounded-3xl border border-gray/20 pt-4 min-w-[27rem]  max-w-[27rem] min-h-[14rem] flex flex-col justify-between">
     <div class="flex justify-between mx-4">
         <div class="flex gap-5">
             <Icon className="w-12 h-12" name={flux.action}/>

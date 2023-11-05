@@ -5,13 +5,13 @@
     import Instagram from "../components/SVGs/+Instagram.svelte";
     import { browser } from '$app/environment';
 
-    import Bougy from "$lib/images/test.gif";
-    import Reactact from "$lib/images/reactAct.png";
-    import Connect from "$lib/images/Connect.png";
-    import Timesave from "$lib/images/TimeSave.png";
+    import Bougy from "../lib/images/test.gif";
+    import Reactact from "../lib/images/reactAct.png";
+    import Connect from "../lib/images/Connect.png";
+    import Timesave from "../lib/images/TimeSave.png";
 
     import {goto} from "$app/navigation";
-  import Icon from "../components/Icon/+Icon.svelte";
+    import Icon from "../components/Icon/+Icon.svelte";
 
     if (browser) {
         if (document.cookie.includes("token")) {
@@ -36,9 +36,9 @@
         <p class="text-center">Commencer à automatiser votre quotidien</p>
       </h1>
       <div class="flex gap-6">
-        <button on:click={() => {
-                    goto('/register');
-                }}>
+        <button data-testid="register" on:click={() => {
+                goto('/register');
+            }}>
           <nav>
             <ul>
               <li
@@ -49,7 +49,7 @@
             </ul>
           </nav>
         </button>
-        <button on:click={() => {
+        <button data-testid="login" on:click={() => {
                     goto('/login');
                 }}>
           <nav>
