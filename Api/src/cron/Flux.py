@@ -1,3 +1,7 @@
+"""
+Flux cron for execute flux
+"""
+
 from src.models.Flux import Flux, FluxGraph
 from src.models.Services import ServiceType
 from src.models.User import UserMe
@@ -32,8 +36,8 @@ def run_reaction(User, already_executed, datas, db, flux_graph):
     interface = \
         services[splitted_service_id[0]](User, db).get_interface()[ServiceType(splitted_service_id[1])][
             flux_graph.service_id]
-    # TODO add variable from prev_data
-    datas[flux_graph.id] = interface.function(flux_graph.config)
+    config = {key: value["value"] for key, value in flux_graph.config.items() if value["id"] == "Rien"}
+    datas[flux_graph.id] = interface.function(config)
     already_executed.add(flux_graph.id)
     return
 
@@ -88,6 +92,7 @@ def execute_flux(db=next(get_db())):
     all_flux = db.query(Flux).all()
     all_flux_ids = {i.id: i for i in all_flux}
     for flux_id in all_flux_ids:
+        error = False
         if not all_flux_ids[flux_id].active or not all_flux_ids[flux_id].checked:
             continue
         all_AREA = db.query(FluxGraph).filter(FluxGraph.flux_id == flux_id).all()
@@ -106,12 +111,20 @@ def execute_flux(db=next(get_db())):
         for AREA in all_AREA:
             if AREA.id in AREA_actions_ids:
                 splitted_service_id = AREA.service_id.split('_')
-                interface = \
-                    services[splitted_service_id[0]](User, db).get_interface()[ServiceType(splitted_service_id[1])][
-                        AREA.service_id]
-                prev_data, datas[AREA.id] = interface.function(AREA.prev_data, AREA.config)
+                try:
+                    interface = \
+                        services[splitted_service_id[0]](User, db).get_interface()[ServiceType(splitted_service_id[1])][
+                            AREA.service_id]
+                    config = {key: value["value"] for key, value in AREA.config.items() if value["id"] == "Rien"}
+                    prev_data, datas[AREA.id] = interface.function(AREA.prev_data, config)
+                except Exception as e:
+                    error = True
+                    break
                 db.query(FluxGraph).filter(FluxGraph.id == AREA.id).update({"prev_data": prev_data})
                 already_executed.add(AREA.id)
+        if error:
+            print(f"Flux {flux_id} not executed")
+            continue
         db.commit()
         for action_id in AREA_actions_ids:
             for REA in all_AREA_by_id[action_id].next_flux_graph_ids:

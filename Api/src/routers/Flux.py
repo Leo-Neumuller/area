@@ -1,3 +1,7 @@
+"""
+Flux routers
+"""
+
 from typing import List
 
 from fastapi import APIRouter, HTTPException, status, Depends

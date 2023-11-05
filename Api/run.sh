@@ -1,11 +1,10 @@
 #!/bin/sh
 
 FASTAPI_URL="http://127.0.0.1:8000/openapi.json"
-DOC_DIR="doc"
+DOC_DIR="docs"
 SOURCE_DIR="./"
-DOC_BUILD_DIR="doc/html_build"
+DOC_BUILD_DIR="docs/html_build"
 AUTHOR="Hugo GALAN"
-OUTPUTDIRDOC="Sphinx-docs"
 
 if [ ! -d "venv" ]; then
     ./install.sh
@@ -30,6 +29,8 @@ elif [ "$1" = "doc" ]; then
   widdershins -y "$TEMP_JSON" -o "$OUTPUT_README" --language_tabs 'shell:Shell' 'javascript:JavaScript' --resolve -s --yaml false --summary true --omitHeader true --search true --expandBody true --headings 2
 
   echo "Routes documentation generated and placed in $OUTPUT_README"
+
+  find src/ -type f -name '*.py' ! -name '__init__.py' | xargs venv/bin/pydoctor --make-html --html-output=docs/api --process-types --project-name=Area --theme=classic
 
 else
   venv/bin/uvicorn main:app --reload

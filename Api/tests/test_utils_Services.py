@@ -9,7 +9,7 @@ class TestUtilsServices(unittest.TestCase):
         self.db = test_help_create_db()
 
     def test_get_authorization_url(self):
-        authorisation, state = Google.get_authorization_url("Gmail" , ["https://mail.google.com/"])
+        authorisation, state = Google.get_authorization_url("Gmail" , ["https://mail.google.com/"], "http://localhost:3000")
         self.assertTrue(state in authorisation)
 
     def test_get_services_with_no_service_saved(self):
@@ -38,7 +38,7 @@ class TestUtilsServices(unittest.TestCase):
 
     def test_authorize_with_invalid_grant(self):
         with self.assertRaises(Service.Exception.InvalidGrant):
-            Google.authorize("Gmail", "Test", "Test", ["https://mail.google.com/"])
+            Google.authorize("Gmail", "Test", "Test", ["https://mail.google.com/"], "http://localhost:3000")
 
     def test_get_headers_from_message_with_no_headers(self):
         filled = Google.get_headers_from_message({}, {"Test": None})

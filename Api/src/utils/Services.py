@@ -1,3 +1,7 @@
+"""
+Services utils (Google)
+"""
+
 import os
 import urllib.parse
 from typing import List, Tuple
@@ -29,12 +33,13 @@ class Google:
                 'scopes': credentials.scopes}
 
     @staticmethod
-    def get_authorization_url(service: str, scopes: List[str],
+    def get_authorization_url(service: str, scopes: List[str], redirect: str,
                               Env: Environment.Settings = Environment.Settings()) -> Tuple[str, str]:
         """
         Get authorization url and state
         :param service: Service
         :param scopes: Scopes
+        :param redirect: Redirect
         :param login_hint: Login hint
         :param Env: Environment
         :return: Authorization url
@@ -43,7 +48,8 @@ class Google:
             os.path.join('secrets', f'Google.json'),
             scopes=scopes
         )
-        flow.redirect_uri = f'{Env.REDIRECT_URI}/services/{urllib.parse.quote(service)}/authorize'
+        redirect = redirect.replace(service, urllib.parse.quote(service))
+        flow.redirect_uri = redirect
         authorization_url, state = flow.authorization_url(
             access_type='offline',
             include_granted_scopes='true',
@@ -51,7 +57,7 @@ class Google:
         return authorization_url, state
 
     @staticmethod
-    def authorize(service: str, state: str, code: str, scopes: List[str],
+    def authorize(service: str, state: str, code: str, scopes: List[str], redirect: str,
                   Env: Environment.Settings = Environment.Settings()) -> dict:
         """
         Authorize
@@ -67,7 +73,8 @@ class Google:
             scopes=scopes,
             state=state,
         )
-        flow.redirect_uri = f'{Env.REDIRECT_URI}/services/{urllib.parse.quote(service)}/authorize'
+        redirect = redirect.replace(service, urllib.parse.quote(service))
+        flow.redirect_uri = redirect
         try:
             flow.fetch_token(code=code)
         except Exception as e:
@@ -75,7 +82,8 @@ class Google:
         return Google.credentials_to_dict(credentials=flow.credentials)
 
     @staticmethod
-    def get_service(service: str, db_service_name: str, User: UserMe, db: Session, version: str) -> googleapiclient.discovery.Resource:
+    def get_service(service: str, db_service_name: str, User: UserMe, db: Session,
+                    version: str) -> googleapiclient.discovery.Resource:
         """
         Get service from service name and user (optional refresh the credentials)
         :param service: Service

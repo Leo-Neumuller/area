@@ -1,3 +1,7 @@
+"""
+Flux Model and utils
+"""
+
 from copy import copy
 from datetime import datetime
 from typing import List, Any, Optional
@@ -154,6 +158,8 @@ class FluxBasicData(BaseModel):
     name: str
     description: str
     active: bool
+    reaction: str
+    action: str
 
 
 def check_iso_format(x):
@@ -262,10 +268,9 @@ def check_flux(CreateFlux: FluxCreateOrModify) -> List[FluxError]:
                                         relatedInputDataIds=[inputData.id],
                                         error="Donnée d'entrée inconnue"))
                 continue
-            if not isinstance(inputData.value, dict):
-                print(inputData.value, flux_check_input_data_type[inputData.type](inputData.value))
+            if "id" in inputData.value and inputData.value["id"] == "Rien":
                 if inputData.required and (
-                        inputData.value is None or flux_check_input_data_type[inputData.type](inputData.value)):
+                        inputData.value is None or flux_check_input_data_type[inputData.type](inputData.value["value"])):
                     Errors.append(FluxError(id="node_input_data_required", relatedNodeIds=[node.id],
                                             relatedInputDataIds=[inputData.id],
                                             error="Donnée d'entrée requise"))
@@ -363,7 +368,6 @@ def recreate_flux_graph(flux: Flux, db: Session):
         nodes[node.id].next_flux_graph_ids = nodes_next[node.id]
     db.commit()
     data = db.query(FluxGraph).filter(FluxGraph.flux_id == flux.id).all()
-    print(data)
 
 
 def get_flux_by_id(fluxId: int, User: UserMe, db: Session) -> Flux:
@@ -434,11 +438,22 @@ def get_all_fluxs(User: UserMe, db: Session) -> List[FluxBasicData]:
     fluxs = db.query(Flux).filter(Flux.user_id == User.id).all()
     fluxs_basic_data = []
     for flux in fluxs:
+        action = ""
+        reaction = ""
+        for node in flux.frontEndData["nodes"]:
+            if action != "" and reaction != "":
+                break
+            if action == "" and node.type.lower() == "action":
+                action = node.service
+            if reaction == "" and node.type.lower() == "reaction":
+                reaction = node.service
         fluxs_basic_data.append(FluxBasicData(
             id=flux.id,
             name=flux.name,
             description=flux.description,
-            active=flux.active
+            active=flux.active,
+            action=action,
+            reaction=reaction
         ))
     return fluxs_basic_data
 

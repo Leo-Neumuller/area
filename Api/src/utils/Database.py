@@ -1,4 +1,6 @@
-import sys
+"""
+Database connection and session
+"""
 
 from sqlalchemy import create_engine, inspect
 from sqlalchemy.ext.declarative import declarative_base, as_declarative
@@ -13,7 +15,7 @@ if inTestMode():
         env.SQL_TEST_URL,
         connect_args={"check_same_thread": False}
     )
-else:  # pragma: no cover
+else: # pragma: no cover
     engine = create_engine(
         env.SQL_URL,
         connect_args={"check_same_thread": False}
@@ -23,7 +25,7 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
 
-def get_db() -> SessionLocal:  # pragma: no cover
+def get_db() -> SessionLocal:
     """
     Get database session
     :return: Database session

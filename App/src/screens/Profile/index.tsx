@@ -1,15 +1,14 @@
 import {Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {StackNavigationProp} from "@react-navigation/stack";
 import React, {useEffect, useState} from "react";
-import HomeLogin from "../LoginScreens/HomeLogin"
 import useThemedStyles from "../../hooks/Theme/useThemedStyle";
 import useTheme from "../../hooks/Theme/useTheme";
 import ButtonComponents from "../../components/ButtonLogin";
-import * as SecureStore from "expo-secure-store";
-import {loadUserData, servicesGet} from "../../api/api";
-import {createOnShouldStartLoadWithRequest} from "react-native-webview/lib/WebViewShared";
+// import * as SecureStore from "expo-secure-store";
+import {authorizeUrlGet, getIsConnected, getOauthService, loadUserData, oauthDisconnect} from "../../api/api";
 import {RFValue} from "react-native-responsive-fontsize";
 import {ThemeTypeContext} from "../../constants/Theme";
+import {InAppBrowser} from "react-native-inappbrowser-reborn";
 
 
 type RootStackParamList = {
@@ -21,21 +20,67 @@ type Props = {
     navigation: StackNavigationProp<RootStackParamList, 'Profile'>;
 };
 
+const oauthAuthorize = async (url: string) => {
+    try {
+        if (await InAppBrowser.isAvailable()) {
+            InAppBrowser.open(url, {
+                // iOS Properties
+                ephemeralWebSession: false,
+                // Android Properties
+                showTitle: false,
+                enableUrlBarHiding: true,
+                enableDefaultShare: false,
+                forceCloseOnRedirection: true
+            }).then((response) => {
+                console.log(response)
+            })
+        }
+    } catch (error) {
+
+    }
+}
+
 export const Profile: React.FC<Props> = ({navigation}) => {
     const Styles = useThemedStyles(styles);
     const Theme = useTheme();
-    const token = SecureStore.getItemAsync("userToken");
+    // const token = EncryptedStorage.getItem("userToken");
     const [userData, setUserData] = useState({
         email: "",
         name: "",
         surname: ""
     })
 
+    const [services, setSevices] = useState<{ [key: string]: any }>({});
+
     useEffect(() => {
         loadUserData().then((res) => {
             setUserData(res);
         });
     }, []);
+
+    useEffect(() => {
+        const onFocus = navigation.addListener('focus', () => {
+            getOauthService().then((res) => {
+                for (let i = 0; i < res.length; i++) {
+                    getIsConnected(res[i]).then((isConnected) => {
+
+                        setSevices((prevState) => {
+                            return {
+                                ...prevState,
+                                [res[i]]: {
+                                    ...isConnected,
+                                }
+                            }
+                        })
+                    })
+                }
+            });
+        })
+        return function clean() {
+            onFocus();
+        }
+    }, []);
+
 
     return (
         <ScrollView>
@@ -164,7 +209,7 @@ export const Profile: React.FC<Props> = ({navigation}) => {
                             text={"SE DECONNECTER"}
                             textColor={Theme.colors.Black}
                             onPress={() => {
-                                SecureStore.setItemAsync("userToken", "");
+                                // EncryptedStorage.setItem("userToken", "");
                                 navigation.reset(
                                     {
                                         index: 0,
@@ -177,6 +222,86 @@ export const Profile: React.FC<Props> = ({navigation}) => {
 
                 </View>
 
+            </View>
+            <View style={{
+                flex: 1,
+                justifyContent: "center",
+                width: "90%",
+                margin: "5%",
+            }}>
+                <Text style={{
+                    ...Theme.Title,
+                    color: Theme.colors.Black,
+                    fontWeight: "bold"
+                }}>
+                    Compte connecté
+                </Text>
+                {
+                    Object.keys(services).map((value, index) => {
+                        return (
+                            <TouchableOpacity key={index} onPress={() => {
+                                if (services[value].is_connected) {
+                                    oauthDisconnect(value).then((res) => {
+                                        setSevices((prevState) => {
+                                            return {
+                                                ...prevState,
+                                                [value]: {
+                                                    ...prevState[value],
+                                                    is_connected: false
+                                                }
+                                            }
+                                        })
+                                    })
+                                } else {
+                                    authorizeUrlGet(value).then((urlGet) => {
+                                        oauthAuthorize(urlGet.url).then((res) => {
+
+                                        })
+                                    })
+                                }
+                            }}
+                                              style={{
+                                                  marginTop: "2%",
+                                                  width: "100%",
+                                                  height: 50,
+                                                  padding: 10,
+                                                  borderRadius: 10,
+                                                  borderColor: Theme.colors.Black,
+                                                  borderWidth: 1,
+                                                  flex: 1,
+                                                  flexDirection: "row",
+                                                  justifyContent: "space-between",
+                                              }}
+                            >
+                                <Text style={{
+                                    ...Theme.Text,
+                                    color: Theme.colors.Black,
+                                    fontWeight: "bold"
+                                }}>
+                                    {value}
+                                </Text>
+                                {
+                                    services[value].is_connected ?
+                                        <Text style={{
+                                            ...Theme.Text,
+                                            color: Theme.colors.Black,
+                                            fontWeight: "bold"
+                                        }}>
+                                            Connecté
+                                        </Text>
+                                        :
+                                        <Text style={{
+                                            ...Theme.Text,
+                                            color: Theme.colors.Black,
+                                            fontWeight: "bold"
+                                        }}>
+                                            Se connecter
+                                        </Text>
+                                }
+                            </TouchableOpacity>
+                        )
+                    })
+                }
             </View>
         </ScrollView>
     )

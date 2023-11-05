@@ -1,5 +1,8 @@
+"""
+Google Calendar service
+"""
+
 from datetime import datetime, timezone
-from pprint import pprint
 from typing import List
 
 from sqlalchemy.orm import Session
@@ -27,7 +30,7 @@ class Calendar(BaseService):
         return "Google Calendar"
 
     @staticmethod
-    def get_authorization_url(User: UserMe, db: Session) -> str:
+    def get_authorization_url(User: UserMe, db: Session, redirect: str) -> str:
         """
         Get authorization url
         :param User: User
@@ -37,12 +40,13 @@ class Calendar(BaseService):
         authorization_url, state = Google.get_authorization_url(
             service=Calendar.get_name(),
             scopes=['https://www.googleapis.com/auth/calendar'],
+            redirect=redirect,
         )
         save_start_authorization(Calendar.get_name(), state, User, db)
         return authorization_url
 
     @staticmethod
-    def authorize(state: str, code: str, scopes: List[str], db: Session):
+    def authorize(state: str, code: str, scopes: List[str], db: Session, redirect: str):
         """
         Basic authorize with Google
         :param state: State
@@ -56,8 +60,10 @@ class Calendar(BaseService):
             state=state,
             code=code,
             scopes=scopes,
+            redirect=redirect,
         )
-        db.query(Service).filter(Service.name == Calendar.get_name(), Service.state == state).update({"refresh": refresh})
+        db.query(Service).filter(Service.name == Calendar.get_name(), Service.state == state).update(
+            {"refresh": refresh})
         db.commit()
 
     @staticmethod
@@ -139,8 +145,8 @@ class Calendar(BaseService):
             info(str(event))
         except Exception as e:
             warn(e)
-            return {"signal": False}
-        return {"signal": True, "event_url": event.get("htmlLink")}
+            return {"signal": False, "data": []}
+        return {"signal": True, "data": [{"event_url": event.get("htmlLink")}]}
 
     @add_metadata(ServiceMetadata(
         name="New Created Event",
@@ -193,7 +199,8 @@ class Calendar(BaseService):
                     "link": event["htmlLink"],
                 })
                 info(str(event))
-            prev_data["time"] = max([datetime.fromisoformat(event["updated"].replace("Z", "")).timestamp() for event in data["items"]])
+            prev_data["time"] = max(
+                [datetime.fromisoformat(event["updated"].replace("Z", "")).timestamp() for event in data["items"]])
         except Exception as e:
             warn(str(e))
             return prev_data, {"signal": False, "data": []}

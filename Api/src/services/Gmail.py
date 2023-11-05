@@ -1,8 +1,11 @@
+"""
+Gmail service
+"""
+
 import base64
 from datetime import datetime, timezone
 from email.message import EmailMessage
-from typing import List, Dict, Callable, Tuple
-from pprint import pprint
+from typing import List, Tuple
 import googleapiclient
 from sqlalchemy.orm import Session
 from src.models.Services import save_start_authorization, Service, ServiceType, BaseService, add_metadata, \
@@ -80,7 +83,7 @@ class Gmail(BaseService):
         return "Gmail"
 
     @staticmethod
-    def get_authorization_url(User: UserMe, db: Session) -> str:
+    def get_authorization_url(User: UserMe, db: Session, redirect: str) -> str:
         """
         Get authorization url
         :param User: User
@@ -88,14 +91,15 @@ class Gmail(BaseService):
         :return: Authorize URL
         """
         authorization_url, state = Google.get_authorization_url(
-            service="Gmail",
-            scopes=['https://mail.google.com/'],
+                "Gmail",
+            ['https://mail.google.com/'],
+            redirect,
         )
         save_start_authorization("Gmail", state, User, db)
         return authorization_url
 
     @staticmethod
-    def authorize(state: str, code: str, scopes: List[str], db: Session):
+    def authorize(state: str, code: str, scopes: List[str], db: Session, redirect: str):
         """
         Basic authorize with Google
         :param state: State
@@ -109,6 +113,7 @@ class Gmail(BaseService):
             state=state,
             code=code,
             scopes=scopes,
+            redirect=redirect,
         )
         db.query(Service).filter(Service.name == "Gmail", Service.state == state).update({"refresh": refresh})
         db.commit()
@@ -121,10 +126,7 @@ class Gmail(BaseService):
         :param service: Service
         :return: str encoded in base64
         """
-        if service is not None:
-            email = service.users().getProfile(userId="me").execute()["emailAddress"]
-        else:
-            email = "me"
+        email = service.users().getProfile(userId="me").execute()["emailAddress"]
         message = EmailMessage()
         message.set_content(data["content"])
         message["Subject"] = data["subject"]
@@ -146,7 +148,7 @@ class Gmail(BaseService):
                 "To": "",
                 "Date": "",
             })
-            email_data["Date"] = datetime.strptime(email_data["Date"], "%a, %d %b %Y %H:%M:%S %z")
+            email_data["Date"] = datetime.strptime(email_data["Date"], '%a, %d %b %Y %H:%M:%S %z')
             email_data["Content"] = ""
             if "parts" not in email_content.keys():
                 return_datas.append(email_data)
@@ -170,6 +172,7 @@ class Gmail(BaseService):
         :param data: Dict of data with keys: content, to, subject
         :return: dict of signal
         """
+        info(f"data : {str(data)}")
         service = Google.get_service("gmail", self.service_name, self.User, self.db, self.version)
         try:
             emailRaw = self.create_email(data, service)
@@ -193,6 +196,7 @@ class Gmail(BaseService):
         :param data: Dict of data with keys: content, to, subject
         :return: None
         """
+        info(f"data : {str(data)}")
         service = Google.get_service("gmail", self.service_name, self.User, self.db, self.version)
         try:
             emailRaw = self.create_email(data, service)
@@ -226,18 +230,19 @@ class Gmail(BaseService):
         :param data: Dict of data with keys: email
         :return: None
         """
+        info(f"prev_data : {str(prev_data)}")
+        info(f"data : {str(data)}")
         service = Google.get_service("gmail", self.service_name, self.User, self.db, self.version)
         prev_time_fetch = datetime.fromtimestamp(prev_data["time"]).astimezone(timezone.utc)
         return_datas = []
         try:
             email_data = service.users().messages().list(userId="me",
-                                                         q=f"from:{data['email']} after:{prev_time_fetch.timestamp()}").execute()
+                                                         q=f"from:{data['email']} after:{int(prev_time_fetch.timestamp())}").execute()
             info(str(email_data))
             if email_data["resultSizeEstimate"] == 0:
                 return prev_data, {"signal": False, "data": []}
             self.parse_messages(email_data, return_datas, service)
-            next_after = max([i["Date"] for i in return_datas]).astimezone(timezone.utc).timestamp()
-            next_data = {"time": next_after}
+            next_data = {"time": datetime.now().astimezone(timezone.utc).timestamp()}
         except Exception as e:
             warn(str(e))
             return prev_data, {"signal": False, "data": []}
@@ -266,18 +271,19 @@ class Gmail(BaseService):
         :param data: Dict of data with keys: subject
         :return: None
         """
+        info(f"prev_data : {str(prev_data)}")
+        info(f"data : {str(data)}")
         service = Google.get_service("gmail", self.service_name, self.User, self.db, self.version)
         prev_time_fetch = datetime.fromtimestamp(prev_data["time"]).astimezone(timezone.utc)
         return_datas = []
         try:
             email_data = service.users().messages().list(userId="me",
-                                                         q=f"subject:{data['subject']} after:{prev_time_fetch.timestamp()}").execute()
+                                                         q=f"subject:{data['subject']} after:{int(prev_time_fetch.timestamp())}").execute()
             info(str(email_data))
             if email_data["resultSizeEstimate"] == 0:
                 return prev_data, {"signal": False, "data": []}
             self.parse_messages(email_data, return_datas, service)
-            next_after = max([i["Date"] for i in return_datas]).astimezone(timezone.utc).timestamp()
-            next_data = {"time": next_after}
+            next_data = {"time": datetime.now().astimezone(timezone.utc).timestamp()}
         except Exception as e:
             warn(str(e))
             return prev_data, {"signal": False, "data": []}

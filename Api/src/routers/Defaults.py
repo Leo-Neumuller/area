@@ -1,3 +1,7 @@
+"""
+Defaults router
+"""
+
 import os
 
 from fastapi import status, APIRouter, Request, HTTPException

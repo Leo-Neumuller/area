@@ -15,51 +15,123 @@ import {ThemeTypeContext} from "../../../constants/Theme";
 import {AREAComponent} from "../AREAComponent";
 import React, {useEffect} from "react";
 import {authorizeUrlGet, servicesAREAGet, serviceSchemaGet, servicesGet} from "../../../api/api";
-import * as SecureStore from "expo-secure-store";
 import {IAREAComponent} from "../../../interfaces/IAREAComponent";
 import {IAREAServices} from "../../../interfaces/IAREAServices";
 import {Picker} from "@react-native-picker/picker";
 import {IServiceSchema} from "../../../interfaces/IServiceSchema";
 import ButtonComponents from "../../ButtonLogin";
+import EncryptedStorage from "react-native-encrypted-storage";
+import {BottomSheetMethods} from "@gorhom/bottom-sheet/lib/typescript/types";
+import { InAppBrowser } from 'react-native-inappbrowser-reborn'
 
 type AREABottomSheetProps = {
     currentArea?: IAREAComponent,
+    bottomSheetRef?:  React.RefObject<BottomSheetMethods> | undefined,
+    setSaveSelectedArea?: React.Dispatch<React.SetStateAction<IAREAComponent | undefined>>
+    deleteArea: () => void;
 };
 
 async function getServices(): Promise<IService> {
-    const token = await SecureStore.getItemAsync("userToken");
+    const token = await EncryptedStorage.getItem("userToken");
     return await servicesGet(token as string);
 }
 
 async function getAREAServices(area: string, service: string): Promise<[IAREAServices]> {
-    const token = await SecureStore.getItemAsync("userToken");
+    const token = await EncryptedStorage.getItem("userToken");
     return await servicesAREAGet(token as string, area, service);
 }
 
 async function getServiceSchema(serviceId: string): Promise<IServiceSchema> {
-    const token = await SecureStore.getItemAsync("userToken");
+    const token = await EncryptedStorage.getItem("userToken");
     return await serviceSchemaGet(token as string, serviceId);
 }
 
 async function getAuthorizeUrlFromApi(serviceId: string): Promise<{ url: string }> {
-    const token = await SecureStore.getItemAsync("userToken");
-    return await authorizeUrlGet(token as string, serviceId);
+    return await authorizeUrlGet(serviceId);
 }
 
-const AREAParamBottomSheet: React.FC<{data: IAREAComponent, setAREAParamOpened: React.Dispatch<React.SetStateAction<boolean>>}> = ({data, setAREAParamOpened}) => {
+async function authService(url: string, serviceId: string): Promise<void> {
+    const newUrl = url.replace(/redirect_uri=.*services/, "redirect_uri=" + encodeURIComponent(process.env.API_URL!) + "%2Fservices");
+
+    console.log(newUrl)
+    try {
+        if (await InAppBrowser.isAvailable()) {
+            InAppBrowser.open(newUrl, {
+                // iOS Properties
+                ephemeralWebSession: false,
+                // Android Properties
+                showTitle: false,
+                enableUrlBarHiding: true,
+                enableDefaultShare: false,
+                forceCloseOnRedirection: true
+            })
+                .then((response) => {
+                    console.log(response)
+                })
+            // InAppBrowser.openAuth(url, "localhost:8000", {
+            //     // iOS Properties
+            //     ephemeralWebSession: false,
+            //     // Android Properties
+            //     showTitle: false,
+            //     enableUrlBarHiding: true,
+            //     enableDefaultShare: false,
+            //
+            // }).then((response) => {
+            //     console.log(response)
+            //     if (
+            //         response.type === 'success' &&
+            //         response.url
+            //     ) {
+            //         Linking.openURL(response.url)
+            //     }
+            // })
+        } else {
+            Linking.openURL(url)
+        }
+    } catch (error) {
+        Linking.openURL(url)
+    }
+}
+const AREAParamBottomSheet: React.FC<{
+    data: IAREAComponent,
+    setAREAParamOpened: React.Dispatch<React.SetStateAction<boolean>>,
+    closeBottomSheet: Function,
+    setSaveSelectedArea?: React.Dispatch<React.SetStateAction<IAREAComponent | undefined>>,
+    refetchSchema?: boolean,
+    setRefetchSchema?: React.Dispatch<React.SetStateAction<boolean>>,
+    deleteArea: () => void;
+    }> = ({data, setAREAParamOpened, closeBottomSheet, setSaveSelectedArea, refetchSchema, setRefetchSchema, deleteArea}) => {
     const Styles = useThemedStyles(styles);
     const Theme = useTheme();
     const [services, setServices] = React.useState<[IAREAServices]>([{"name": "", "id": "", "description": ""}]);
-    const [selectedService, setSelectedService] = React.useState<string>("");
+    const [selectedService, setSelectedService] = React.useState<IAREAServices>();
     const [schema, setSchema] = React.useState<IServiceSchema>();
     const [authUrl, setAuthUrl] = React.useState<string>("");
 
+    const setSchemaData = (id: string, value: string) => {
+        let schemaData: IServiceSchema = schema!;
+        let indexItem = 0;
+
+        let item = { ...schemaData?.inputsData.find((element, index) => {
+                if (element.id == id) {
+                    indexItem = index;
+                    return element;
+                }
+        })};
+        if (item) {
+            item.value = value;
+            // @ts-ignore
+            schemaData.inputsData[indexItem] = item;
+            setSchema(schemaData!)
+        }
+    }
+
     useEffect(() => {
-        if (!data.default) {
+        if ((!data.default && data.serviceSchema == undefined)) {
             getAREAServices(data.type!, data.name!)
                 .then((res: [IAREAServices]) => {
                     setServices(res);
-                    setSelectedService(res[0].id)
+                    setSelectedService(res[0])
                 })
                 .catch((err) => {
                     console.error(err);
@@ -68,25 +140,53 @@ const AREAParamBottomSheet: React.FC<{data: IAREAComponent, setAREAParamOpened: 
     }, []);
 
     useEffect(() => {
-        if (selectedService != "") {
-            getServiceSchema(selectedService)
-                .then((res: any) => {
-                    setSchema(res);
+        if (!data.default && data.serviceSchema) {
+            setSchema(data.serviceSchema);
+            getAREAServices(data.type!, data.name!)
+                .then((res: [IAREAServices]) => {
+                    setServices(res);
+                    setSelectedService(data.subService)
                 })
                 .catch((err) => {
                     console.error(err);
                 })
         }
-    }, [selectedService]);
+    }, [data]);
+
+    useEffect(() => {
+        if (selectedService != undefined && selectedService.id && (data.serviceSchema == undefined || refetchSchema)) {
+            getServiceSchema(selectedService!.id)
+                .then((res: IServiceSchema) => {
+                    setSchema(res);
+                    data.serviceSchema = res;
+                    setRefetchSchema!(false);
+                })
+                .catch((err) => {
+                    console.error(err);
+                })
+        }
+
+    }, [selectedService, refetchSchema]);
 
     return (
         <ScrollView style={[Styles.container]} persistentScrollbar={true}>
-            <Text style={[Theme.Title, {color: Theme.colors.White, paddingLeft: 20}]}>
-                Application
-            </Text>
+            <View style={{paddingLeft: 20, paddingRight: 20, width: "100%", flexDirection: "row", justifyContent: "space-between"}}>
+                <Text style={[Theme.Title, {color: Theme.colors.White, justifyContent: "center"}]}>
+                    Application
+                </Text>
+                <TouchableOpacity onPress={() => {
+                    deleteArea()
+                    closeBottomSheet()
+                }} style={{backgroundColor: Theme.colors.Red, justifyContent: "center", borderRadius: 20, paddingHorizontal: 15}}>
+                    <Text style={[Theme.Subtitle, {color: Theme.colors.Black}]}>Supprimer</Text>
+                </TouchableOpacity>
+            </View>
             <View style={Styles.areaContainer}>
                 <View style={Styles.areaContentContainer}>
-                    <AREAComponent data={data} inEditor={false} onPress={(data) => { setAREAParamOpened(false) }}/>
+                    <AREAComponent data={data} inEditor={false} onPress={(data) => {
+                        setAREAParamOpened(false);
+                        setRefetchSchema!(true);
+                    }}/>
                 </View>
             </View>
             <View style={{flex: 1}}>
@@ -97,8 +197,17 @@ const AREAParamBottomSheet: React.FC<{data: IAREAComponent, setAREAParamOpened: 
                     <Picker
                         style={Styles.picker}
                         dropdownIconColor={Theme.colors.Black}
-                        onValueChange={(itemValue: string, itemIndex) => setSelectedService(itemValue)}
-                        selectedValue={selectedService}
+                        onValueChange={(itemValue: string, itemIndex) => {
+                            if (services[0].id != "") {
+                                setSelectedService(services.find((element) => {
+                                    if (element.id == itemValue) {
+                                        return element;
+                                    }
+                                }))
+                            }
+                            setRefetchSchema!(true)
+                        }}
+                        selectedValue={selectedService?.id}
                         mode={"dropdown"}
                     >
                         {services.map((item, index) => {
@@ -118,10 +227,20 @@ const AREAParamBottomSheet: React.FC<{data: IAREAComponent, setAREAParamOpened: 
                                     height: item.inputType == "textMultiline" ? 100 : "10%",
                                 }}>
                                     {item.inputType == "textMultiline" &&
-                                        <TextInput style={[Styles.input, {color: Theme.colors.White, paddingLeft: 20}]} placeholder={item.name} placeholderTextColor={Theme.colors.Gray} />
+                                        <TextInput style={[Styles.input, {color: Theme.colors.White, paddingLeft: 20}]} placeholder={item.name} placeholderTextColor={Theme.colors.Gray} onChangeText={
+                                            (text: string) => {
+                                                setSchemaData(item.id, text);
+                                            }}
+                                            defaultValue={item.value}
+                                        />
                                     }
                                     {item.inputType == "text" &&
-                                        <TextInput style={[Styles.input, {color: Theme.colors.White, paddingLeft: 20}]} placeholder={item.name} placeholderTextColor={Theme.colors.Gray} />
+                                        <TextInput style={[Styles.input, {color: Theme.colors.White, paddingLeft: 20}]} placeholder={item.name} placeholderTextColor={Theme.colors.Gray} onChangeText={
+                                            (text: string) => {
+                                                setSchemaData(item.id, text);
+                                            }}
+                                            defaultValue={item.value}
+                                        />
                                     }
                                 </View>
                             )
@@ -152,12 +271,14 @@ const AREAParamBottomSheet: React.FC<{data: IAREAComponent, setAREAParamOpened: 
                             borderRadius: 20,
                         }}
                         onPress={() => {
-                            console.log(data.name)
                             getAuthorizeUrlFromApi(data.name!)
                                 .then((res: any) => {
-                                    Linking.openURL(res.url)
-                                        .catch((res) => {
-                                            console.error(res);
+                                    authService(res.url, selectedService!.id!)
+                                        .then((res) => {
+                                            console.log(res);
+                                        })
+                                        .catch((err) => {
+                                            console.error(err);
                                         })
                                 })
                                 .catch((err) => {
@@ -179,18 +300,28 @@ const AREAParamBottomSheet: React.FC<{data: IAREAComponent, setAREAParamOpened: 
                 alignItems: "center",
                 paddingTop: 20
             }}>
-                <ButtonComponents text={"Save"} wid={"80%"} hei={"100%"} bgColor={Theme.colors.Primary}/>
+                <ButtonComponents onPress={
+                    () => {
+                        setSaveSelectedArea!({...data, serviceSchema: schema, subService: selectedService});
+                        closeBottomSheet();
+                    }
+                } text={"Save"} wid={"80%"} hei={"100%"} bgColor={Theme.colors.Primary}/>
             </View>
         </ScrollView>
     )
 }
 
-export const AREABottomSheet: React.FC<AREABottomSheetProps> = ({currentArea}) => {
+export const AREABottomSheet: React.FC<AREABottomSheetProps> = ({currentArea, bottomSheetRef, setSaveSelectedArea, deleteArea}) => {
     const Styles = useThemedStyles(styles);
     const Theme = useTheme();
     const [services, setServices] = React.useState<IService>({"action": [""], "reaction": [""]});
     const [actionParamOpened, setAREAParamOpened] = React.useState<boolean>(false);
     const [currentAreaParam, setCurrentAreaParam] = React.useState<IAREAComponent>();
+    const [refetchSchema, setRefetchSchema] = React.useState<boolean>(false);
+
+    const closeBottomSheet = () => {
+        bottomSheetRef?.current?.close();
+    }
 
     useEffect(() => {
         getServices()
@@ -203,15 +334,29 @@ export const AREABottomSheet: React.FC<AREABottomSheetProps> = ({currentArea}) =
     }, []);
 
     useEffect(() => {
-        setAREAParamOpened(false);
+        if (currentArea)
+            if (!currentArea!.default) {
+                setAREAParamOpened(true);
+                setCurrentAreaParam(currentArea);
+            } else {
+                setAREAParamOpened(false);
+            }
     }, [currentArea]);
 
     return (
-        actionParamOpened ? <AREAParamBottomSheet data={currentAreaParam!} setAREAParamOpened={setAREAParamOpened} /> :
+        actionParamOpened ? <AREAParamBottomSheet data={currentAreaParam!} setAREAParamOpened={setAREAParamOpened} closeBottomSheet={closeBottomSheet} setSaveSelectedArea={setSaveSelectedArea} refetchSchema={refetchSchema} setRefetchSchema={setRefetchSchema} deleteArea={deleteArea} /> :
         <View style={Styles.container}>
-            <Text style={[Theme.Title, {color: Theme.colors.White, paddingLeft: 20}]}>
-                {currentArea?.type == "action" ? "Action" : "Reaction"}
-            </Text>
+            <View style={{paddingLeft: 20, paddingRight: 20, width: "100%", flexDirection: "row", justifyContent: "space-between"}}>
+                <Text style={[Theme.Title, {color: Theme.colors.White, justifyContent: "center"}]}>
+                    {currentArea?.type == "action" ? "Action" : "Reaction"}
+                </Text>
+                <TouchableOpacity onPress={() => {
+                    deleteArea()
+                    closeBottomSheet()
+                }} style={{backgroundColor: Theme.colors.Red, justifyContent: "center", borderRadius: 20, paddingHorizontal: 15}}>
+                    <Text style={[Theme.Subtitle, {color: Theme.colors.Black}]}>Supprimer</Text>
+                </TouchableOpacity>
+            </View>
             <View style={Styles.areaContainer}>
                 <VirtualizedList
                     getItemCount={(data) => data.length}
@@ -220,7 +365,7 @@ export const AREABottomSheet: React.FC<AREABottomSheetProps> = ({currentArea}) =
                     getItem={(data, index) => data[index]}
                     initialNumToRender={1}
                     renderItem={({item}) => {
-                        const data: IAREAComponent = {
+                        let data: IAREAComponent = {
                             name: item,
                             default: false,
                             type: currentArea?.type == "action" ? "action" : "reaction",

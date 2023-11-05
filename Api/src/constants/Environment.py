@@ -1,3 +1,7 @@
+"""
+Environment variables parser
+"""
+
 from pydantic_settings import BaseSettings
 
 from src.utils.Helper import inDocMode

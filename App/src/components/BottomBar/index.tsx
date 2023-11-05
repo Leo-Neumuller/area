@@ -10,7 +10,6 @@ import useThemedStyles from '../../hooks/Theme/useThemedStyle';
 import { ThemeType, ThemeTypeContext } from '../../constants/Theme';
 import useTheme from "../../hooks/Theme/useTheme";
 
-
 const Tab = createMaterialTopTabNavigator();
 
 type RootStackParamList = {

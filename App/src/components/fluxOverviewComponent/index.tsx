@@ -78,7 +78,7 @@ export default function FluxOverview(Props: Props) {
                         alignItems: "center",
                         justifyContent: "center",
                     }}>
-                        <TouchableOpacity>
+                        <TouchableOpacity onPress={Props.onPress}>
                             <EditSVG style={{color: Theme.colors.Black}}/>
                         </TouchableOpacity>
                     </View>

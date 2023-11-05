@@ -4,10 +4,11 @@ import {StackNavigationProp} from "@react-navigation/stack";
 import useThemedStyles from "../../hooks/Theme/useThemedStyle";
 import useTheme from "../../hooks/Theme/useTheme";
 import {ThemeTypeContext} from "../../constants/Theme";
-import EditSVG from "../../../assets/formkit_arrowright.svg";
+import EditSVG from "../../../assets/Vector.svg";
 import AddSVG from "../../../assets/AddComponent.svg";
 import FluxOverview from "../../components/fluxOverviewComponent"
-import {fluxGet} from "../../api/api";
+import {fluxGet, fluxIdGet} from "../../api/api";
+import EncryptedStorage from "react-native-encrypted-storage";
 
 
 type RootStackParamList = {
@@ -29,14 +30,18 @@ interface flux {
 export const Flux: React.FC<Props> = ({navigation}) => {
     const Styles = useThemedStyles(styles);
     const Theme = useTheme();
-
     const [userFluxs, setUserFluxs] = useState<flux[]>([])
 
     useEffect(() => {
-        fluxGet().then((res) => {
-            setUserFluxs(res);
+        const onFocus = navigation.addListener('focus', () => {
+            fluxGet().then((res) => {
+                setUserFluxs(res);
+            })
         })
-    }, [navigation.getState()])
+        return function clean() {
+            onFocus();
+        }
+    }, [])
 
     return (
         <ScrollView>
@@ -52,19 +57,64 @@ export const Flux: React.FC<Props> = ({navigation}) => {
                         color: Theme.colors.Black,
                         fontWeight: "bold"
                     }}>
-                        Vos Flux
+                        Mes Flux
                     </Text>
                 </View>
             </View>
-            {userFluxs.map((value, index) => {
+            {userFluxs.length == 0 ?
+                <View style={{
+                    height: Dimensions.get("window").height * 0.7,
+                    alignItems: "center",
+                    justifyContent: "center"
+                }}>
+                    <View style={{
+                        height: "15%",
+                        width: "100%",
+
+                        alignItems: "center"
+
+                    }}>
+                        <TouchableOpacity style={{
+                            height: "100%",
+                            width: "20%",
+                            backgroundColor: "#37363733",
+                            borderRadius: 50,
+                            alignItems: "center",
+                            justifyContent: "center"
+                        }}>
+                            <EditSVG style={{color: "#37363790"}}/>
+
+                        </TouchableOpacity>
+                    </View>
+                    <Text style={{
+                        ...Theme.Text
+                    }}>
+                        Ajouter un flux
+                    </Text>
+                </View> : null}
+            {userFluxs.map((value , index) => {
                 return (
                     <FluxOverview key={index}
                                   desc={value.description}
                                   name={value.name}
+                                  onPress={() => {
+                                      return(
+                                          EncryptedStorage.getItem("userToken").then((token) => {
+                                                  fluxIdGet(token!, value.id).then((res) => {
+                                                        // @ts-ignore
+                                                      navigation.navigate('FluxEditor', {
+                                                          itemId: value.id,
+                                                          otherParam: {flux: res}
+                                                      })
+                                                  })
+                                          })
+                                      )
+                              }}
                     />
                 )
             })}
         </ScrollView>
+
     )
 }
 

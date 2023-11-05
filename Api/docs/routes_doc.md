@@ -454,15 +454,15 @@ Create/Modify flux
 This operation does not require authentication
 </aside>
 
-## Get all fluxs
+## Delete flux
 
-<a id="opIdget_fluxs_flux_fluxs_get"></a>
+<a id="opIddelete_flux_flux__fluxId__delete"></a>
 
 > Code samples
 
 ```shell
 # You can also use wget
-curl -X GET /flux/fluxs \
+curl -X DELETE /flux/{fluxId} \
   -H 'Accept: application/json' \
   -H 'access-token: string'
 
@@ -475,9 +475,9 @@ const headers = {
   'access-token':'string'
 };
 
-fetch('/flux/fluxs',
+fetch('/flux/{fluxId}',
 {
-  method: 'GET',
+  method: 'DELETE',
 
   headers: headers
 })
@@ -489,14 +489,15 @@ fetch('/flux/fluxs',
 
 ```
 
-`GET /flux/fluxs`
+`DELETE /flux/{fluxId}`
 
-Get all fluxs
+Delete flux
 
-<h3 id="get-all-fluxs-parameters">Parameters</h3>
+<h3 id="delete-flux-parameters">Parameters</h3>
 
 |Name|In|Type|Required|Description|
 |---|---|---|---|---|
+|fluxId|path|integer|true|none|
 |access-token|header|string|false|none|
 
 > Example responses
@@ -504,14 +505,9 @@ Get all fluxs
 > 200 Response
 
 ```json
-[
-  {
-    "id": 0,
-    "name": "string",
-    "description": "string",
-    "active": true
-  }
-]
+{
+  "id": 0
+}
 ```
 
 > 401 Response
@@ -522,28 +518,24 @@ Get all fluxs
 }
 ```
 
-<h3 id="get-all-fluxs-responses">Responses</h3>
+> 404 Response
+
+```json
+{
+  "detail": "string"
+}
+```
+
+<h3 id="delete-flux-responses">Responses</h3>
 
 |Status|Meaning|Description|Schema|
 |---|---|---|---|
-|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|List of fluxs|Inline|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Flux|[FluxSend](#schemafluxsend)|
 |401|[Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)|Unauthorized|None|
+|404|[Not Found](https://tools.ietf.org/html/rfc7231#section-6.5.4)|Flux not found|None|
 |422|[Unprocessable Entity](https://tools.ietf.org/html/rfc2518#section-10.3)|Validation Error|[HTTPValidationError](#schemahttpvalidationerror)|
 
-<h3 id="get-all-fluxs-responseschema">Response Schema</h3>
-
-Status Code **200**
-
-*Response Get Fluxs Flux Fluxs Get*
-
-|Name|Type|Required|Restrictions|Description|
-|---|---|---|---|---|
-|Response Get Fluxs Flux Fluxs Get|[[FluxBasicData](#schemafluxbasicdata)]|false|none|[Flux Basic Data Model]|
-|» FluxBasicData|[FluxBasicData](#schemafluxbasicdata)|false|none|Flux Basic Data Model|
-|»» id|integer|true|none|none|
-|»» name|string|true|none|none|
-|»» description|string|true|none|none|
-|»» active|boolean|true|none|none|
+<h3 id="delete-flux-responseschema">Response Schema</h3>
 
 <aside class="success">
 This operation does not require authentication
@@ -687,6 +679,193 @@ Get flux
 |422|[Unprocessable Entity](https://tools.ietf.org/html/rfc2518#section-10.3)|Validation Error|[HTTPValidationError](#schemahttpvalidationerror)|
 
 <h3 id="get-flux-responseschema">Response Schema</h3>
+
+<aside class="success">
+This operation does not require authentication
+</aside>
+
+## Toggle active flux
+
+<a id="opIdtoggle_flux_flux__fluxId__patch"></a>
+
+> Code samples
+
+```shell
+# You can also use wget
+curl -X PATCH /flux/{fluxId} \
+  -H 'Accept: application/json' \
+  -H 'access-token: string'
+
+```
+
+```javascript
+
+const headers = {
+  'Accept':'application/json',
+  'access-token':'string'
+};
+
+fetch('/flux/{fluxId}',
+{
+  method: 'PATCH',
+
+  headers: headers
+})
+.then(function(res) {
+    return res.json();
+}).then(function(body) {
+    console.log(body);
+});
+
+```
+
+`PATCH /flux/{fluxId}`
+
+Toggle active flux
+
+<h3 id="toggle-active-flux-parameters">Parameters</h3>
+
+|Name|In|Type|Required|Description|
+|---|---|---|---|---|
+|fluxId|path|integer|true|none|
+|access-token|header|string|false|none|
+
+> Example responses
+
+> 200 Response
+
+```json
+{
+  "id": 0,
+  "active": true
+}
+```
+
+> 401 Response
+
+```json
+{
+  "detail": "string"
+}
+```
+
+> 404 Response
+
+```json
+{
+  "detail": "string"
+}
+```
+
+<h3 id="toggle-active-flux-responses">Responses</h3>
+
+|Status|Meaning|Description|Schema|
+|---|---|---|---|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Toggle works|[FluxToggleSend](#schemafluxtogglesend)|
+|401|[Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)|Unauthorized|None|
+|404|[Not Found](https://tools.ietf.org/html/rfc7231#section-6.5.4)|Flux not found|None|
+|422|[Unprocessable Entity](https://tools.ietf.org/html/rfc2518#section-10.3)|Validation Error|[HTTPValidationError](#schemahttpvalidationerror)|
+
+<h3 id="toggle-active-flux-responseschema">Response Schema</h3>
+
+<aside class="success">
+This operation does not require authentication
+</aside>
+
+## Get all fluxs
+
+<a id="opIdget_fluxs_flux_fluxs_get"></a>
+
+> Code samples
+
+```shell
+# You can also use wget
+curl -X GET /flux/fluxs \
+  -H 'Accept: application/json' \
+  -H 'access-token: string'
+
+```
+
+```javascript
+
+const headers = {
+  'Accept':'application/json',
+  'access-token':'string'
+};
+
+fetch('/flux/fluxs',
+{
+  method: 'GET',
+
+  headers: headers
+})
+.then(function(res) {
+    return res.json();
+}).then(function(body) {
+    console.log(body);
+});
+
+```
+
+`GET /flux/fluxs`
+
+Get all fluxs
+
+<h3 id="get-all-fluxs-parameters">Parameters</h3>
+
+|Name|In|Type|Required|Description|
+|---|---|---|---|---|
+|access-token|header|string|false|none|
+
+> Example responses
+
+> 200 Response
+
+```json
+[
+  {
+    "id": 0,
+    "name": "string",
+    "description": "string",
+    "active": true,
+    "reaction": "string",
+    "action": "string"
+  }
+]
+```
+
+> 401 Response
+
+```json
+{
+  "detail": "string"
+}
+```
+
+<h3 id="get-all-fluxs-responses">Responses</h3>
+
+|Status|Meaning|Description|Schema|
+|---|---|---|---|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|List of fluxs|Inline|
+|401|[Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)|Unauthorized|None|
+|422|[Unprocessable Entity](https://tools.ietf.org/html/rfc2518#section-10.3)|Validation Error|[HTTPValidationError](#schemahttpvalidationerror)|
+
+<h3 id="get-all-fluxs-responseschema">Response Schema</h3>
+
+Status Code **200**
+
+*Response Get Fluxs Flux Fluxs Get*
+
+|Name|Type|Required|Restrictions|Description|
+|---|---|---|---|---|
+|Response Get Fluxs Flux Fluxs Get|[[FluxBasicData](#schemafluxbasicdata)]|false|none|[Flux Basic Data Model]|
+|» FluxBasicData|[FluxBasicData](#schemafluxbasicdata)|false|none|Flux Basic Data Model|
+|»» id|integer|true|none|none|
+|»» name|string|true|none|none|
+|»» description|string|true|none|none|
+|»» active|boolean|true|none|none|
+|»» reaction|string|true|none|none|
+|»» action|string|true|none|none|
 
 <aside class="success">
 This operation does not require authentication
@@ -984,13 +1163,13 @@ This operation does not require authentication
 
 ## Services
 
-<a id="opIdget_services_services_services_get"></a>
+<a id="opIdget_services_with_oauth_services_services_oauth_get"></a>
 
 > Code samples
 
 ```shell
 # You can also use wget
-curl -X GET /services/services \
+curl -X GET /services/services/oauth \
   -H 'Accept: application/json' \
   -H 'access-token: string'
 
@@ -1003,7 +1182,7 @@ const headers = {
   'access-token':'string'
 };
 
-fetch('/services/services',
+fetch('/services/services/oauth',
 {
   method: 'GET',
 
@@ -1017,7 +1196,7 @@ fetch('/services/services',
 
 ```
 
-`GET /services/services`
+`GET /services/services/oauth`
 
 Get services
 
@@ -1032,14 +1211,9 @@ Get services
 > 200 Response
 
 ```json
-{
-  "action": [
-    "string"
-  ],
-  "reaction": [
-    "string"
-  ]
-}
+[
+  "string"
+]
 ```
 
 > 401 Response
@@ -1054,11 +1228,19 @@ Get services
 
 |Status|Meaning|Description|Schema|
 |---|---|---|---|
-|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Services|[ServicesType](#schemaservicestype)|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Services|Inline|
 |401|[Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)|Unauthorized|None|
 |422|[Unprocessable Entity](https://tools.ietf.org/html/rfc2518#section-10.3)|Validation Error|[HTTPValidationError](#schemahttpvalidationerror)|
 
 <h3 id="services-responseschema">Response Schema</h3>
+
+Status Code **200**
+
+*Response Get Services With Oauth Services Services Oauth Get*
+
+|Name|Type|Required|Restrictions|Description|
+|---|---|---|---|---|
+|Response Get Services With Oauth Services Services Oauth Get|[string]|false|none|none|
 
 <aside class="success">
 This operation does not require authentication
@@ -1164,7 +1346,7 @@ This operation does not require authentication
 
 ```shell
 # You can also use wget
-curl -X GET /services/{service}/authorize_url \
+curl -X GET /services/{service}/authorize_url?redirect=string&end_redirect=string \
   -H 'Accept: application/json' \
   -H 'access-token: string'
 
@@ -1177,7 +1359,7 @@ const headers = {
   'access-token':'string'
 };
 
-fetch('/services/{service}/authorize_url',
+fetch('/services/{service}/authorize_url?redirect=string&end_redirect=string',
 {
   method: 'GET',
 
@@ -1200,6 +1382,8 @@ Get authorization url
 |Name|In|Type|Required|Description|
 |---|---|---|---|---|
 |service|path|string|true|none|
+|redirect|query|string|true|none|
+|end_redirect|query|string|true|none|
 |access-token|header|string|false|none|
 
 > Example responses
@@ -1260,7 +1444,7 @@ This operation does not require authentication
 
 ```shell
 # You can also use wget
-curl -X GET /services/{service}/authorize?state=string&code=string&scope=string \
+curl -X GET /services/{service}/authorize \
   -H 'Accept: application/json'
 
 ```
@@ -1271,7 +1455,7 @@ const headers = {
   'Accept':'application/json'
 };
 
-fetch('/services/{service}/authorize?state=string&code=string&scope=string',
+fetch('/services/{service}/authorize',
 {
   method: 'GET',
 
@@ -1294,9 +1478,9 @@ Authorize
 |Name|In|Type|Required|Description|
 |---|---|---|---|---|
 |service|path|string|true|none|
-|state|query|string|true|none|
-|code|query|string|true|none|
-|scope|query|string|true|none|
+|state|query|string|false|none|
+|code|query|string|false|none|
+|scope|query|string|false|none|
 |error|query|string|false|none|
 
 > Example responses
@@ -1382,6 +1566,73 @@ null
 |422|[Unprocessable Entity](https://tools.ietf.org/html/rfc2518#section-10.3)|Validation Error|[HTTPValidationError](#schemahttpvalidationerror)|
 
 <h3 id="is-connected-responseschema">Response Schema</h3>
+
+<aside class="success">
+This operation does not require authentication
+</aside>
+
+## Disconnect
+
+<a id="opIddisconnect_services__service__disconnect_get"></a>
+
+> Code samples
+
+```shell
+# You can also use wget
+curl -X GET /services/{service}/disconnect \
+  -H 'Accept: application/json' \
+  -H 'access-token: string'
+
+```
+
+```javascript
+
+const headers = {
+  'Accept':'application/json',
+  'access-token':'string'
+};
+
+fetch('/services/{service}/disconnect',
+{
+  method: 'GET',
+
+  headers: headers
+})
+.then(function(res) {
+    return res.json();
+}).then(function(body) {
+    console.log(body);
+});
+
+```
+
+`GET /services/{service}/disconnect`
+
+Disconnect
+
+<h3 id="disconnect-parameters">Parameters</h3>
+
+|Name|In|Type|Required|Description|
+|---|---|---|---|---|
+|service|path|string|true|none|
+|access-token|header|string|false|none|
+
+> Example responses
+
+> 200 Response
+
+```json
+null
+```
+
+<h3 id="disconnect-responses">Responses</h3>
+
+|Status|Meaning|Description|Schema|
+|---|---|---|---|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Disconnect|Inline|
+|422|[Unprocessable Entity](https://tools.ietf.org/html/rfc2518#section-10.3)|Validation Error|[HTTPValidationError](#schemahttpvalidationerror)|
+
+<h3 id="disconnect-responseschema">Response Schema</h3>
 
 <aside class="success">
 This operation does not require authentication
@@ -1752,6 +2003,7 @@ DataConfigurationType
 |DataConfigurationType|textMultiline|
 |DataConfigurationType|select|
 |DataConfigurationType|checkbox|
+|DataConfigurationType|date|
 
 <h2 id="tocS_FluxBasicData">FluxBasicData</h2>
 <!-- backwards compatibility -->
@@ -1765,7 +2017,9 @@ DataConfigurationType
   "id": 0,
   "name": "string",
   "description": "string",
-  "active": true
+  "active": true,
+  "reaction": "string",
+  "action": "string"
 }
 
 ```
@@ -1780,6 +2034,8 @@ FluxBasicData
 |name|string|true|none|none|
 |description|string|true|none|none|
 |active|boolean|true|none|none|
+|reaction|string|true|none|none|
+|action|string|true|none|none|
 
 <h2 id="tocS_FluxCreateOrModify-Input">FluxCreateOrModify-Input</h2>
 <!-- backwards compatibility -->
@@ -2528,6 +2784,30 @@ FluxSend
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
 |id|integer|true|none|none|
+
+<h2 id="tocS_FluxToggleSend">FluxToggleSend</h2>
+<!-- backwards compatibility -->
+<a id="schemafluxtogglesend"></a>
+<a id="schema_FluxToggleSend"></a>
+<a id="tocSfluxtogglesend"></a>
+<a id="tocsfluxtogglesend"></a>
+
+```json
+{
+  "id": 0,
+  "active": true
+}
+
+```
+
+FluxToggleSend
+
+### Properties
+
+|Name|Type|Required|Restrictions|Description|
+|---|---|---|---|---|
+|id|integer|true|none|none|
+|active|boolean|true|none|none|
 
 <h2 id="tocS_HTTPValidationError">HTTPValidationError</h2>
 <!-- backwards compatibility -->

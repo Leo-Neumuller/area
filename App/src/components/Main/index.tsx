@@ -1,6 +1,4 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import {useFonts} from "expo-font";
-import * as SplashScreen from "expo-splash-screen";
 import {
     SafeAreaView,
     StyleSheet,
@@ -12,17 +10,10 @@ import {
 import {NavigationContainer} from '@react-navigation/native';
 import { Routes } from '../../screens/Routes';
 import jwt_decode from "jwt-decode";
-import * as SecureStore from 'expo-secure-store';
+import EncryptedStorage from 'react-native-encrypted-storage';
 import useTheme from "../../hooks/Theme/useTheme";
 import {ThemeTypeContext} from "../../constants/Theme";
 import useThemedStyles from "../../hooks/Theme/useThemedStyle";
-
-
-
-
-
-
-SplashScreen.preventAutoHideAsync();
 
 export default function Main() {
     const Theme = useTheme();
@@ -30,36 +21,26 @@ export default function Main() {
     const [isLogged, setIsLogged] = useState<boolean | null>(null);
 
     async function checkLogged() {
-        const jwt = await SecureStore.getItemAsync("userToken")
+        const jwt = await EncryptedStorage.getItem("userToken")
         try {
             const data: {[key: string]: any} = jwt_decode(jwt!);
             if (data.exp * 1000 < Date.now()) {
-                await SecureStore.setItemAsync("userToken", "");
+                await EncryptedStorage.setItem("userToken", "");
                 setIsLogged(false);
             }
         } catch (e) {
-            await SecureStore.setItemAsync("userToken", "");
+            await EncryptedStorage.setItem("userToken", "");
             setIsLogged(false);
         }
         setIsLogged(!!(jwt));
     }
 
-    const [fontsLoaded] = useFonts({
-        'space-grotesk': require('../../../assets/fonts/spaceGrotesk.ttf'),
-        'zen-tokyo-zoo': require('../../../assets/fonts/zenTokyoZoo.ttf'),
-    });
-    const onLayoutRootView = useCallback(async () => {
-        if (fontsLoaded) {
-            await SplashScreen.hideAsync();
-        }
-        await checkLogged();
-    }, [fontsLoaded]);
-    if (!fontsLoaded) {
-        return null;
-    }
+    useEffect(() => {
+        checkLogged();
+    }, [])
 
     return (
-        <SafeAreaView style={Styles.container} onLayout={onLayoutRootView}>
+        <SafeAreaView style={Styles.container}>
             <Routes isLogged={isLogged}/>
         </SafeAreaView>
     );

@@ -205,7 +205,9 @@ export async function createFlux(cookie: string, flux: CreateFlux, verify: boole
  */
 export async function getOauthLink(cookie: string, service: string) {
     const redirect_uri = window.location.origin + "/redirected";
-    const res = await fetch(import.meta.env.VITE_API_URL + `/services/` + service + `/authorize_url?redirect_uri=${redirect_uri}`, {
+    const pre_redirect_uri = window.location.origin + "/oauth/" + encodeURI(service);
+    console.log(pre_redirect_uri);
+    const res = await fetch(import.meta.env.VITE_API_URL + `/services/` + service + `/authorize_url?end_redirect=${redirect_uri}&redirect=${pre_redirect_uri}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -418,4 +420,11 @@ export async function getOauthServices(cookie: string) {
         throw new Error(err.detail);
     }
     return res.json();
+}
+
+export async function pushOauthData(service: string,data: string) {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/services/${service}/authorize${data}` , {
+        method: 'GET',
+    })
+    return res;
 }

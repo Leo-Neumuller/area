@@ -1,4 +1,6 @@
-import warnings
+"""
+JWT utils
+"""
 from datetime import datetime, timedelta
 
 from jose.exceptions import JWTClaimsError, JWSError
@@ -11,6 +13,9 @@ from src.utils.Helper import warn
 
 
 class JWTException(Exception):
+    """
+    JWT Exception
+    """
     def __init__(self, message: str):
         self.message = message
 
@@ -19,6 +24,9 @@ class JWTException(Exception):
 
 
 class JWTExpiredException(JWTException):
+    """
+    JWT Expired Exception
+    """
     def __init__(self, message: str):
         super().__init__(message)
 
