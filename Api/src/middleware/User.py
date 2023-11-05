@@ -1,7 +1,8 @@
-import warnings
+"""
+User Authentication Middleware
+"""
 
 from fastapi import HTTPException, Header, status, Depends
-from pydantic.v1 import parse_obj_as
 from sqlalchemy.orm import Session
 
 from src.models.User import get_user_by_id, User, UserMe

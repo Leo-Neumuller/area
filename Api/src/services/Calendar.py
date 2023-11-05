@@ -1,5 +1,8 @@
+"""
+Google Calendar service
+"""
+
 from datetime import datetime, timezone
-from pprint import pprint
 from typing import List
 
 from sqlalchemy.orm import Session

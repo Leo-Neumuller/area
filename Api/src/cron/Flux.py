@@ -1,3 +1,7 @@
+"""
+Flux cron for execute flux
+"""
+
 from src.models.Flux import Flux, FluxGraph
 from src.models.Services import ServiceType
 from src.models.User import UserMe

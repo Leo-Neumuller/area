@@ -1,10 +1,16 @@
+"""
+Cron module
+"""
+
 import atexit
 from src.cron.Flux import execute_flux
 from apscheduler.schedulers.background import BackgroundScheduler
+import os
 
-scheduler = BackgroundScheduler()
-scheduler.add_job(func=execute_flux, trigger="interval", seconds=30)
-execute_flux()
-scheduler.start()
+if "DOC" not in os.environ:
+    scheduler = BackgroundScheduler()
+    scheduler.add_job(func=execute_flux, trigger="interval", seconds=30)
+    execute_flux()
+    scheduler.start()
 
-atexit.register(lambda: scheduler.shutdown())
+    atexit.register(lambda: scheduler.shutdown())

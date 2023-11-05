@@ -1,3 +1,7 @@
+"""
+About model and utils
+"""
+
 from pydantic import BaseModel
 
 

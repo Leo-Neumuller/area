@@ -6,3 +6,9 @@ area_test.db-journal
 htmlcov
 secrets/*.json
 env
+docs/api/fonts
+docs/api/*.html
+docs/api/*.js
+docs/api/*.css
+docs/api/*.json
+docs/api/*.inv

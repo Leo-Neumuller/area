@@ -1,4 +1,6 @@
-from datetime import datetime, timezone
+"""
+Services router
+"""
 from typing import List
 
 from fastapi import APIRouter, HTTPException, status, Depends

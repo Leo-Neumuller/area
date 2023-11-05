@@ -1,3 +1,7 @@
+"""
+RegexChecker module
+"""
+
 import re
 
 

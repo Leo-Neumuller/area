@@ -1,8 +1,11 @@
+"""
+Gmail service
+"""
+
 import base64
 from datetime import datetime, timezone
 from email.message import EmailMessage
-from typing import List, Dict, Callable, Tuple
-from pprint import pprint
+from typing import List, Tuple
 import googleapiclient
 from sqlalchemy.orm import Session
 from src.models.Services import save_start_authorization, Service, ServiceType, BaseService, add_metadata, \

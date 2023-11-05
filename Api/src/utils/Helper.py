@@ -1,8 +1,11 @@
+"""
+Helper functions
+"""
+
 import base64
 import os
 import string
 import traceback
-import warnings
 import sys
 from inspect import getframeinfo, stack
 import random

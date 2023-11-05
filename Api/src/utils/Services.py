@@ -1,3 +1,7 @@
+"""
+Services utils (Google)
+"""
+
 import os
 import urllib.parse
 from typing import List, Tuple

@@ -1,3 +1,7 @@
+"""
+User Model and utils
+"""
+
 import sqlalchemy
 from pydantic import BaseModel
 from sqlalchemy import Column, Integer, String

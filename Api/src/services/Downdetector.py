@@ -1,3 +1,7 @@
+"""
+Downdetector service
+"""
+
 from typing import Tuple
 
 from sqlalchemy.orm import Session

@@ -1,3 +1,7 @@
+"""
+Flux Model and utils
+"""
+
 from copy import copy
 from datetime import datetime
 from typing import List, Any, Optional

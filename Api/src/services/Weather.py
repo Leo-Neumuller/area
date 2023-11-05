@@ -1,3 +1,7 @@
+"""
+Weather service
+"""
+
 import json
 from typing import Tuple
 
@@ -48,11 +52,6 @@ class Weather(BaseService):
         :return: dict of signal
         """
 
-        """
-        curl -X 'GET' \
-  'https://api.weatherapi.com/v1/current.json?q=mouchin&lang=fr&key=a591f50c7ae84d42a8160928230511' \
-  -H 'accept: application/json'
-        """
         try:
             with open("secrets/Weather.json") as f:
                 data = json.load(f)

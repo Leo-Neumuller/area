@@ -1,7 +1,10 @@
+"""
+Spotify service
+"""
+
 import json
 import urllib
 from datetime import datetime
-from pprint import pprint
 from typing import List, Tuple
 
 import requests

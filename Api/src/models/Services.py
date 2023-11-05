@@ -1,3 +1,7 @@
+"""
+Services model and utils
+"""
+
 import inspect
 from enum import Enum
 from functools import wraps

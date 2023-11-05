@@ -40,7 +40,7 @@ async def startup_event():
         print(f"{key}: " + "*" * (len(str(value))))
     if "DOC" in os.environ:
         print("Updating openapi.json")
-        with open("./doc/openapi.json", 'w+') as fp:
+        with open("./docs/openapi.json", 'w+') as fp:
             json.dump(app.openapi(), fp)
     pass
 
