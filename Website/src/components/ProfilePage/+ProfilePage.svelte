@@ -101,7 +101,9 @@
 									try {
 										if (popup?.closed) {
 											clearInterval(interval);
-                      dic = {...dic, [service]: true};
+                                            const res = checkConnected(getCookie("token"), service).then((res) => {
+                                                dic = {...dic, [service]: res.is_connected}
+                                            });
 										}
 									} catch {
 										return;

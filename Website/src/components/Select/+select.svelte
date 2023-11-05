@@ -15,7 +15,7 @@
         <option class="bg-gray" selected={true} disabled={true}>{placeholder}</option>
     {/if}
     {#each options as option}
-        {#if value === option}
+        {#if value === option && value !== undefined}
             <option class="bg-gray" value={option} selected>{option}</option>
         {:else}
             <option class="bg-gray" value={option}>{option}</option>

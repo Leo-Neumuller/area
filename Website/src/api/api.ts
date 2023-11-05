@@ -7,7 +7,7 @@ export interface signupProps {
     email: string;
     password: string;
 }
-
+ 
 export async function signupPost(data: { [key: string]: string }) {
     const res = await fetch(import.meta.env.VITE_API_URL + "/user/signup", {
         method: 'POST',
