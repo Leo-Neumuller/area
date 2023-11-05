@@ -33,7 +33,7 @@
     </div>
     <div class="flex flex-col gap-10 w-full justify-center items-center">
       <h1 class="font-bold text-[4.4vw] text-customWhite">
-        <p class="text-center">Commencer à automatiser votre quotidien</p>
+        <p class="text-center">Commencez à automatiser votre quotidien</p>
       </h1>
       <div class="flex gap-6">
         <button data-testid="register" on:click={() => {
@@ -56,7 +56,7 @@
             <ul>
               <li
                 class="font-SpaceGrotesk font-semibold flex rounded-3xl px-6 py-4 align-middle items-center justify-center text-[1.6vw] uppercase">
-                Se conneter
+                Se connecter
                 <span></span><span></span><span></span><span></span>
               </li>
             </ul>
@@ -95,14 +95,14 @@
   </section>
   <div class="flex flex-col gap-[8vw] border-t border-gray pt-20">
     <AppPres image={Reactact} buttonText="Explorer les flux" hideButton={false} onClick={() => {}}
-             title="Créé des flux d'automatisation personalisé"
-             text="Automatisez les taches fastidieuses pour vous concentrer sur le travail qui compte vraiment avec les flux."/>
+             title="Créez des fluxs d'automatisation personalisés"
+             text="Automatisez les taches fastidieuses pour vous concentrer sur le travail qui compte vraiment avec les fluxs."/>
     <AppPres image={Connect} buttonText="Catalogue d'applications" hideButton={false} onClick={() => {}}
-             title="Un large nombre d'application à interconnecté"
+             title="Un large nombre d'applications à interconnecter"
              text="Un grand nombre de services disponibles pour répondre à tous vos besoins."/>
     <AppPres image={Timesave} hideButton onClick={() => {}} buttonText="  "
-             title="Optimisé votre quotidien et les tâches redondantes"
-             text="Fini les tâches répétitives à réaliser tous les jours, développez vos flux."/>
+             title="Optimisez votre quotidien et les tâches redondantes"
+             text="Fini les tâches répétitives à réaliser tous les jours, développez vos fluxs."/>
   </div>
 </section>
 

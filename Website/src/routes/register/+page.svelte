@@ -91,10 +91,10 @@
   <div class="flex justify-around w-11/12 pb-4">
     <div class="flex flex-col float-right w-3/6">
       <h1 class="font-bold text-[4.2vw] text-black mt-[10vw] self-center w-11/12">
-        <p>Près à optimiser votre quotidien ?</p>
+        <p>Prêt à optimiser votre quotidien ?</p>
       </h1>
       <h2 class="mt-[4vw] text-[2.2vw] self-center w-11/12">
-        <p>Créé un compte pour commencer à réaliser vos propre flux</p>
+        <p>Créé un compte pour commencer à réaliser vos propres fluxs</p>
       </h2>
     </div>
     <form method="post" on:submit|preventDefault={handleSubmit}>
