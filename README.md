@@ -64,6 +64,14 @@ Do the same thing for Spotify with a file called Spotify.json:
 }
 
 ```
+Same for Weather with a Weather.json file:
+
+```sh
+{
+  "api_key": "##################"
+}
+
+```
 
 ### How to get your secrets:
 
