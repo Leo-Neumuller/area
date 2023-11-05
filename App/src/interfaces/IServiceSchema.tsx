@@ -15,7 +15,7 @@ export interface IServiceSchema {
                     Items: string;
                 }
             ]
-            value?: string | number | boolean | Date;
+            value?: any;
         }
     ],
     outputData : [
