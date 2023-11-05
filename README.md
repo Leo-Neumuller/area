@@ -20,6 +20,24 @@ The annotation of commit are:
 - [+] : Add of files or features
 - [-] : Delete of files or features
 
+## Environment
+
+Create a .env file at the root of the project. It should look similar to this:
+
+```sh
+APP_NAME=AREA-API
+APP_VERSION=1.0.0
+
+SQL_URL=sqlite:///./area.db
+SQL_TEST_URL=sqlite:///./area_test.db
+JWT_SECRET=YOUR JWT SECRET
+JWT_ALGORITHM=HS256
+JWT_EXPIRE_DAYS=1
+JWT_EXPIRE_SECONDS=3600
+
+REDIRECT_URI=http://localhost:8000
+```
+
 ## Docker run
 
 ```bash
