@@ -18,3 +18,8 @@
 
 **/.DS_Store
 
+**/package-lock.json
+
+**/bun.lockb
+
+*.apk

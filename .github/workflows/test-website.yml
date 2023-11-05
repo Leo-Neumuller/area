@@ -1,0 +1,25 @@
+name: Test the website
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "dev" ]
+  pull_request:
+    branches: [ "dev" ]
+
+jobs:
+  test:
+    timeout-minutes: 20
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./Website
+    steps:
+      - name: Setup repo
+        uses: actions/checkout@v3
+
+      - name: Setup Svelte
+        run: ./install.sh
+      
+      - name: Test website
+        run: ./run.sh tests

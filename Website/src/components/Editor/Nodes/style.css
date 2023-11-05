@@ -1,0 +1,115 @@
+.node {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    cursor: grab;
+    box-shadow: 1px 1px 11px -6px rgba(0, 0, 0, 0.75);
+    user-select: none;
+    z-index: 10;
+    transition: border ease 0.2s, box-shadow ease 0.2s;
+    width: 420px;
+    height: 100px;
+    border-radius: 20px;
+}
+
+.Action {
+    background-color: #373637;
+}
+
+.Action .input {
+    background-color: #373637;
+}
+
+.Action .output {
+    background-color: #373637;
+}
+
+.Reaction {
+    background-color: #D9C6F4;
+}
+
+.Reaction .input {
+    background-color: #D9C6F4;
+}
+
+.Reaction .output {
+    background-color: #D9C6F4;
+}
+
+.node:hover {
+    box-shadow: 1px 1px 12px -6px rgba(0, 0, 0, 0.75);
+}
+
+.nodeSelected {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    cursor: grab;
+    box-shadow: 1px 1px 11px -6px rgba(0, 0, 0, 0.75);
+    user-select: none;
+    z-index: 10;
+    transition: border ease 0.2s, box-shadow ease 0.2s;
+    width: 420px;
+    height: 100px;
+    border-radius: 20px;
+}
+
+.nodeSelected:hover {
+    box-shadow: 1px 1px 12px -6px rgba(0, 0, 0, 0.75);
+}
+
+.inputsWrapper {
+    position: absolute;
+    top: -24px;
+    left: 0;
+    height: 12px;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    pointer-events: none;
+}
+
+.input {
+    width: 12px;
+    height: 12px;
+    border-radius: 100%;
+    cursor: crosshair;
+    pointer-events: all;
+    z-index: 20;
+    transition: scale ease 0.2s;
+}
+
+.outputsWrapper {
+    position: absolute;
+    bottom: -24px;
+    left: 0px;
+    height: 12px;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    pointer-events: none;
+}
+
+.output {
+    width: 12px;
+    height: 12px;
+    border-radius: 100%;
+    cursor: crosshair;
+    pointer-events: all;
+    z-index: 20;
+    transition: scale ease 0.2s;
+}
+
+.output:hover {
+    scale: 2;
+}
+
+.input:hover {
+    scale: 2;
+}

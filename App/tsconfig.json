@@ -1,6 +1,4 @@
 {
-  "extends": "expo/tsconfig.base",
-  "compilerOptions": {
-    "strict": true
-  }
+  "extends": "@tsconfig/react-native/tsconfig.json",
+  "include": ["./src", "App.tsx", "assets"]
 }

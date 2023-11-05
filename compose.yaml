@@ -3,11 +3,15 @@ services:
     build:
       context: ./Website
       dockerfile: client_web.Dockerfile
+      args:
+        VITE_API_URL: "http://${EXTERNAL_IP}:8080"
     ports:
       - "8081:4173"
     depends_on:
       - client_mobile
       - server
+    environment:
+      VITE_API_URL: "http://${EXTERNAL_IP}:8080"
   server:
     build:
       context: ./Api
@@ -15,15 +19,20 @@ services:
     ports:
       - '8080:8000'
     volumes:
-      - api:/usr/src/api
+      - apk:/apk/
+    env_file:
+      - .env
+    hostname: api
+    depends_on:
+      - client_mobile
   client_mobile:
     build:
-      context: .
-      dockerfile: ./App/client_mobile.Dockerfile
-    environment:
-      - EXPO_TOKEN=${EXPO_TOKEN}
+      context: ./App
+      dockerfile: client_mobile.Dockerfile
+      args:
+        - API_URL=http://${EXTERNAL_IP}:8080
     volumes:
-      - api:/usr/src/api
-    command: /bin/bash -c " mv *.apk build.apk && cp /app/App/build.apk /usr/src/api/"
+      - apk:/apk/
+    command: /bin/bash -c "rm /apk/*; cp /usr/src/app/android/app/build/outputs/apk/release/app-release.apk /apk/client.apk"
 volumes:
-  api:
+  apk:

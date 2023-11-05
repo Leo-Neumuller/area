@@ -1,0 +1,38 @@
+name: Test the api
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "dev" ]
+  pull_request:
+    branches: [ "dev" ]
+
+jobs:
+  test:
+    timeout-minutes: 20
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./Api
+    steps:
+      - name: Setup repo
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        run: ./install.sh
+
+      - name: Setup Google service
+        run: echo '${{ secrets.GOOGLE_SERVICE }}' > ./secrets/Google.json
+      
+      - name: Test api
+        run: ./run.sh tests
+        env:
+          APP_NAME: ${{ vars.APP_NAME }}
+          APP_VERSION: ${{ vars.APP_VERSION }}
+          JWT_ALGORITHM: ${{ vars.JWT_ALGORITHM }}
+          JWT_EXPIRE_DAYS: ${{ vars.JWT_EXPIRE_DAYS }}
+          JWT_EXPIRE_SECONDS: ${{ vars.JWT_EXPIRE_SECONDS }}
+          REDIRECT_URI: ${{ vars.REDIRECT_URI }}
+          SQL_TEST_URL: ${{ vars.SQL_TEST_URL }}
+          SQL_URL: ${{ vars.SQL_URL }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}

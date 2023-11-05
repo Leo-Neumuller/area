@@ -1,34 +1,113 @@
-FROM node:20-buster
+FROM ubuntu:20.04
 
-WORKDIR /app
+ENV DEBIAN_FRONTEND=noninteractive
+
+# set default build arguments
+# https://developer.android.com/studio#command-tools
+ARG SDK_VERSION=commandlinetools-linux-9477386_latest.zip
+ARG ANDROID_BUILD_VERSION=33
+ARG ANDROID_TOOLS_VERSION=30.0.3
+ARG NDK_VERSION=23.1.7779620
+ARG NODE_VERSION=18
+ARG WATCHMAN_VERSION=4.9.0
+ARG CMAKE_VERSION=3.22.1
+
+# set default environment variables, please don't remove old env for compatibilty issue
+ENV ADB_INSTALL_TIMEOUT=10
+ENV ANDROID_HOME=/opt/android
+ENV ANDROID_SDK_ROOT=${ANDROID_HOME}
+ENV ANDROID_NDK_HOME=${ANDROID_HOME}/ndk/$NDK_VERSION
+
+ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+ENV CMAKE_BIN_PATH=${ANDROID_HOME}/cmake/$CMAKE_VERSION/bin
+
+ENV PATH=${CMAKE_BIN_PATH}:${ANDROID_HOME}/cmdline-tools/latest/bin:${ANDROID_HOME}/emulator:${ANDROID_HOME}/platform-tools:${ANDROID_HOME}/tools:${ANDROID_HOME}/tools/bin:${PATH}
+
+# Install system dependencies
+RUN apt update -qq && apt install -qq -y --no-install-recommends \
+        apt-transport-https \
+        curl \
+        file \
+        gcc \
+        git \
+        g++ \
+        gnupg2 \
+        libc++1-10 \
+        libgl1 \
+        libtcmalloc-minimal4 \
+        make \
+        openjdk-17-jdk-headless \
+        openssh-client \
+        patch \
+        python3 \
+        python3-distutils \
+        rsync \
+        ruby \
+        ruby-dev \
+        tzdata \
+        unzip \
+        sudo \
+        ninja-build \
+        zip \
+        # Dev libraries requested by Hermes
+        libicu-dev \
+        # Dev dependencies required by linters
+        jq \
+        shellcheck \
+    && gem install bundler \
+    && rm -rf /var/lib/apt/lists/*;
+
+# install nodejs using n
+RUN curl -L https://raw.githubusercontent.com/tj/n/master/bin/n -o n \
+    && bash n $NODE_VERSION \
+    && rm n \
+    && npm install -g n \
+    && npm install -g yarn
+
+# Full reference at https://dl.google.com/android/repository/repository2-1.xml
+# download and unpack android
+RUN curl -sS https://dl.google.com/android/repository/${SDK_VERSION} -o /tmp/sdk.zip \
+    && mkdir -p ${ANDROID_HOME}/cmdline-tools \
+    && unzip -q -d ${ANDROID_HOME}/cmdline-tools /tmp/sdk.zip \
+    && mv ${ANDROID_HOME}/cmdline-tools/cmdline-tools ${ANDROID_HOME}/cmdline-tools/latest \
+    && rm /tmp/sdk.zip \
+    && yes | sdkmanager --licenses \
+    && yes | sdkmanager "platform-tools" \
+        "platforms;android-$ANDROID_BUILD_VERSION" \
+        "build-tools;$ANDROID_TOOLS_VERSION" \
+        "cmake;$CMAKE_VERSION" \
+        "ndk;$NDK_VERSION" \
+    && rm -rf ${ANDROID_HOME}/.android \
+    && chmod 777 -R /opt/android
+
+# install gradle
+RUN curl -L https://services.gradle.org/distributions/gradle-8.0.1-all.zip -o gradle-8.0.1-all.zip
+RUN apt-get install -y unzip
+RUN unzip gradle-8.0.1-all.zip
+RUN echo 'export GRADLE_HOME=/gradle-8.0.1' >> $HOME/.bashrc
+RUN echo 'export PATH=$PATH:$GRADLE_HOME/bin' >> $HOME/.bashrc
+RUN /bin/bash -c "source $HOME/.bashrc"
+
+ENV GRADLE_HOME=/gradle-8.0.1
+ENV PATH=$PATH:$GRADLE_HOME/bin
+
+ARG API_URL
+ENV API_URL $API_URL
+
+WORKDIR /usr/src/app
+
+COPY package.json .
+
+RUN npm i
 
 COPY . .
 
-RUN apt install git
+WORKDIR android
 
-RUN apt-get update && \
-    DEBIAN_FRONTEND=noninteractive \
-    apt-get -y install default-jre-headless && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+RUN chmod +x ./gradlew
 
-ARG ANDROID_SDK_VERSION=7302050
-ENV ANDROID_SDK_ROOT /opt/android-sdk
-ENV ANDROID_HOME /opt/android-sdk
-RUN mkdir -p ${ANDROID_SDK_ROOT}/cmdline-tools && \
-    wget -q https://dl.google.com/android/repository/commandlinetools-linux-${ANDROID_SDK_VERSION}_latest.zip && \
-    unzip *tools*linux*.zip -d ${ANDROID_SDK_ROOT}/cmdline-tools && \
-    mv ${ANDROID_SDK_ROOT}/cmdline-tools/cmdline-tools ${ANDROID_SDK_ROOT}/cmdline-tools/tools && \
-    rm *tools*linux*.zip
+RUN sed -i -e 's/\r$//' gradlew
 
-RUN yes | /opt/android-sdk/cmdline-tools/tools/bin/sdkmanager --licenses
+RUN API_URL=$API_URL gradle bundleRelease
 
-RUN apt update
-
-RUN apt install openjdk-11-jdk -y
-
-WORKDIR App
-
-RUN npm install
-
-RUN npx eas build -p android --profile preview --local --non-interactive
+RUN API_URL=$API_URL gradle assembleRelease
