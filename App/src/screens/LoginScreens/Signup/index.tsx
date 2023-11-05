@@ -25,6 +25,7 @@ import Login from "../Login";
 import {ThemeTypeContext} from "../../../constants/Theme";
 import EncryptedStorage from "react-native-encrypted-storage";
 
+// @ts-ignore
 export default function Signup({navigation}) {
     const Styles = useThemedStyles(styles);
     const Theme = useTheme();

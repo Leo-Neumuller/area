@@ -12,6 +12,7 @@ import AppWidget from "../../components/AppWidget"
 import {ThemeTypeContext} from "../../constants/Theme";
 import EncryptedStorage from "react-native-encrypted-storage";
 import {IAREAServices} from "../../interfaces/IAREAServices";
+import IService from "../../interfaces/IService";
 
 
 type RootStackParamList = {

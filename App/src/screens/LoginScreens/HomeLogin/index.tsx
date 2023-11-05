@@ -11,6 +11,7 @@ import {RFValue} from "react-native-responsive-fontsize";
 import {ThemeTypeContext} from "../../../constants/Theme";
 import {GoogleSignin, statusCodes} from "@react-native-google-signin/google-signin";
 
+// @ts-ignore
 export default function HomeLogin({navigation}) {
     const Styles = useThemedStyles(styles);
     const Theme = useTheme();
