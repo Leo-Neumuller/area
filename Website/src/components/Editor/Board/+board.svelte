@@ -59,6 +59,7 @@
 	}
 
 	function handleMouseDown(e: any) {
+		advancedModify = false;
 		selectedNode = null;
 		selectedEdge = null;
 		modifyMenu = false;
@@ -259,6 +260,7 @@
 	}
 
 	function handleOnMouseDownNode(id: string, e: MouseEvent) {
+		advancedModify = false;
 		selectedEdge = null;
 		selectedNode = id;
 		clickedPosition = {x: e.x, y: e.y};
@@ -297,6 +299,7 @@
 
 	function handleOnMouseDownOutput(outputPositionX: number, outputPositionY: number, nodeId: string, outputIndex: number) {
 		selectedNode = null;
+		advancedModify = false;
 
 		const boardWrapper = document.getElementById("boardWrapper");
 
@@ -351,6 +354,7 @@
 	}
 
 	function handleOnMouseDownEdge(id: string) {
+		advancedModify = false;
 		selectedEdge = id;
 	}
 
@@ -368,7 +372,6 @@
 	}
 
 	function handleModifyNode() {
-		console.log(nodeRegister)
 		if (nodeRegister.service != "") {
 			advancedModify = true;
 		} else {
@@ -571,7 +574,7 @@
 					successCheckmark = true;
 				})
 			}}>
-				Sauvergarder le flux
+				Sauvegarder le flux
 			</button>
 		</div>
 

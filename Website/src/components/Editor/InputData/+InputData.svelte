@@ -71,7 +71,7 @@
         }
       }} value="a" class="w-full bg-customWhite/[10%] rounded-lg p-4 font-SpaceGrotesk text-customWhite text-[1.25rem] font-normal">
         <option class="bg-gray text-center" value="Rien" selected>
-          <h1>Rien</h1>
+          <h1>Valeur personalisé</h1>
         </option>
         {#each metadata as data}
             {#if data["type"] === inputD.type}  
@@ -97,7 +97,7 @@
 			  <input disabled class={classInput[inputD.inputType]} {...type} on:change={changeInput[inputD.inputType]} value="" placeholder="" />
       {/if}
             {#if service === "Reaction"}
-            <h1 class="self-center text-white/20 font-SpaceGrotesk">ou</h1>
+              <h1 class="self-center text-white/20 font-SpaceGrotesk">ou</h1>
               <div class="w-full">
                 <select on:change={(e) => {
                   if (e) {
@@ -108,7 +108,7 @@
                   }
                 }} value="a" class="w-full bg-customWhite/[10%] rounded-lg p-4 font-SpaceGrotesk text-customWhite text-[1.25rem] font-normal">
                   <option class="bg-gray text-center" value="Rien" selected>
-                    <h1>Rien</h1>
+                    <h1>Valeur personalisé</h1>
                   </option>
                   {#each metadata as data}
                       {#if data["type"] === inputD.type}
@@ -119,7 +119,7 @@
                         {/if}
                       {/if}
                   {/each}
-                </select>
+                </select> 
               </div>
             {/if}
 		</div>
