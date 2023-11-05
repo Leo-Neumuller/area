@@ -60,7 +60,7 @@ Do the same thing for Spotify with a file called Spotify.json:
 ```sh
 {
     "client_id": "################################",
-    "client_secret": ""################################"
+    "client_secret": "################################"
 }
 
 ```
