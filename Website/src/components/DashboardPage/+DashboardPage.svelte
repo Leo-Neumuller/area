@@ -59,7 +59,7 @@
                         <div>Loading...</div>
                     {:then flux}
                         {#each flux as f, index}
-                            <FluxRow description={f.description} active={f.active} index={index} id={f.id}/>
+                            <FluxRow logo={{"action" : f.action, "reaction": f.reaction}} description={f.description} active={f.active} index={index} id={f.id}/>
                         {/each}
                     {/await}
                 </div>

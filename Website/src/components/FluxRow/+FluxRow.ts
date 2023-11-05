@@ -5,6 +5,7 @@ export interface FluxCardProps {
     active: boolean;
     index: number;
     id: number;
+    logo: {action: string, reaction: string};
 }
 
 export default FluxRow__SvelteComponent_;

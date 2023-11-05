@@ -1,7 +1,9 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
+  import { act } from "@testing-library/svelte";
   import { deleteFlux } from "../../api/api";
   import { getCookie } from "../../api/helpers";
+  import Icon from "../Icon/+Icon.svelte";
     import Instagram from "../SVGs/+Instagram.svelte";
     import RightArrow from "../SVGs/+RightArrow.svelte";
 
@@ -10,6 +12,8 @@
         name: string;
         description: string;
         active: boolean;
+        action: string;
+        reaction: string;
     };
     export let deleteButton: boolean | undefined;
 
@@ -18,8 +22,8 @@
 <div class="rounded-3xl border border-gray/20 pt-4 min-w-[27rem] min-h-[14rem] flex flex-col justify-between">
     <div class="flex justify-between mx-4">
         <div class="flex gap-5">
-            <Instagram className="w-12 h-12" color="#000"/>
-            <Instagram className="w-12 h-12" color="#000"/>
+            <Icon className="w-12 h-12" name={flux.action}/>
+            <Icon className="w-12 h-12" name={flux.reaction}/>
         </div>
         {#if deleteButton}
             <button class="font-SpaceGrotesk text-red-600 border border-red-600 rounded-2xl px-6 font-bold hover:text-customWhite hover:bg-red-600"
