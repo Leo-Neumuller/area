@@ -50,10 +50,10 @@
 
     {#if $page.url.pathname === '/'}
       <div>
-        <button
+        <!-- <button
           class="hover-underline-animation-alt text-customWhite text-[1.775rem] font-medium px-6 py-2 rounded-full uppercase">
           explorer
-        </button>
+        </button> -->
         <Button onClick={() => {
                 goto('/login');
             }}>

@@ -11,6 +11,7 @@
     import Timesave from "$lib/images/TimeSave.png";
 
     import {goto} from "$app/navigation";
+  import Icon from "../components/Icon/+Icon.svelte";
 
     if (browser) {
         if (document.cookie.includes("token")) {
@@ -68,25 +69,38 @@
     <div class="flex">
       {#each {length: 4} as _, index (index)}
         <section class="scrolling-text-title">
-          {#each {length: 5} as _, index (index)}
-            <div>
-              <AppSpotlight name="Instagram">
-                <Instagram className="w-[2.3vw] h-[2.3vw]" color="#373637"/>
-              </AppSpotlight>
-            </div>
-          {/each}
+          <div>
+            <AppSpotlight name="Gmail">
+              <Icon className="w-[2.3vw] h-[2.3vw]" name="Gmail"/>
+            </AppSpotlight>
+          </div>
+          <div>
+            <AppSpotlight name="Weather">
+              <Icon className="w-[2.3vw] h-[2.3vw]" name="Weather"/>
+            </AppSpotlight>
+          </div>
+          <div>
+            <AppSpotlight name="Down Detector">
+              <Icon className="w-[2.3vw] h-[2.3vw]" name="Down Detector"/>
+            </AppSpotlight>
+          </div>
+          <div>
+            <AppSpotlight name="Google Calendar">
+              <Icon className="w-[2.3vw] h-[2.3vw]" name="Google Calendar"/>
+            </AppSpotlight>
+          </div>
         </section>
       {/each}
     </div>
   </section>
   <div class="flex flex-col gap-[8vw] border-t border-gray pt-20">
-    <AppPres image={Reactact} buttonText="Explorer les flux"
+    <AppPres image={Reactact} buttonText="Explorer les flux" hideButton={false} onClick={() => {}}
              title="Créé des flux d'automatisation personalisé"
              text="Automatisez les taches fastidieuses pour vous concentrer sur le travail qui compte vraiment avec les flux."/>
-    <AppPres image={Connect} buttonText="Catalogue d'applications"
+    <AppPres image={Connect} buttonText="Catalogue d'applications" hideButton={false} onClick={() => {}}
              title="Un large nombre d'application à interconnecté"
              text="Un grand nombre de services disponibles pour répondre à tous vos besoins."/>
-    <AppPres image={Timesave} hideButton
+    <AppPres image={Timesave} hideButton onClick={() => {}} buttonText="  "
              title="Optimisé votre quotidien et les tâches redondantes"
              text="Fini les tâches répétitives à réaliser tous les jours, développez vos flux."/>
   </div>

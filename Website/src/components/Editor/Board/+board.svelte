@@ -186,6 +186,18 @@
 		}
 	}
 
+	function makeid(length: number) {
+		let result = '';
+		const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+		const charactersLength = characters.length;
+		let counter = 0;
+		while (counter < length) {
+		result += characters.charAt(Math.floor(Math.random() * charactersLength));
+		counter += 1;
+		}
+		return result;
+	}
+
 
 	function handleOnCLickAdd(numberInputs: number, numberOutputs: number, type: string) {
 		const randomX = (window.innerWidth / 2) - 200;
@@ -199,7 +211,7 @@
 		nodes = [
 			...nodes,
 			{
-				id: `node_${Date.now()}-${Math.random().toString(36).substring(7)}`,
+				id: `node_${Date.now()}-${makeid(7)}`,
 				prevPosition: nodePrev,
 				currPosition: nodeCurr,
 				numberInputs: numberInputs,
@@ -493,9 +505,9 @@
 
 	
 	function getSubeserviceid() {
-		let parentNode = nodes.find((nodes) => nodes.id === nodeRegister.inputEdgeIds[0]?.slice(6, 30))
+		let parentNode = nodes.find((nodes) => nodes.id === nodeRegister.inputEdgeIds[0]?.slice(6, 32))
 		return {"subService": parentNode?.subServiceId,
-				"parent": nodeRegister.inputEdgeIds[0]?.slice(6, 30)};
+				"parent": nodeRegister.inputEdgeIds[0]?.slice(6, 32)};
 	}
 
 </script>
