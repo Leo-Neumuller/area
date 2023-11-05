@@ -92,11 +92,11 @@
     </div>
     <form method="post" on:submit|preventDefault={handleSubmit}>
       <div class="flex flex-col float-right bg-gray w-[30vw] rounded-[4vw] mt-[10vw] h-">
-        <div class="flex flex-col items-center w-5/6 mx-auto pt-[2vw] gap-[1vw]">
+        <div data-testid="emailInput" class="flex flex-col items-center w-5/6 mx-auto pt-[2vw] gap-[1vw]">
           <p class="self-start text-[1.4vw] text-customWhite">Email</p>
           <Input className="w-full"  placeholder="Email" name="email" />
         </div>
-        <div class="flex flex-col items-center w-5/6 mx-auto pt-[2vw] gap-[1vw]">
+        <div data-testid="passwordInput" class="flex flex-col items-center w-5/6 mx-auto pt-[2vw] gap-[1vw]">
           <p class="self-start text-[1.4vw] text-customWhite">Mot de passe</p>
           <Input className="w-full" placeholder="Mot de passe" name="password" type="password" />
         </div>
@@ -110,7 +110,7 @@
         </div>
       </div>
     </form>
-    <div id="g_id_onload"
+    <div id="g_id_onload" data-testid="googleButton"
          data-client_id="630431542437-08rct8rqgqvvtvdr5rtiq0dr0nh5j1cj.apps.googleusercontent.com"
          data-callback="handleCredentialResponse"
     >

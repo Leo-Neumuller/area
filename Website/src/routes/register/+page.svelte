@@ -14,7 +14,7 @@
             goto("/dashboard");
         }
 
-        function parseJwt(token) {
+        function parseJwt(token: any) {
             let base64Url = token.split('.')[1];
             let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
             let jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function (c) {
@@ -99,19 +99,19 @@
     </div>
     <form method="post" on:submit|preventDefault={handleSubmit}>
       <div class="flex flex-col float-right bg-gray w-[30vw] h-auto rounded-[4vw] mt-[3vw]">
-        <div class="flex flex-col items-center w-5/6 mx-auto pt-[2vw] gap-[1vw]">
+        <div data-testid="surNameInput" class="flex flex-col items-center w-5/6 mx-auto pt-[2vw] gap-[1vw]">
           <p class="self-start text-[1.4vw] text-customWhite">Nom</p>
           <Input className="w-full" placeholder="Nom" name="name"/>
         </div>
-        <div class="flex flex-col items-center w-5/6 mx-auto pt-[2vw] gap-[1vw]">
+        <div data-testid="nameInput" class="flex flex-col items-center w-5/6 mx-auto pt-[2vw] gap-[1vw]">
           <p class="self-start text-[1.4vw] text-customWhite">Prénom</p>
           <Input className="w-full" placeholder="Prénom" name="surname"/>
         </div>
-        <div class="flex flex-col items-center w-5/6 mx-auto pt-[2vw] gap-[1vw]">
+        <div data-testid="emailInput" class="flex flex-col items-center w-5/6 mx-auto pt-[2vw] gap-[1vw]">
           <p class="self-start text-[1.4vw] text-customWhite">Email</p>
           <Input className="w-full" placeholder="Email" name="email"/>
         </div>
-        <div class="flex flex-col items-center w-5/6 mx-auto pt-[2vw] gap-[1vw]">
+        <div data-testid="PasswordInput" class="flex flex-col items-center w-5/6 mx-auto pt-[2vw] gap-[1vw]">
           <p class="self-start text-[1.4vw] text-customWhite">Mot de passe</p>
           <Input className="w-full" placeholder="Mot de passe" name="password" type="password"/>
         </div>
@@ -126,7 +126,7 @@
       </div>
     </form>
   </div>
-  <div id="g_id_onload"
+  <div id="g_id_onload" data-testid="googleButton"
        data-client_id="630431542437-08rct8rqgqvvtvdr5rtiq0dr0nh5j1cj.apps.googleusercontent.com"
        data-callback="handleCredentialResponse"
   >

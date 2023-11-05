@@ -10,13 +10,13 @@
     }
 </script>
 
-<select on:input={handleChangeType} class="w-full bg-customWhite/[10%] rounded-lg p-4 font-SpaceGrotesk text-customWhite text-[1.65rem] font-normal">
+<select data-testid="select" on:input={handleChangeType} class="w-full bg-customWhite/[10%] rounded-lg p-4 font-SpaceGrotesk text-customWhite text-[1.65rem] font-normal">
     {#if placeholder}
         <option class="bg-gray" selected={true} disabled={true}>{placeholder}</option>
     {/if}
     {#each options as option}
         {#if value === option && value !== undefined}
-            <option class="bg-gray" value={option} selected>{option}</option>
+            <option data-testid="selected" class="bg-gray" value={option} selected>{option}</option>
         {:else}
             <option class="bg-gray" value={option}>{option}</option>
         {/if}
