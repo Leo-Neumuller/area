@@ -65,9 +65,6 @@
                     <DashboardButton label="Application" onClick={() => {selected = 2;}} selected={selected === 2}>
                         <Flux className="w-12 h-12" color={selected === 2 ? "#D9C6F4" : "#F3F3F3"}/>
                     </DashboardButton>
-                    <DashboardButton label="Pré-créé" onClick={() => {selected = 3;}} selected={selected === 3}>
-                        <PreCreate className="w-12 h-12" color={selected === 3 ? "#D9C6F4" : "#F3F3F3"}/>
-                    </DashboardButton>
                 </div>
             </div>
             <div class="self-end flex flex-col w-full border-t border-customWhite pt-6">
