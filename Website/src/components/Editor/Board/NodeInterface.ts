@@ -21,7 +21,7 @@ export default interface Node {
     id: string;
     numberInputs: number;
     numberOutputs: number;
-    service?: string;
+    service: string;
     subService?: string;
     subServiceId?: string;
     inputDataFromSubServiceId?: string;

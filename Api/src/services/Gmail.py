@@ -1,8 +1,11 @@
+"""
+Gmail service
+"""
+
 import base64
 from datetime import datetime, timezone
 from email.message import EmailMessage
-from typing import List, Dict, Callable, Tuple
-from pprint import pprint
+from typing import List, Tuple
 import googleapiclient
 from sqlalchemy.orm import Session
 from src.models.Services import save_start_authorization, Service, ServiceType, BaseService, add_metadata, \
@@ -169,6 +172,7 @@ class Gmail(BaseService):
         :param data: Dict of data with keys: content, to, subject
         :return: dict of signal
         """
+        info(f"data : {str(data)}")
         service = Google.get_service("gmail", self.service_name, self.User, self.db, self.version)
         try:
             emailRaw = self.create_email(data, service)
@@ -192,6 +196,7 @@ class Gmail(BaseService):
         :param data: Dict of data with keys: content, to, subject
         :return: None
         """
+        info(f"data : {str(data)}")
         service = Google.get_service("gmail", self.service_name, self.User, self.db, self.version)
         try:
             emailRaw = self.create_email(data, service)
@@ -225,18 +230,19 @@ class Gmail(BaseService):
         :param data: Dict of data with keys: email
         :return: None
         """
+        info(f"prev_data : {str(prev_data)}")
+        info(f"data : {str(data)}")
         service = Google.get_service("gmail", self.service_name, self.User, self.db, self.version)
         prev_time_fetch = datetime.fromtimestamp(prev_data["time"]).astimezone(timezone.utc)
         return_datas = []
         try:
             email_data = service.users().messages().list(userId="me",
-                                                         q=f"from:{data['email']} after:{prev_time_fetch.timestamp()}").execute()
+                                                         q=f"from:{data['email']} after:{int(prev_time_fetch.timestamp())}").execute()
             info(str(email_data))
             if email_data["resultSizeEstimate"] == 0:
                 return prev_data, {"signal": False, "data": []}
             self.parse_messages(email_data, return_datas, service)
-            next_after = max([i["Date"] for i in return_datas]).astimezone(timezone.utc).timestamp()
-            next_data = {"time": next_after}
+            next_data = {"time": datetime.now().astimezone(timezone.utc).timestamp()}
         except Exception as e:
             warn(str(e))
             return prev_data, {"signal": False, "data": []}
@@ -265,18 +271,19 @@ class Gmail(BaseService):
         :param data: Dict of data with keys: subject
         :return: None
         """
+        info(f"prev_data : {str(prev_data)}")
+        info(f"data : {str(data)}")
         service = Google.get_service("gmail", self.service_name, self.User, self.db, self.version)
         prev_time_fetch = datetime.fromtimestamp(prev_data["time"]).astimezone(timezone.utc)
         return_datas = []
         try:
             email_data = service.users().messages().list(userId="me",
-                                                         q=f"subject:{data['subject']} after:{prev_time_fetch.timestamp()}").execute()
+                                                         q=f"subject:{data['subject']} after:{int(prev_time_fetch.timestamp())}").execute()
             info(str(email_data))
             if email_data["resultSizeEstimate"] == 0:
                 return prev_data, {"signal": False, "data": []}
             self.parse_messages(email_data, return_datas, service)
-            next_after = max([i["Date"] for i in return_datas]).astimezone(timezone.utc).timestamp()
-            next_data = {"time": next_after}
+            next_data = {"time": datetime.now().astimezone(timezone.utc).timestamp()}
         except Exception as e:
             warn(str(e))
             return prev_data, {"signal": False, "data": []}

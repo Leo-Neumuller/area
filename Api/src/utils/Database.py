@@ -1,4 +1,6 @@
-import sys
+"""
+Database connection and session
+"""
 
 from sqlalchemy import create_engine, inspect
 from sqlalchemy.ext.declarative import declarative_base, as_declarative

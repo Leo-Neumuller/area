@@ -1,3 +1,7 @@
+"""
+Routers module
+"""
+
 import os
 import importlib
 from fastapi import APIRouter

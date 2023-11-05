@@ -1,3 +1,7 @@
+"""
+Flux cron for execute flux
+"""
+
 from src.models.Flux import Flux, FluxGraph
 from src.models.Services import ServiceType
 from src.models.User import UserMe
@@ -32,8 +36,8 @@ def run_reaction(User, already_executed, datas, db, flux_graph):
     interface = \
         services[splitted_service_id[0]](User, db).get_interface()[ServiceType(splitted_service_id[1])][
             flux_graph.service_id]
-    # TODO add variable from prev_data
-    datas[flux_graph.id] = interface.function(flux_graph.config)
+    config = {key: value["value"] for key, value in flux_graph.config.items() if value["id"] == "Rien"}
+    datas[flux_graph.id] = interface.function(config)
     already_executed.add(flux_graph.id)
     return
 
@@ -111,7 +115,8 @@ def execute_flux(db=next(get_db())):
                     interface = \
                         services[splitted_service_id[0]](User, db).get_interface()[ServiceType(splitted_service_id[1])][
                             AREA.service_id]
-                    prev_data, datas[AREA.id] = interface.function(AREA.prev_data, AREA.config)
+                    config = {key: value["value"] for key, value in AREA.config.items() if value["id"] == "Rien"}
+                    prev_data, datas[AREA.id] = interface.function(AREA.prev_data, config)
                 except Exception as e:
                     error = True
                     break

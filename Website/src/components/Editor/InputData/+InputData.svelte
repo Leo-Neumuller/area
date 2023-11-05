@@ -1,8 +1,8 @@
 <script lang="ts">
     import type {inputData} from "../Board/NodeInterface";
     import Select from "../../Select/+select.svelte";
-  import { getSubServiceMetadata } from "../../../api/api";
-  import { getCookie } from "../../../api/helpers";
+    import { getSubServiceMetadata } from "../../../api/api";
+    import { getCookie } from "../../../api/helpers";
 
     export let inputD: inputData;
     export let nodeType: {[key: string]: any} | undefined;
@@ -44,9 +44,11 @@
         metadata = res["outputsData"];
       })
     }
-    if (typeof inputD.value === "string") {
+    console.log(inputD.value)
+    if (!inputD.value) {
       inputD.value = {
         "value": "",
+        "id": "Rien",
       }
     }
 </script>
@@ -54,7 +56,7 @@
 <div class="pt-4">
 	<h1 class="text-customWhite text-[1.2vw]">{inputD.name}</h1>
 	{#if inputD.inputType === "textMultiline"}
-    {#if inputD.value["id"] === "Rien"  || inputD.value["id"] === undefined}
+    {#if inputD.value["id"] === undefined || inputD.value["id"] === "Rien"}
 		  <textarea class={classInput[inputD.inputType]} on:change={changeInput[inputD.inputType]} rows="5" bind:value={inputD.value["value"]} placeholder="Ecriver..."/>
       {:else}
       <textarea disabled class={classInput[inputD.inputType]} on:change={changeInput[inputD.inputType]} rows="5" value="" placeholder=""/>
@@ -72,7 +74,7 @@
           <h1>Rien</h1>
         </option>
         {#each metadata as data}
-            {#if data["type"] === inputD.type}
+            {#if data["type"] === inputD.type}  
               {#if data["id"] === inputD.value["id"]}
                 <option class="bg-gray" value={data["id"]} selected>{data["id"]}</option>
               {:else}
@@ -89,7 +91,7 @@
 				because type can't be dynamic with a bind:value
 		-->
 		<div class="flex gap-4">
-      {#if inputD.value["id"] === "Rien" || inputD.value["id"] === undefined}
+      {#if inputD.value["id"] === undefined || inputD.value["id"] === "Rien"}
 			  <input class={classInput[inputD.inputType]} {...type} on:change={changeInput[inputD.inputType]} bind:value={inputD.value["value"]} placeholder="Ecriver..." />
         {:else}
 			  <input disabled class={classInput[inputD.inputType]} {...type} on:change={changeInput[inputD.inputType]} value="" placeholder="" />
