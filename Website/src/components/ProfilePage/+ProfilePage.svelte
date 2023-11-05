@@ -1,6 +1,6 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
-    import { checkConnected, disconnectService, getOauthLink, getServices, userMe } from "../../api/api";
+    import { checkConnected, disconnectService, getOauthLink, getOauthServices, getServices, userMe } from "../../api/api";
     import { getCookie } from "../../api/helpers";
   import Icon from "../Icon/+Icon.svelte";
     import Goto from "../SVGs/+Goto";
@@ -9,6 +9,7 @@
     import TextInput from "../TextInput/+TextInput.svelte";
 
     let services:any = [];
+    let OauthServices:any = [];
     async function getUserMe() {
         const res = await userMe(getCookie("token"));
         return res
@@ -27,6 +28,10 @@
     getServices(getCookie("token")).then((res) => {
         let data = [...res.action, ...res.reaction];
         services = data.filter(onlyUnique) 
+    })
+    
+    getOauthServices(getCookie("token")).then((res) => {
+        OauthServices = res;
     })
 </script>
 
@@ -75,51 +80,53 @@
     </h1>
     <div class="flex gap-6 flex-wrap pt-4">
         {#each services as service}
-            <div class="border border-gray rounded-lg p-3 text-[1.5rem]">
-                {#await isConnected(service)}
-                    Wait
-                {:then res}
-                    {#if dic[service]}
-                        <button class="flex justify-between gap-5"
-                            on:click={() => {
-                                disconnectService(getCookie("token"), service).then((res) => {
-                                    dic = {...dic, [service]: false};
-                                })
-                            }}>
-                            <Icon name={service} className="w-10 h-10"/>
-                            <h1 class="items-center">Se déconnecter</h1>
-                            <div>
-                                <Validate className="w-8 h-8 pt-1" color="#373637"/>
-                            </div>
-                        </button>
-                    {:else}
-                        <button class="flex justify-between gap-5"
-                            on:click={() => {
-                                getOauthLink(getCookie("token"), service).then((res) => {
-								const popup = window.open(res["url"], "popup", "width=600,height=600 popup=true");
-								const interval = setInterval(() => {
-									try {
-										if (popup?.closed) {
-											clearInterval(interval);
-                                            const res = checkConnected(getCookie("token"), service).then((res) => {
-                                                dic = {...dic, [service]: res.is_connected}
-                                            });
-										}
-									} catch {
-										return;
-									}
-								}, 1000);
-							});
-                            }}>
-                            <Icon name={service} className="w-10 h-10"/>
-                            <h1 class="items-center">Se connecter</h1>
-                            <div>
-                                <Goto className="w-8 h-8 pt-2" color="#373637"/>
-                            </div>
-                        </button>
-                    {/if}
-                {/await}
-            </div>
+            {#if OauthServices.includes(service)}
+                <div class="border border-gray rounded-lg p-3 text-[1.5rem]">
+                    {#await isConnected(service)}
+                        Wait
+                    {:then res}
+                        {#if dic[service]}
+                            <button class="flex justify-between gap-5"
+                                on:click={() => {
+                                    disconnectService(getCookie("token"), service).then((res) => {
+                                        dic = {...dic, [service]: false};
+                                    })
+                                }}>
+                                <Icon name={service} className="w-10 h-10"/>
+                                <h1 class="items-center">Se déconnecter</h1>
+                                <div>
+                                    <Validate className="w-8 h-8 pt-1" color="#373637"/>
+                                </div>
+                            </button>
+                        {:else}
+                            <button class="flex justify-between gap-5"
+                                on:click={() => {
+                                    getOauthLink(getCookie("token"), service).then((res) => {
+                                    const popup = window.open(res["url"], "popup", "width=600,height=600 popup=true");
+                                    const interval = setInterval(() => {
+                                        try {
+                                            if (popup?.closed) {
+                                                clearInterval(interval);
+                                                const res = checkConnected(getCookie("token"), service).then((res) => {
+                                                    dic = {...dic, [service]: res.is_connected}
+                                                });
+                                            }
+                                        } catch {
+                                            return;
+                                        }
+                                    }, 1000);
+                                });
+                                }}>
+                                <Icon name={service} className="w-10 h-10"/>
+                                <h1 class="items-center">Se connecter</h1>
+                                <div>
+                                    <Goto className="w-8 h-8 pt-2" color="#373637"/>
+                                </div>
+                            </button>
+                        {/if}
+                    {/await}
+                </div>
+            {/if}
         {/each}
     </div>
 </div>
