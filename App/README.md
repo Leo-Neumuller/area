@@ -443,6 +443,11 @@ It is located in the folder [docs/documentation](/App/docs/documentation)
 
 ### 🔧 Installation
 
+Setup the environment by either creating a .env or exporting it:
+```sh
+export API_URL=http://10.0.2.2:8000
+```
+
 Install the dependencies:
 ```sh
 ./install.sh
