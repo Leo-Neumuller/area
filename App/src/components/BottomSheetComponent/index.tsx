@@ -6,6 +6,15 @@ import useTheme from '../../hooks/Theme/useTheme';
 import { BottomSheetMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
 import { ThemeTypeContext } from '../../constants/Theme';
 
+/**
+ * Props for the bottom sheet component.
+ * @type children jsx props.
+ * @type opened if the bottom sheet is opened.
+ * @type setOpened set the opened state.
+ * @type ref ref to the bottom sheet.
+ * @type content content of the bottom sheet.
+ * @constructor
+ */
 export type AddComponentProps = {
   children?: string | JSX.Element | JSX.Element[]
   opened?: boolean
@@ -14,6 +23,15 @@ export type AddComponentProps = {
   content?: React.ReactNode
 }
 
+/**
+ * Bottom sheet component.
+ * @param children jsx props.
+ * @param opened if the bottom sheet is opened.
+ * @param setOpened set the opened state.
+ * @param ref ref to the bottom sheet.
+ * @param content content of the bottom sheet.
+ * @constructor
+ */
 export const BottomSheetComponent: React.FC<AddComponentProps> = React.forwardRef(({children, opened, setOpened, content}, ref) => {
   const Styles = useThemedStyles(styles);
   const Theme = useTheme();

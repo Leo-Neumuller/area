@@ -2,7 +2,11 @@ import React, {useEffect} from "react";
 import {Text, View} from "react-native";
 import {oauthAuthorize} from "../../api/api";
 
-
+/**
+ * Oauth screen.
+ * @param props the props of the component.
+ * @constructor
+ */
 export default function Oauth(props: any) {
     useEffect(() => {
         oauthAuthorize(props.route.params["service"], props.route.path.split("?")[1]).then((res) => {

@@ -9,6 +9,14 @@ import { ThemeTypeContext } from '../../../constants/Theme';
 import IAREAComponent from "../../../interfaces/IAREAComponent";
 import getUrlImg from "../../../hooks/getIcon";
 
+/**
+ * Props for the AREA component.
+ * @type inEditor if the component is in the editor.
+ * @type onPress function to call when the component is pressed.
+ * @type data data of the component.
+ * @type customSvg custom svg to display.
+ * @constructor
+ */
 type Props = {
     inEditor: boolean,
     onPress: (data?: IAREAComponent) => void,
@@ -16,6 +24,14 @@ type Props = {
     customSvg?: React.ReactNode,
 }
 
+/**
+ * Component for the AREA component.
+ * @param inEditor if the component is in the editor.
+ * @param onPress function to call when the component is pressed.
+ * @param data data of the component.
+ * @param customSvg custom svg to display.
+ * @constructor
+ */
 export const AREAComponent: React.FC<Props> = ({inEditor, onPress, data, customSvg}) => {
     const Styles = useThemedStyles(styles);
     const Theme = useTheme();
