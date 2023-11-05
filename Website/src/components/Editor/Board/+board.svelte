@@ -369,31 +369,31 @@
 		getOauthServices(getCookie("token")).then((res) => {
 			OauthServices = res;
 		})
-		// const interval = setInterval(() => {
-		// 	if (!window.location.pathname.includes("flux-editor")) {
-		// 		clearInterval(interval);
-		// 	}
-		// 	if (!saveMenu && !advancedModify && !modifyMenu && !newNodeMenu) {
-		// 		const data: CreateFlux =  {
-		// 			"name": name,
-		// 			"description": descr,
-		// 			"nodes": nodes,
-		// 			"edges": edges,
-		// 		};
-		// 		if ($page.url.searchParams.get("FluxId")) {
-		// 			data["id"] = Number($page.url.searchParams.get("FluxId"));
-		// 		}
-		// 		createFlux(getCookie("token"), data, true).then((res) => {
-		// 			if (res && res?.detail && res?.detail[0] && res?.detail[0]?.error) {
-		// 				errorMessage = res?.detail[0]?.error;
-		// 				return;
-		// 			}
-		// 			errorMessage = "";
-		// 			$page.url.searchParams.set("FluxId", res["id"]);
-		// 			goto(`?${$page.url.searchParams.toString()}`);
-		// 		})
-		// 	}
-		// }, 2000)
+		const interval = setInterval(() => {
+			if (!window.location.pathname.includes("flux-editor")) {
+				clearInterval(interval);
+			}
+			if (!saveMenu && !advancedModify && !modifyMenu && !newNodeMenu) {
+				const data: CreateFlux =  {
+					"name": name,
+					"description": descr,
+					"nodes": nodes,
+					"edges": edges,
+				};
+				if ($page.url.searchParams.get("FluxId")) {
+					data["id"] = Number($page.url.searchParams.get("FluxId"));
+				}
+				createFlux(getCookie("token"), data, true).then((res) => {
+					if (res && res?.detail && res?.detail[0] && res?.detail[0]?.error) {
+						errorMessage = res?.detail[0]?.error;
+						return;
+					}
+					errorMessage = "";
+					$page.url.searchParams.set("FluxId", res["id"]);
+					goto(`?${$page.url.searchParams.toString()}`);
+				})
+			}
+		}, 2000)
 
 		const board = document.getElementById("board");
 		if (board) {
