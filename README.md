@@ -26,3 +26,9 @@ The annotation of commit are:
 ./docker_compose.sh
 ```
 
+## Documentation of parts
+
+- [API](Api/README.md)
+- [Website](Website/README.md)
+- [Mobile](App/README.md)
+
