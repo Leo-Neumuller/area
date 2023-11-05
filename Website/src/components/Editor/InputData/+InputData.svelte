@@ -76,9 +76,9 @@
         {#each metadata as data}
             {#if data["type"] === inputD.type}  
               {#if data["id"] === inputD.value["id"]}
-                <option class="bg-gray" value={data["id"]} selected>{data["id"]}</option>
+                <option class="bg-gray" value={data["id"]} selected>{data["name"]}</option>
               {:else}
-                <option class="bg-gray" value={data["id"]}>{data["id"]}</option>
+                <option class="bg-gray" value={data["id"]}>{data["name"]}</option>
               {/if}
             {/if}
         {/each}
@@ -113,9 +113,9 @@
                   {#each metadata as data}
                       {#if data["type"] === inputD.type}
                         {#if data["id"] === inputD.value["id"]}
-                          <option class="bg-gray" value={data["id"]} selected>{data["id"]}</option>
+                          <option class="bg-gray" value={data["id"]} selected>{data["name"]}</option>
                         {:else}
-                          <option class="bg-gray" value={data["id"]}>{data["id"]}</option>
+                          <option class="bg-gray" value={data["id"]}>{data["name"]}</option>
                         {/if}
                       {/if}
                   {/each}

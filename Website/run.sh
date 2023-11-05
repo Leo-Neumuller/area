@@ -8,7 +8,7 @@ if [ "$1" = "prod" ]; then
   npm run build
   npm run preview
 elif [ "$1" = "tests" ]; then
-  echo "No tests"
+  npm run test
 else
   npm run dev
 fi
