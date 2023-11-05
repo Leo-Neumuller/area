@@ -7,6 +7,7 @@ from src.models.Services import ServiceType
 from src.models.User import UserMe
 from src.services import services
 from src.utils.Database import get_db
+from src.utils.Helper import info
 
 
 def check_signals(flux_graph: FluxGraph, datas: dict):
@@ -16,6 +17,7 @@ def check_signals(flux_graph: FluxGraph, datas: dict):
     :param datas: datas
     :return:
     """
+
     for flux_graph_prev in flux_graph.prev_flux_graph_ids:
         if "signal" in datas[flux_graph_prev] and not datas[flux_graph_prev]["signal"]:
             return False
@@ -37,9 +39,32 @@ def run_reaction(User, already_executed, datas, db, flux_graph):
         services[splitted_service_id[0]](User, db).get_interface()[ServiceType(splitted_service_id[1])][
             flux_graph.service_id]
     config = {key: value["value"] for key, value in flux_graph.config.items() if value["id"] == "Rien"}
+    configs = []
+    if len(config.keys()) != len(flux_graph.config.keys()):
+        for key in flux_graph.config.keys():
+            if key not in config.keys():
+                for flux_graph_prev in flux_graph.prev_flux_graph_ids:
+                    if flux_graph_prev in already_executed and len(datas[flux_graph_prev]["data"]) != 0 and flux_graph.config[key]["id"] in datas[flux_graph_prev]["data"][0].keys():
+                        for i in range(len(datas[flux_graph_prev]["data"])):
+                            if len(configs) <= i:
+                                configs.append(config.copy())
+                            configs[i][key] = datas[flux_graph_prev]["data"][i][flux_graph.config[key]["id"]]
+
+    if len(configs) != 0:
+        index = 0
+        for i in range(len(configs)):
+            if len(configs[i].keys()) != len(flux_graph.config.keys()):
+                index = i
+                break
+        configs = configs[:index + 1]
+        for config in configs:
+            datas[flux_graph.id] = interface.function(config)
+        already_executed.add(flux_graph.id)
+        return already_executed
+
     datas[flux_graph.id] = interface.function(config)
     already_executed.add(flux_graph.id)
-    return
+    return already_executed
 
 
 def run_dependent_flux(flux_graph: FluxGraph, datas: dict, already_executed: set, User: UserMe, all_AREA_by_id: dict,
@@ -80,7 +105,7 @@ def run_next_flux(flux_graph: FluxGraph, datas: dict, already_executed: set, Use
     if flux_graph.id in already_executed:
         return
     run_dependent_flux(flux_graph, datas, already_executed, User, all_AREA_by_id, db)
-    if not datas[flux_graph.id]["signal"]:
+    if not datas[flux_graph.id]["signal"] or flux_graph.id in already_executed:
         return
     for flux_graph_next in flux_graph.next_flux_graph_ids:
         run_next_flux(all_AREA_by_id[flux_graph_next], datas, already_executed, User, all_AREA_by_id, db)

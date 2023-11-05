@@ -275,9 +275,6 @@ def check_flux(CreateFlux: FluxCreateOrModify) -> List[FluxError]:
                                             relatedInputDataIds=[inputData.id],
                                             error="Donnée d'entrée requise"))
                     continue
-            else:
-                # TODO: check dict data is in another node output
-                pass
             if inputData.inputType == "select" and inputData.value not in inputData.data:
                 Errors.append(FluxError(id="node_input_data_select_not_found", relatedNodeIds=[node.id],
                                         relatedInputDataIds=[inputData.id],

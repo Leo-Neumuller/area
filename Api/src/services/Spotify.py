@@ -164,6 +164,8 @@ class Spotify(BaseService):
         :return: Create draft
         """
         refresh = self.check_refresh_token()
+        info(str(prev_data))
+        info(str(data))
         try:
             response = requests.get("https://api.spotify.com/v1/me/player?market=FR", headers={
                 "Content-Type": "application/json",
@@ -173,7 +175,7 @@ class Spotify(BaseService):
                 return {"last_track_uri": ""}, {"signal": False, "data": []}
             elif response.status_code == 200:
                 data_spotify = response.json()
-                info(data_spotify)
+                info(str(data_spotify))
                 if "last_track_uri" not in prev_data or prev_data["last_track_uri"] != data_spotify["item"]["uri"]:
                     if data_spotify["is_playing"]:
                         return {"last_track_uri": data_spotify["item"]["uri"]}, {"signal": True, "data": [{
