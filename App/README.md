@@ -1,9 +1,19 @@
 <div align="center">
 <h1 align="center">
-<img src="https://raw.githubusercontent.com/PKief/vscode-material-icon-theme/ec559a9f6bfd399b82bb44393651661b08aaf7ba/icons/folder-markdown-open.svg" width="100" />
+<svg width="47" height="21" viewBox="0 0 47 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="logos:flux">
+<g clip-path="url(#clip0_123_558)">
+<path id="Vector" d="M37.6428 6.16536e-06C35.8672 -0.00215703 34.1281 0.564959 32.6305 1.63451L23.4998 9.15456L18.6871 5.19133C18.397 5.71921 18.1051 6.2438 17.8257 6.78692C17.7583 6.91765 17.6959 7.05004 17.6296 7.18056L21.6523 10.4932L13.211 17.4442C12.0549 18.253 10.7194 18.6814 9.35667 18.6805C5.3312 18.6805 2.0557 15.0078 2.0557 10.4932C2.0557 5.97842 5.33065 2.30589 9.35667 2.30589C10.7194 2.30464 12.055 2.73297 13.211 3.54201L14.0501 4.23254C14.3969 3.56054 14.7562 2.90418 15.1189 2.25256L14.369 1.63492C12.8714 0.565178 11.1322 -0.00182359 9.35667 0.000829695C4.18943 0.000623812 0 4.69865 0 10.4932C0 16.2878 4.18888 20.9856 9.35667 20.9856C11.1322 20.9879 12.8713 20.4209 14.369 19.3513L23.5 11.8317L28.3313 15.8103C28.6272 15.2666 28.9224 14.721 29.2145 14.1526C29.2724 14.0399 29.3247 13.9282 29.3818 13.8153L25.3479 10.4932L33.7886 3.54201C34.9448 2.73338 36.2803 2.30509 37.643 2.30589C41.669 2.30589 44.9439 5.97842 44.9439 10.4932C44.9439 15.0078 41.669 18.6805 37.643 18.6805C36.2802 18.6817 34.9447 18.2533 33.7886 17.4442L32.9617 16.7634C32.6161 17.4308 32.2624 18.0928 31.9005 18.7493L32.6312 19.3505C34.1287 20.4204 35.8679 20.9876 37.6435 20.9852C42.8108 20.9852 47.0002 16.2869 47.0002 10.4926C46.9995 4.69804 42.8106 6.16536e-06 37.6428 6.16536e-06Z" fill="#D9C6F4"/>
+</g>
+</g>
+<defs>
+<clipPath id="clip0_123_558">
+<rect width="47" height="21" fill="white"/>
+</clipPath>
+</defs>
+</svg>
 <br></h1>
-<h3>◦ GitHub: Unlock Your Code's Potential</h3>
-<h3>◦ Developed with the software and tools below.</h3>
+<h3>◦ Flux Mobile</h3>
 
 <p align="center">
 <img src="https://img.shields.io/badge/GNU%20Bash-4EAA25.svg?style=flat-square&logo=GNU-Bash&logoColor=white" alt="GNU%20Bash" />
@@ -33,23 +43,13 @@
     - [🔧 Installation](#-installation)
     - [🤖 Running ](#-running-)
     - [🧪 Tests](#-tests)
-- [🛣 Roadmap](#-roadmap)
-- [🤝 Contributing](#-contributing)
-- [📄 License](#-license)
-- [👏 Acknowledgments](#-acknowledgments)
 
 ---
 
 
 ## 📍 Overview
 
-This repository contains a project that offers a valuable use-case. The codebase includes various files and directories that enable the implementation of a specific feature or functionality. Its main component, App.tsx, interacts with other files like.env,.eslintrc.js, and.prettierrc.js, among others. The project also includes testing files and configurations. The repository aims to provide a solution or enhancement to a specific problem and is designed to be easy to understand and implement for developers.
-
----
-
-## 📦 Features
-
-Exception: 
+This is the mobile version of the flux app.
 
 ---
 
@@ -435,109 +435,20 @@ Exception:
 
 ---
 
-## 🚀 Getting Started
-
-***Dependencies***
-
-Please ensure you have the following dependencies installed on your system:
-
-`- ℹ️ Dependency 1`
-
-`- ℹ️ Dependency 2`
-
-`- ℹ️ ...`
-
 ### 🔧 Installation
 
-1. Clone the  repository:
+Install the dependencies:
 ```sh
-git clone ../
-```
-
-2. Change to the project directory:
-```sh
-cd 
-```
-
-3. Install the dependencies:
-```sh
-npm install
+./install.sh
 ```
 
 ### 🤖 Running 
 
 ```sh
-npm run build && node dist/main.js
+./run.sh
 ```
 
 ### 🧪 Tests
 ```sh
-npm test
+./run.sh tests
 ```
-
----
-
-
-## 🛣 Project Roadmap
-
-> - [X] `ℹ️  Task 1: Implement X`
-> - [ ] `ℹ️  Task 2: Implement Y`
-> - [ ] `ℹ️ ...`
-
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Here are several ways you can contribute:
-
-- **[Submit Pull Requests](https://github.com/local//blob/main/CONTRIBUTING.md)**: Review open PRs, and submit your own PRs.
-- **[Join the Discussions](https://github.com/local//discussions)**: Share your insights, provide feedback, or ask questions.
-- **[Report Issues](https://github.com/local//issues)**: Submit bugs found or log feature requests for LOCAL.
-
-#### *Contributing Guidelines*
-
-<details closed>
-<summary>Click to expand</summary>
-
-1. **Fork the Repository**: Start by forking the project repository to your GitHub account.
-2. **Clone Locally**: Clone the forked repository to your local machine using a Git client.
-   ```sh
-   git clone <your-forked-repo-url>
-   ```
-3. **Create a New Branch**: Always work on a new branch, giving it a descriptive name.
-   ```sh
-   git checkout -b new-feature-x
-   ```
-4. **Make Your Changes**: Develop and test your changes locally.
-5. **Commit Your Changes**: Commit with a clear and concise message describing your updates.
-   ```sh
-   git commit -m 'Implemented new feature x.'
-   ```
-6. **Push to GitHub**: Push the changes to your forked repository.
-   ```sh
-   git push origin new-feature-x
-   ```
-7. **Submit a Pull Request**: Create a PR against the original project repository. Clearly describe the changes and their motivations.
-
-Once your PR is reviewed and approved, it will be merged into the main branch.
-
-</details>
-
----
-
-## 📄 License
-
-
-This project is protected under the [SELECT-A-LICENSE](https://choosealicense.com/licenses) License. For more details, refer to the [LICENSE](https://choosealicense.com/licenses/) file.
-
----
-
-## 👏 Acknowledgments
-
-- List any resources, contributors, inspiration, etc. here.
-
-[**Return**](#Top)
-
----
-
