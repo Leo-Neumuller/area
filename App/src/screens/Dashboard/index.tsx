@@ -113,6 +113,19 @@ export const Dashboard: React.FC<Props> = ({navigation}) => {
                         return (
                             <DashboardFluxOverview name={item.name}
                                                    desc={item.description}
+                                                   onPress={() => {
+                                                       return (
+                                                           EncryptedStorage.getItem("userToken").then((token) => {
+                                                               fluxIdGet(token!, item.id).then((res) => {
+                                                                   // @ts-ignore
+                                                                   navigation.navigate('FluxEditor', {
+                                                                       itemId: item.id,
+                                                                       otherParam: {flux: res}
+                                                                   })
+                                                               })
+                                                           })
+                                                       )
+                                                   }}
                             />
 
                         )
@@ -152,7 +165,8 @@ export const Dashboard: React.FC<Props> = ({navigation}) => {
                                 name={value.name}
                                 active={value.active}
                                 desc={value.description}
-                                refresh={refreshFlux}/>
+                                refresh={refreshFlux}
+                            />
                             {index < userFluxs.length - 1 ?
                                 <View style={{
                                     alignSelf: "center",
