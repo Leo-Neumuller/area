@@ -23,6 +23,7 @@ import ButtonComponents from "../../ButtonLogin";
 import EncryptedStorage from "react-native-encrypted-storage";
 import {BottomSheetMethods} from "@gorhom/bottom-sheet/lib/typescript/types";
 import { InAppBrowser } from 'react-native-inappbrowser-reborn'
+import DatePicker from "react-native-date-picker";
 
 type AREABottomSheetProps = {
     currentArea?: IAREAComponent,
@@ -107,8 +108,19 @@ const AREAParamBottomSheet: React.FC<{
     const [selectedService, setSelectedService] = React.useState<IAREAServices>();
     const [schema, setSchema] = React.useState<IServiceSchema>();
     const [authUrl, setAuthUrl] = React.useState<string>("");
+    const [invalidInputs, setInvalidInputs] = React.useState<boolean>(false);
 
-    const setSchemaData = (id: string, value: string) => {
+    function setNewDate() {
+        schema?.inputsData.map((item, index) => {
+            if (item.inputType == "date") {
+                let date = new Date(Date.now());
+                // @ts-ignore
+                item.value = date;
+                setSchema(schema!);
+            }
+        })
+    }
+    const setSchemaData = (id: string, value: string | Date) => {
         let schemaData: IServiceSchema = schema!;
         let indexItem = 0;
 
@@ -127,6 +139,7 @@ const AREAParamBottomSheet: React.FC<{
     }
 
     useEffect(() => {
+        setInvalidInputs(false);
         if ((!data.default && data.serviceSchema == undefined)) {
             getAREAServices(data.type!, data.name!)
                 .then((res: [IAREAServices]) => {
@@ -160,6 +173,7 @@ const AREAParamBottomSheet: React.FC<{
                     setSchema(res);
                     data.serviceSchema = res;
                     setRefetchSchema!(false);
+                    setNewDate();
                 })
                 .catch((err) => {
                     console.error(err);
@@ -212,7 +226,7 @@ const AREAParamBottomSheet: React.FC<{
                     >
                         {services.map((item, index) => {
                             return (
-                                <Picker.Item key={index} label={item.name} value={item.id} color={Theme.colors.White} />
+                                <Picker.Item key={index} style={{backgroundColor: "#46444a"}} label={item.name} value={item.id} color={Theme.colors.White} />
                             )
                         })}
                     </Picker>
@@ -227,20 +241,28 @@ const AREAParamBottomSheet: React.FC<{
                                     height: item.inputType == "textMultiline" ? 100 : "10%",
                                 }}>
                                     {item.inputType == "textMultiline" &&
-                                        <TextInput style={[Styles.input, {color: Theme.colors.White, paddingLeft: 20}]} placeholder={item.name} placeholderTextColor={Theme.colors.Gray} onChangeText={
+                                        <TextInput style={[Styles.input, {color: Theme.colors.White, paddingLeft: 20}]} placeholder={item.name + (item.required && "*")} placeholderTextColor={Theme.colors.Gray} onChangeText={
                                             (text: string) => {
                                                 setSchemaData(item.id, text);
                                             }}
-                                            defaultValue={item.value}
+                                            defaultValue={item.value as string}
                                         />
                                     }
                                     {item.inputType == "text" &&
-                                        <TextInput style={[Styles.input, {color: Theme.colors.White, paddingLeft: 20}]} placeholder={item.name} placeholderTextColor={Theme.colors.Gray} onChangeText={
+                                        <TextInput style={[Styles.input, {color: Theme.colors.White, paddingLeft: 20}]} placeholder={item.name + (item.required && "*")} placeholderTextColor={Theme.colors.Gray} onChangeText={
                                             (text: string) => {
                                                 setSchemaData(item.id, text);
                                             }}
-                                            defaultValue={item.value}
+                                            defaultValue={item.value as string}
                                         />
+                                    }
+                                    {item.inputType == "date" &&
+                                        <View>
+                                            <Text style={[Styles.input, {color: Theme.colors.Gray, paddingLeft: 20, alignSelf: "center"}]}>{item.name + (item.required && "*")}</Text>
+                                            <DatePicker date={item.value != undefined ? new Date(item.value as string) as Date : new Date()} style={[Styles.input, {paddingLeft: 20, alignSelf: "center"}]} androidVariant={"nativeAndroid"} onDateChange={(date) => {
+                                                setSchemaData(item.id, date);
+                                            }} />
+                                        </View>
                                     }
                                 </View>
                             )
@@ -292,16 +314,32 @@ const AREAParamBottomSheet: React.FC<{
                     </TouchableOpacity>
                 </View>
             </View>
+            {invalidInputs &&
+                <Text style={{
+                    color: 'red',
+                    flexWrap: "wrap",
+                    textAlign: "center"
+                }}>
+                    Les champs requis (*) ne sont pas complété
+                </Text>
+            }
             <View style={{
                 height: "40%",
                 width: "100%",
                 flex: 1,
                 justifyContent: "center",
                 alignItems: "center",
-                paddingTop: 20
+                paddingTop: 20,
             }}>
                 <ButtonComponents onPress={
                     () => {
+                        if (schema?.inputsData.filter((item) => (item.value == undefined || item.value == "") && item.required).length != 0) {
+                            setInvalidInputs(true);
+                            return;
+                        } else {
+                            setInvalidInputs(false);
+                        }
+
                         setSaveSelectedArea!({...data, serviceSchema: schema, subService: selectedService});
                         closeBottomSheet();
                     }
