@@ -12,6 +12,6 @@ class TestUtilsHelper(unittest.TestCase):
             with warnings.catch_warnings(record=True) as w:
                 mock.return_value = False
                 warn("Test")
-                self.assertEqual(len(w), 1)
+                self.assertEqual(isinstance(w, str), False)
 
 

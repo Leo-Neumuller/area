@@ -27,8 +27,8 @@ class TestServicesGmail(unittest.TestCase):
     def test_get_authorization_url(self):
         with patch.object(Google, "get_authorization_url") as mock:
             mock.return_value = ("TestUrl", "TestState")
-            url = Gmail.get_authorization_url(self.user, self.db)
-            mock.assert_called_once_with(service="Gmail", scopes=['https://mail.google.com/'])
+            url = Gmail.get_authorization_url(self.user, self.db, "http://locahost:8080")
+            mock.assert_called_once_with("Gmail", ['https://mail.google.com/'], "http://locahost:8080")
             self.assertEqual(url, "TestUrl")
             data = self.db.query(Service).filter(Service.name == "Gmail", Service.state == "TestState").first()
             self.assertEqual(data.name, "Gmail")
@@ -41,14 +41,14 @@ class TestServicesGmail(unittest.TestCase):
                 mock.return_value = MagicMock()
                 mock.return_value.redirect_uri = None
                 mock.return_value.fetch_token.side_effect = Exception("Invalid Grant")
-                Gmail.authorize("Test", "Test", ["https://mail.google.com/"], self.db)
+                Gmail.authorize("Test", "Test", ["https://mail.google.com/"], self.db, "http://locahost:8080")
 
     def test_authorize(self):
         with patch.object(Google, "authorize") as mock:
             mock.return_value = {"token": "test"}
-            Gmail.authorize("Test", "Test", ["https://mail.google.com/"], self.db)
+            Gmail.authorize("Test", "Test", ["https://mail.google.com/"], self.db, "http://locahost:8080")
             mock.assert_called_once_with(service="Gmail", state="Test", code="Test",
-                                         scopes=["https://mail.google.com/"])
+                                         scopes=["https://mail.google.com/"], redirect='http://locahost:8080')
 
     def test_create_draft(self):
         with patch.object(Google, "get_service") as mock:
@@ -71,7 +71,7 @@ class TestServicesGmail(unittest.TestCase):
                 "to": "ToTest",
                 "subject": "SubjectTest"
             })
-            mock.assert_called_once_with("Gmail", self.user, self.db, "v1")
+            mock.assert_called_once_with("gmail","Gmail", self.user, self.db, "v1")
             mock.return_value.users.return_value.getProfile.return_value.execute.assert_called_once()
             self.assertEqual(data, {"signal": True})
 
@@ -97,7 +97,7 @@ class TestServicesGmail(unittest.TestCase):
                 "to": "ToTest",
                 "subject": "SubjectTest"
             })
-            mock.assert_called_once_with("Gmail", self.user, self.db, "v1")
+            mock.assert_called_once_with("gmail", "Gmail", self.user, self.db, "v1")
             self.assertEqual(data, {"signal": False})
 
     def test_send_email(self):
@@ -115,7 +115,7 @@ class TestServicesGmail(unittest.TestCase):
                 "to": "ToTest",
                 "subject": "SubjectTest"
             })
-            mock.assert_called_once_with("Gmail", self.user, self.db, "v1")
+            mock.assert_called_once_with("gmail", "Gmail", self.user, self.db, "v1")
             self.assertEqual(data, {"signal": True})
 
     def test_send_email_with_error(self):
@@ -130,7 +130,7 @@ class TestServicesGmail(unittest.TestCase):
                 "to": "ToTest",
                 "subject": "SubjectTest"
             })
-            mock.assert_called_once_with("Gmail", self.user, self.db, "v1")
+            mock.assert_called_once_with("gmail", "Gmail", self.user, self.db, "v1")
             self.assertEqual(data, {"signal": False})
 
     def test_new_email_from_email(self):
@@ -186,7 +186,7 @@ class TestServicesGmail(unittest.TestCase):
                 "email": "TestEmail"
             })
             time_datetime = datetime.strptime(time, '%a, %d %b %Y %H:%M:%S %z')
-            mock.assert_called_once_with("Gmail", self.user, self.db, "v1")
+            mock.assert_called_once_with("gmail", "Gmail", self.user, self.db, "v1")
             self.assertEqual(data, (
                 {
                     "time": time_datetime.timestamp()
@@ -221,7 +221,7 @@ class TestServicesGmail(unittest.TestCase):
                 "email": "TestEmail"
             })
             time_datetime = datetime.strptime(time, '%a, %d %b %Y %H:%M:%S %z')
-            mock.assert_called_once_with("Gmail", self.user, self.db, "v1")
+            mock.assert_called_once_with("gmail", "Gmail", self.user, self.db, "v1")
             self.assertEqual(data, (
                 {
                     "time": 0
@@ -251,7 +251,7 @@ class TestServicesGmail(unittest.TestCase):
             }, {
                 "email": "TestEmail"
             })
-            mock.assert_called_once_with("Gmail", self.user, self.db, "v1")
+            mock.assert_called_once_with("gmail", "Gmail", self.user, self.db, "v1")
             self.assertEqual(data, (
                 {
                     "time": 0
@@ -285,7 +285,7 @@ class TestServicesGmail(unittest.TestCase):
                 "email": "TestEmail"
             })
             time_datetime = datetime.strptime(time, '%a, %d %b %Y %H:%M:%S %z')
-            mock.assert_called_once_with("Gmail", self.user, self.db, "v1")
+            mock.assert_called_once_with("gmail", "Gmail", self.user, self.db, "v1")
             self.assertEqual(data, (
                 {
                     "time": 0
@@ -327,7 +327,7 @@ class TestServicesGmail(unittest.TestCase):
                 "email": "TestEmail"
             })
             time_datetime = datetime.strptime(time, '%a, %d %b %Y %H:%M:%S %z')
-            mock.assert_called_once_with("Gmail", self.user, self.db, "v1")
+            mock.assert_called_once_with("gmail", "Gmail", self.user, self.db, "v1")
             self.assertEqual(data, ({
                                         "time": time_datetime.timestamp()
                                     }, {
@@ -380,7 +380,7 @@ class TestServicesGmail(unittest.TestCase):
                 "email": "TestEmail"
             })
             time_datetime = datetime.strptime(time, '%a, %d %b %Y %H:%M:%S %z')
-            mock.assert_called_once_with("Gmail", self.user, self.db, "v1")
+            mock.assert_called_once_with("gmail", "Gmail", self.user, self.db, "v1")
             self.assertEqual(data, ({
                                         "time": time_datetime.timestamp()
                                     }, {
@@ -445,7 +445,7 @@ class TestServicesGmail(unittest.TestCase):
                 "subject": "TestSubject"
             })
             time_datetime = datetime.strptime(time, '%a, %d %b %Y %H:%M:%S %z')
-            mock.assert_called_once_with("Gmail", self.user, self.db, "v1")
+            mock.assert_called_once_with("gmail", "Gmail", self.user, self.db, "v1")
             self.assertEqual(data, (
                 {
                     "time": time_datetime.timestamp()
@@ -482,7 +482,7 @@ class TestServicesGmail(unittest.TestCase):
                 "subject": "TestSubject"
             })
             time_datetime = datetime.strptime(time, '%a, %d %b %Y %H:%M:%S %z')
-            mock.assert_called_once_with("Gmail", self.user, self.db, "v1")
+            mock.assert_called_once_with("gmail", "Gmail", self.user, self.db, "v1")
             self.assertEqual(data, (
                 {
                     "time": 0
@@ -511,7 +511,7 @@ class TestServicesGmail(unittest.TestCase):
                 "subject": "TestSubject2"
             })
             time_datetime = datetime.strptime(time, '%a, %d %b %Y %H:%M:%S %z')
-            mock.assert_called_once_with("Gmail", self.user, self.db, "v1")
+            mock.assert_called_once_with("gmail", "Gmail", self.user, self.db, "v1")
             self.assertEqual(data, (
                 {
                     "time": 0
