@@ -27,6 +27,13 @@ interface flux {
     active: boolean
 }
 
+/**
+ * Route for Flux page.
+ * The Flux page shows you all your Flux and allows you to edit and delete them.
+ *
+ * @param navigation the navigation prop.
+ * @returns The Flux page as jsx.
+ */
 export const Flux: React.FC<Props> = ({navigation}) => {
     const Styles = useThemedStyles(styles);
     const Theme = useTheme();
@@ -84,11 +91,11 @@ export const Flux: React.FC<Props> = ({navigation}) => {
                         <TouchableOpacity style={{
                             height: "100%",
                             width: "20%",
-                            backgroundColor: "#37363733",
                             borderRadius: 50,
                             alignItems: "center",
                             justifyContent: "center"
-                        }}>
+                        }}
+                                          onPress={() => navigation.navigate('FluxEditor' as never)}>
                             <EditSVG style={{color: "#37363790"}}/>
 
                         </TouchableOpacity>
@@ -99,7 +106,7 @@ export const Flux: React.FC<Props> = ({navigation}) => {
                         Ajouter un flux
                     </Text>
                 </View> : null}
-            {userFluxs.map((value , index) => {
+            {userFluxs.map((value, index) => {
                 return (
                     <FluxOverview key={index}
                                   desc={value.description}
@@ -107,18 +114,18 @@ export const Flux: React.FC<Props> = ({navigation}) => {
                                   refresh={refreshFlux}
                                   id={value.id}
                                   onPress={() => {
-                                      return(
+                                      return (
                                           EncryptedStorage.getItem("userToken").then((token) => {
-                                                  fluxIdGet(token!, value.id).then((res) => {
-                                                        // @ts-ignore
-                                                      navigation.navigate('FluxEditor', {
-                                                          itemId: value.id,
-                                                          otherParam: {flux: res}
-                                                      })
+                                              fluxIdGet(token!, value.id).then((res) => {
+                                                  // @ts-ignore
+                                                  navigation.navigate('FluxEditor', {
+                                                      itemId: value.id,
+                                                      otherParam: {flux: res}
                                                   })
+                                              })
                                           })
                                       )
-                              }}
+                                  }}
                     />
                 )
             })}

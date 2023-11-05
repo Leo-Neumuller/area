@@ -40,6 +40,13 @@ const oauthAuthorize = async (url: string) => {
     }
 }
 
+/**
+ * Route for Profile page.
+ * In the profile page, you can find the user's information and his connected applications
+ *
+ * @param navigation the navigation prop.
+ * @returns The Profile page as jsx.
+ */
 export const Profile: React.FC<Props> = ({navigation}) => {
     const Styles = useThemedStyles(styles);
     const Theme = useTheme();

@@ -15,6 +15,12 @@ import useTheme from "../../hooks/Theme/useTheme";
 import {ThemeTypeContext} from "../../constants/Theme";
 import useThemedStyles from "../../hooks/Theme/useThemedStyle";
 
+
+/**
+ * The main component is used to see if the token is saved and if you need to log in again.
+ *
+ * @returns if he is logged.
+ */
 export default function Main() {
     const Theme = useTheme();
     const Styles = useThemedStyles(styles);

@@ -19,9 +19,16 @@ import getUrlImg from "../../hooks/getIcon";
 
 
 interface Props {
-    desc?: string;
     data?: string[];
 }
+
+/**
+ * The widgets component in the flat list of the App page.
+ * There are 2 widgets on this component, splited in two rows.
+ *
+ * @param Props.data The name of the action/reaction.
+ * @returns 2 widgets with an image and a text.
+ */
 export default function AppWidget(Props: Props) {
     const Styles = useThemedStyles(styles);
     const Theme = useTheme();
