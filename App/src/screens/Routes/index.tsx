@@ -9,6 +9,11 @@ import Oauth from "../Oauth";
 
 const Stack = createStackNavigator()
 
+/**
+ * Function to return the routes of the app
+ * @param isLogged the state of the user
+ * @constructor
+ */
 export const Routes: React.FC<{isLogged: boolean | null}> = ({isLogged}) => {
 
     if (isLogged == null) {
@@ -24,6 +29,7 @@ export const Routes: React.FC<{isLogged: boolean | null}> = ({isLogged}) => {
             <Stack.Navigator initialRouteName={isLogged? "BottomBar" : "HomeLogin"} screenOptions={{headerShown: false}}>
                 <Stack.Screen name='BottomBar' component={BottomBar} />
                 {RoutesList.map((value, index) => {
+                    // @ts-ignore
                     return (<Stack.Screen key={index} {...value}/>);
                 })
                 }

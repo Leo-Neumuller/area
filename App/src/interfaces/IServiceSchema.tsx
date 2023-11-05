@@ -7,7 +7,7 @@ export interface IServiceSchema {
         data: {
             id: string;
             name: string;
-            inputType: "text" | "number" | "textMultiline" | "select" | "checkbox";
+            inputType: "text" | "number" | "textMultiline" | "select" | "checkbox" | "date";
             type: string;
             required: boolean;
             data: [
@@ -15,7 +15,7 @@ export interface IServiceSchema {
                     Items: string;
                 }
             ]
-            value?: string;
+            value?: any;
         }
     ],
     outputData : [

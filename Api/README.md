@@ -25,11 +25,11 @@ sudo apt-get install python3 python3-pip python3-venv
 ### Run tests
 Run all the tests
 ```bash
-./run.sh test
+./run.sh tests
 ```
 Run a specific file
 ```bash
-./run.sh test tests/test_file.py
+./run.sh test_one tests/test_file.py
 ```
 
 ### Run Docs

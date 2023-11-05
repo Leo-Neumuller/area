@@ -4,7 +4,7 @@ Spotify service
 
 import json
 import urllib
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Tuple
 
 import requests
@@ -93,7 +93,7 @@ class Spotify(BaseService):
         db.commit()
         return
 
-    def check_refresh_token(self):
+    def check_refresh_token(self, force_refresh: bool = False):
         """
         Check refresh token
         :return: Refresh token
@@ -102,8 +102,8 @@ class Spotify(BaseService):
             refresh = self.db.query(Service).filter(Service.name == self.get_name(),
                                                     Service.user_id == self.User.id).first().refresh
             refresh_token = refresh["refresh_token"]
-            if "last_refresh" not in refresh or refresh["last_refresh"] + refresh[
-                "expires_in"] < datetime.now().timestamp() - 1000:
+            if force_refresh or ("last_refresh" not in refresh or refresh["last_refresh"] + refresh[
+                "expires_in"] < (datetime.now().timestamp() - 1000)):
                 param = {
                     "grant_type": "refresh_token",
                     "refresh_token": refresh_token,
@@ -159,21 +159,29 @@ class Spotify(BaseService):
     ))
     def current_track_play(self, prev_data: dict, data: dict) -> Tuple[dict, dict]:
         """
-        Create draft
+        Check if current track is playing
+        :param prev_data: Previous data
         :param data: Data
-        :return: Create draft
         """
         refresh = self.check_refresh_token()
+        info(str(prev_data))
+        info(str(data))
         try:
             response = requests.get("https://api.spotify.com/v1/me/player?market=FR", headers={
                 "Content-Type": "application/json",
                 "Authorization": f"Bearer {refresh['access_token']}"
             })
+            if response.status_code == 401:
+                refresh = self.check_refresh_token(True)
+                response = requests.get("https://api.spotify.com/v1/me/player?market=FR", headers={
+                    "Content-Type": "application/json",
+                    "Authorization": f"Bearer {refresh['access_token']}"
+                })
             if response.status_code == 204:
                 return {"last_track_uri": ""}, {"signal": False, "data": []}
             elif response.status_code == 200:
                 data_spotify = response.json()
-                info(data_spotify)
+                info(str(data_spotify))
                 if "last_track_uri" not in prev_data or prev_data["last_track_uri"] != data_spotify["item"]["uri"]:
                     if data_spotify["is_playing"]:
                         return {"last_track_uri": data_spotify["item"]["uri"]}, {"signal": True, "data": [{
@@ -214,9 +222,9 @@ class Spotify(BaseService):
     ))
     def current_track_play_by_artist(self, prev_data: dict, data: dict) -> Tuple[dict, dict]:
         """
-        Create draft
+        Check if current track is playing by artist
+        :param prev_data: Previous data
         :param data: Data
-        :return: Create draft
         """
         refresh = self.check_refresh_token()
         try:
@@ -224,6 +232,12 @@ class Spotify(BaseService):
                 "Content-Type": "application/json",
                 "Authorization": f"Bearer {refresh['access_token']}"
             })
+            if response.status_code == 401:
+                refresh = self.check_refresh_token(True)
+                response = requests.get("https://api.spotify.com/v1/me/player?market=FR", headers={
+                    "Content-Type": "application/json",
+                    "Authorization": f"Bearer {refresh['access_token']}"
+                })
             if response.status_code == 204:
                 return {"last_track_uri": ""}, {"signal": False, "data": []}
             elif response.status_code == 200:
@@ -252,9 +266,8 @@ class Spotify(BaseService):
     ))
     def next_track(self, data: dict) -> Tuple[dict, dict]:
         """
-        Create draft
+        Next track
         :param data: Data
-        :return: Create draft
         """
         refresh = self.check_refresh_token()
         try:
@@ -262,6 +275,12 @@ class Spotify(BaseService):
                 "Content-Type": "application/json",
                 "Authorization": f"Bearer {refresh['access_token']}"
             })
+            if response.status_code == 401:
+                refresh = self.check_refresh_token(True)
+                response = requests.get("https://api.spotify.com/v1/me/player?market=FR", headers={
+                    "Content-Type": "application/json",
+                    "Authorization": f"Bearer {refresh['access_token']}"
+                })
             if response.status_code != 200:
                 return {"signal": False, "data": []}
             data_spotify = response.json()
@@ -271,43 +290,6 @@ class Spotify(BaseService):
                         "Content-Type": "application/json",
                         "Authorization": f"Bearer {refresh['access_token']}"
                     })
-                print(response.text)
-                if response.status_code == 204:
-                    return {"signal": True, "data": []}
-        except Exception as e:
-            warn(str(e))
-            return {"signal": False, "data": []}
-        return {"signal": False, "data": []}
-
-    @add_metadata(ServiceMetadata(
-        name="Passer à la musique suivante",
-        description="Permet de passer à la musique suivante",
-        type=ServiceType.reaction,
-        inputsData=[],
-        outputsData=[]
-    ))
-    def next_track(self, data: dict) -> Tuple[dict, dict]:
-        """
-        Create draft
-        :param data: Data
-        :return: Create draft
-        """
-        refresh = self.check_refresh_token()
-        try:
-            response = requests.get("https://api.spotify.com/v1/me/player?market=FR", headers={
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {refresh['access_token']}"
-            })
-            if response.status_code != 200:
-                return {"signal": False, "data": []}
-            data_spotify = response.json()
-            if data_spotify["is_playing"]:
-                response = requests.post(
-                    f"https://api.spotify.com/v1/me/player/next?device_id={data_spotify['device']['id']}", headers={
-                        "Content-Type": "application/json",
-                        "Authorization": f"Bearer {refresh['access_token']}"
-                    })
-                print(response.text)
                 if response.status_code == 204:
                     return {"signal": True, "data": []}
         except Exception as e:
@@ -332,9 +314,8 @@ class Spotify(BaseService):
     ))
     def volume(self, data: dict) -> Tuple[dict, dict]:
         """
-        Create draft
+        Change volume
         :param data: Data
-        :return: Create draft
         """
         refresh = self.check_refresh_token()
         if data["volume"] < 0:
@@ -355,7 +336,6 @@ class Spotify(BaseService):
                     headers={
                         "Authorization": f"Bearer {refresh['access_token']}"
                     })
-                print(response.status_code)
                 if response.status_code == 204:
                     return {"signal": True, "data": []}
         except Exception as e:

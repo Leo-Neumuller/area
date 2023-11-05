@@ -12,6 +12,7 @@ import AppWidget from "../../components/AppWidget"
 import {ThemeTypeContext} from "../../constants/Theme";
 import EncryptedStorage from "react-native-encrypted-storage";
 import {IAREAServices} from "../../interfaces/IAREAServices";
+import IService from "../../interfaces/IService";
 
 
 type RootStackParamList = {
@@ -38,6 +39,13 @@ async function getServices(): Promise<IService> {
     return await servicesGet(token as string);
 }
 
+/**
+ * Route for the App page.
+ * The App page is the page that shows you all the usable applications.
+ *
+ * @param navigation The navigation prop.
+ * @returns The App page as jsx.
+ */
 export const App: React.FC<Props> = ({navigation}) => {
     const Styles = useThemedStyles(styles);
     const Theme = useTheme();

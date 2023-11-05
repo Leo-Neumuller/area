@@ -17,21 +17,21 @@ from src.utils.Services import Google
 input_mail = [
     inputData(
         id="content",
-        name="Email content",
+        name="Contenu de l'email",
         inputType=DataConfigurationType.textMultiline,
         type="string",
         required=True,
     ),
     inputData(
         id="to",
-        name="To",
+        name="Destinataire",
         inputType=DataConfigurationType.text,
         type="string",
         required=True,
     ),
     inputData(
         id="subject",
-        name="Subject",
+        name="Sujet du mail",
         inputType=DataConfigurationType.text,
         type="string",
         required=True,
@@ -41,27 +41,27 @@ input_mail = [
 output_mail = [
     outputData(
         id="Subject",
-        name="Subject",
+        name="Sujet du mail",
         type="string",
     ),
     outputData(
         id="From",
-        name="From",
+        name="Expéditeur",
         type="string",
     ),
     outputData(
         id="To",
-        name="To",
+        name="Destinataire",
         type="string",
     ),
     outputData(
         id="Date",
-        name="Date",
+        name="Date de réception",
         type="date",
     ),
     outputData(
         id="Content",
-        name="Content",
+        name="Contenu du mail",
         type="string",
     ),
 ]
@@ -160,8 +160,8 @@ class Gmail(BaseService):
             return_datas.append(email_data)
 
     @add_metadata(ServiceMetadata(
-        name="Create draft",
-        description="Create draft",
+        name="Création d'un brouillon",
+        description="Créer un brouillon dans Gmail",
         type=ServiceType.reaction,
         inputsData=input_mail,
         outputsData=[]
@@ -184,8 +184,8 @@ class Gmail(BaseService):
         return {"signal": True}
 
     @add_metadata(ServiceMetadata(
-        name="Send email",
-        description="Send Email",
+        name="Envoyer un email",
+        description="Envoyer un email",
         type=ServiceType.reaction,
         inputsData=input_mail,
         outputsData=[]
@@ -208,14 +208,14 @@ class Gmail(BaseService):
         return {"signal": True}
 
     @add_metadata(ServiceMetadata(
-        name="New email from email",
-        description="New email from email",
+        name="Nouvel email avec pour destinataire",
+        description="Nouvel email avec pour destinataire",
         type=ServiceType.action,
         prev_data={"time": lambda: datetime.now().astimezone(timezone.utc).timestamp()},
         inputsData=[
             inputData(
                 id="email",
-                name="Email",
+                name="Destinataire",
                 inputType=DataConfigurationType.text,
                 type="string",
                 required=True,
@@ -249,14 +249,14 @@ class Gmail(BaseService):
         return next_data, {"signal": True, "data": return_datas}
 
     @add_metadata(ServiceMetadata(
-        name="New email with subject",
-        description="New email with subject",
+        name="Nouvel email avec pour sujet",
+        description="Nouvel email avec pour sujet",
         type=ServiceType.action,
         prev_data={"time": lambda: datetime.now().astimezone(timezone.utc).timestamp()},
         inputsData=[
             inputData(
                 id="subject",
-                name="Subject",
+                name="Sujet du mail",
                 inputType=DataConfigurationType.text,
                 type="string",
                 required=True,

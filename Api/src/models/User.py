@@ -95,15 +95,15 @@ def create_user(db: Session, user: UserCreate) -> User:
     :return: Created user
     """
     if check_email(user.email) is False:
-        raise UserCreateException("Email is not valid", status_code=status.HTTP_400_BAD_REQUEST)
+        raise UserCreateException("L'Email n'est pas valide", status_code=status.HTTP_400_BAD_REQUEST)
     if check_password(user.password) is False:
         raise UserCreateException(
-            "Password is not valid, Should have eight characters, at least one uppercase letter, one lowercase letter and one number",
+            "Le mot de passe n'est pas valide. Il doit contenir huit caractères, au moins une lettre majuscule, une lettre minuscule et un chiffre.",
             status_code=status.HTTP_400_BAD_REQUEST)
     if len(user.surname) == 0:
-        raise UserCreateException("Surname is empty", status_code=status.HTTP_400_BAD_REQUEST)
+        raise UserCreateException("Le Nom est vide", status_code=status.HTTP_400_BAD_REQUEST)
     if len(user.name) == 0:
-        raise UserCreateException("Name is empty", status_code=status.HTTP_400_BAD_REQUEST)
+        raise UserCreateException("Le Prénom est vide", status_code=status.HTTP_400_BAD_REQUEST)
     hashed_password = get_password_hash(user.password)
     db_user = User(email=user.email, password=hashed_password, surname=user.surname, name=user.name)
     db.add(db_user)
@@ -111,7 +111,7 @@ def create_user(db: Session, user: UserCreate) -> User:
         db.commit()
     except sqlalchemy.exc.IntegrityError:
         db.rollback()
-        raise UserCreateException("Email already exists", status_code=status.HTTP_409_CONFLICT)
+        raise UserCreateException("L'Email existe déjà", status_code=status.HTTP_409_CONFLICT)
     db.refresh(db_user)
     return db_user
 
@@ -157,7 +157,7 @@ def login_user(db: Session, user: UserLogin) -> User:
     """
     db_user = db.query(User).filter(User.email == user.email).first()
     if db_user is None or not verify_password(user.password, db_user.password):
-        raise UserLoginException("Incorrect email address or password", status_code=status.HTTP_400_BAD_REQUEST)
+        raise UserLoginException("Incorrect email address ou mot de passe", status_code=status.HTTP_400_BAD_REQUEST)
     return db_user
 
 
@@ -188,5 +188,5 @@ def get_user_by_id(db: Session, user_id: int) -> UserMe:
     """
     db_user = db.query(User).filter(User.id == user_id).first()
     if db_user is None:
-        raise User.NotFoundException("User not found")
+        raise User.NotFoundException("User n'est pas trouvé")
     return UserMe(email=db_user.email, surname=db_user.surname, name=db_user.name, id=db_user.id)
