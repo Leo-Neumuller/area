@@ -177,7 +177,9 @@ export async function serviceSchemaGet (token: string, serviceId: string) {
         const error = await res.json();
         throw new Error(error.detail);
     }
-    return res.json();
+    const data = await res.json();
+    data["inputsData"] = data["inputsData"].map((inputData: any) =>({...inputData, value: {value: "", "id": "Rien"}}))
+    return new Promise<any>((resolve) => resolve(data));
 }
 
 /**
@@ -251,7 +253,7 @@ export async function fluxGet() {
  * @throws An error if the response contains an error
  */
 export async function fluxPost(token: string, flux: IFLUX) {
-    const res = await fetch(process.env.API_URL + "/flux", {
+    const res = await fetch(process.env.API_URL + `/flux?verify=${true}`, {
         method: "POST",
         body: JSON.stringify(flux),
         headers: {

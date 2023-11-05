@@ -204,6 +204,7 @@ export default function Signup({navigation}) {
                                                 marginVertical: 5
 
                                             }}
+                                            secureTextEntry={true}
                                             placeholder="Mot de Passe"
                                             placeholderTextColor="#FFFFFF80"
                                             onChangeText={(password) => setData((prev) => ({...prev, password: password}))}

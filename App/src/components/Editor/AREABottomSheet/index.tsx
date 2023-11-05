@@ -140,7 +140,7 @@ const AREAParamBottomSheet: React.FC<{
                 }
         })};
         if (item) {
-            item.value = value;
+            item.value["value"] = value;
             // @ts-ignore
             schemaData.inputsData[indexItem] = item;
             setSchema(schemaData!)
@@ -268,7 +268,7 @@ const AREAParamBottomSheet: React.FC<{
                                             (text: string) => {
                                                 setSchemaData(item.id, text);
                                             }}
-                                            defaultValue={item.value as string}
+                                            defaultValue={item.value["value"] as string}
                                         />
                                     }
                                     {item.inputType == "text" &&
@@ -276,13 +276,13 @@ const AREAParamBottomSheet: React.FC<{
                                             (text: string) => {
                                                 setSchemaData(item.id, text);
                                             }}
-                                            defaultValue={item.value as string}
+                                            defaultValue={item.value["value"] as string}
                                         />
                                     }
                                     {item.inputType == "date" &&
                                         <View>
                                             <Text style={[Styles.input, {color: Theme.colors.Gray, paddingLeft: 20, alignSelf: "center"}]}>{item.name + (item.required && "*")}</Text>
-                                            <DatePicker date={item.value != undefined ? new Date(item.value as string) as Date : new Date()} style={[Styles.input, {paddingLeft: 20, alignSelf: "center"}]} androidVariant={"nativeAndroid"} onDateChange={(date) => {
+                                            <DatePicker date={item.value["value"] != undefined ? new Date(item.value["value"] as string) as Date : new Date()} style={[Styles.input, {paddingLeft: 20, alignSelf: "center"}]} androidVariant={"nativeAndroid"} onDateChange={(date) => {
                                                 setSchemaData(item.id, date);
                                             }} />
                                         </View>
