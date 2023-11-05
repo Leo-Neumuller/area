@@ -9,7 +9,6 @@ export interface signupProps {
 }
 
 export async function signupPost(data: { [key: string]: string }) {
-    console.log("signupPost")
     const res = await fetch(import.meta.env.VITE_API_URL + "/user/signup", {
         method: 'POST',
         body: JSON.stringify(data),
@@ -102,8 +101,8 @@ export async function createFlux(cookie: string, flux: CreateFlux, verify: boole
     // formater for api
     for (let node of flux.nodes) {
         for (let inputData of node.inputsData ?? []) {
-            if (inputData.inputType === "date") {
-                inputData.value = new Date(inputData.value).toISOString();
+            if (inputData.inputType === "date" && inputData.value["value"]) {
+                inputData.value["value"] = new Date(inputData.value).toISOString();
             }
         }
     }
@@ -243,6 +242,22 @@ export async function disconnectService(cookie: string, service: number) {
 export async function deleteFlux(cookie: string, fluxId: any) {
     const res = await fetch(import.meta.env.VITE_API_URL + `/flux/${fluxId}`, {
         method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'access-token': cookie
+        }
+    })
+    if (res.status !== 200) {
+        let err = await res.json();
+
+        throw new Error(err.detail);
+    }
+    return res.json();
+}
+
+export async function getOauthServices(cookie: string) {
+    const res = await fetch(import.meta.env.VITE_API_URL + `/services/services/oauth`, {
+        method: 'GET',
         headers: {
             'Content-Type': 'application/json',
             'access-token': cookie
