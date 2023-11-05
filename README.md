@@ -65,6 +65,17 @@ Do the same thing for Spotify with a file called Spotify.json:
 
 ```
 
+### How to get your secrets:
+
+Google:
+
+https://developers.google.com/identity/protocols/oauth2
+
+Spotify:
+
+https://developer.spotify.com/documentation/web-api/concepts/authorization
+
+
 
 ## Docker run
 
