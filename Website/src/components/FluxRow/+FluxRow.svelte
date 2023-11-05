@@ -26,7 +26,7 @@
                     active = !active;
                     window.location.reload();
                 }}>
-                Activer
+                Activé
             </button>
         {:else}
             <button class="rounded-xl bg-white/30 min-w-[11rem] py-1 font-medium"
@@ -35,7 +35,7 @@
                     active = !active;
                     window.location.reload();
                 }}>
-                Désactiver
+                Désactivé
             </button>   
         {/if}
     </div>

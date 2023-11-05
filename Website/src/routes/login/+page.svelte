@@ -87,7 +87,7 @@
         <p>Bon retour parmis nous</p>
       </h1>
       <h2 class="mt-[4vw] text-[2.2vw] self-center w-9/12">
-        <p>Connectez vous pour retrouver tous vos flux</p>
+        <p>Connectez-vous pour retrouver tous vos fluxs</p>
       </h2>
     </div>
     <form method="post" on:submit|preventDefault={handleSubmit}>

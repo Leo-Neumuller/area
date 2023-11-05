@@ -52,7 +52,7 @@
                     }}>
                     <PlusSigne className="w-12 h-12 pt-1" color="#373637"/>
                     <h1 class="text-gray font-bold text-[1.8rem]">
-                        Nouveaux flux
+                        Nouveau flux
                     </h1>
                 </button>
                 <div class="pt-16 flex flex-col gap-3">

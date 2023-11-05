@@ -51,7 +51,7 @@
         </div>
         <div class="pr-6">
             <h1 class="text-[3rem] font-SpaceGrotesk font-medium text-gray">
-                Tous les flux
+                Tous les fluxs
             </h1>
             <div class="bg-gray w-full rounded-3xl pb-6">
                 <div class="flex flex-col overflow-auto w-full pb-4 pt-6 px-10 gap-6 mt-10">
