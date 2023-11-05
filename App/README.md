@@ -53,6 +53,12 @@ This is the mobile version of the flux app.
 
 ---
 
+## 📦 Technical documentation
+
+It is located in the folder [docs/documentation](#/docs/documentation)
+
+---
+
 
 ## 📂 Repository Structure
 
