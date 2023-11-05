@@ -80,17 +80,13 @@ export default function ActiveComponent(Props: Props) {
                     trackColor={{false: '#767577', true: '#767577'}}
                     thumbColor={Props.active ? Theme.colors.Primary : Theme.colors.White}
                     ios_backgroundColor="#3e3e3e"
-                    onTouchEnd={() => {
-
+                    onChange={() => {
 
                     }}
-                    onChange={() => {
+                    onValueChange={() => {
                         changeActive(Props.id).then(() => {
                             Props.refresh();
                         });
-                    }}
-                    onValueChange={() => {
-
                     }}
                     value={Props.active}
                 />
