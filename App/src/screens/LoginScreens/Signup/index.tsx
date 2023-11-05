@@ -43,12 +43,12 @@ export default function Signup({navigation}) {
         <ScrollView>
             <SafeAreaView style={{
                 backgroundColor: Theme.colors.White,
-                height: Dimensions.get("window").height * 0.97,
                 width: "100%"
             }}>
                 {/* <StatusBar style="auto"/> */}
                 <View style={{
-                    height: "20%",
+                    height: Dimensions.get("window").height * 0.15,
+                    justifyContent: "space-evenly"
                 }}>
                     <Text style={{
                         fontSize: RFValue(80),
@@ -59,54 +59,73 @@ export default function Signup({navigation}) {
                     }}>FLUX</Text>
                 </View>
                 <View style={{
-                    height: "72%",
+                    height: Dimensions.get("window").height * 0.95,
                     justifyContent: "space-evenly",
-                    alignItems: "center"
+                    alignItems: "center",
+                    paddingVertical: 10
 
                 }}>
-                    <View style={{
-                        height: "100%",
-                        width: "100%",
-                        alignItems: "center",
-                    }}>
+                    <View style={{height: "95%",
+                    width: Dimensions.get("window").width,
+                    alignItems: "center"}}>
                         <View style={{
                             backgroundColor: Theme.colors.Black,
                             borderRadius: 20,
                             width: "90%"
                         }}>
                             <View style={{
-                                margin: "7%",
-                                height: "57%"
+                                height: "65%"
                             }}>
-                                <View style={{margin: "2%"}}>
-                                    <Text style={{
-                                        ...Theme.Subtitle,
-                                        color: Theme.colors.White,
-                                    }
-                                    }> Nom </Text>
-                                    <View style={{...Styles.styleInput}}>
+                                <View style={{
+                                    height: "25%",
+                                    justifyContent: "space-evenly"
+                                }}>
+                                    <View style={{
+                                        marginLeft: "5%",
+                                    }}>
+                                        <Text style={{
+                                            ...Theme.Subtitle,
+                                            color: Theme.colors.White,
+                                        }
+                                        }> Nom </Text>
+                                    </View>
+                                    <View style={{
+                                        ...Styles.styleInput,
+                                        width: "90%",
+                                        alignSelf: "center"
+                                    }}>
                                         <TextInput
-
                                             style={{
                                                 ...Theme.Text,
                                                 marginHorizontal: 20,
-                                                marginVertical: 5,
-
+                                                marginVertical: 5
 
                                             }}
                                             placeholder="Nom"
                                             placeholderTextColor="#FFFFFF80"
-                                            onChangeText={(surname) => setData((prev) => ({...prev, surname: surname}))}
+                                            onChangeText={(email) => setData((prev) => ({...prev, email: email}))}
+
                                         />
                                     </View>
                                 </View>
-                                <View style={{margin: 5}}>
-                                    <Text style={{
-                                        ...Theme.Subtitle,
-                                        color: Theme.colors.White,
-                                    }
-                                    }> Prénom </Text>
-                                    <View style={{...Styles.styleInput}}>
+                                <View style={{
+                                    height: "25%",
+                                    justifyContent: "space-evenly"
+                                }}>
+                                    <View style={{
+                                        marginLeft: "5%",
+                                    }}>
+                                        <Text style={{
+                                            ...Theme.Subtitle,
+                                            color: Theme.colors.White,
+                                        }
+                                        }> Prénom </Text>
+                                    </View>
+                                    <View style={{
+                                        ...Styles.styleInput,
+                                        width: "90%",
+                                        alignSelf: "center"
+                                    }}>
                                         <TextInput
                                             style={{
                                                 ...Theme.Text,
@@ -116,17 +135,29 @@ export default function Signup({navigation}) {
                                             }}
                                             placeholder="Prénom"
                                             placeholderTextColor="#FFFFFF80"
-                                            onChangeText={(name) => setData((prev) => ({...prev, name: name}))}
+                                            onChangeText={(email) => setData((prev) => ({...prev, email: email}))}
+
                                         />
                                     </View>
                                 </View>
-                                <View style={{margin: 5}}>
-                                    <Text style={{
-                                        ...Theme.Subtitle,
-                                        color: Theme.colors.White,
-                                    }
-                                    }> Email </Text>
-                                    <View style={{...Styles.styleInput}}>
+                                <View style={{
+                                    height: "25%",
+                                    justifyContent: "space-evenly"
+                                }}>
+                                    <View style={{
+                                        marginLeft: "5%",
+                                    }}>
+                                        <Text style={{
+                                            ...Theme.Subtitle,
+                                            color: Theme.colors.White,
+                                        }
+                                        }> Email </Text>
+                                    </View>
+                                    <View style={{
+                                        ...Styles.styleInput,
+                                        width: "90%",
+                                        alignSelf: "center"
+                                    }}>
                                         <TextInput
                                             style={{
                                                 ...Theme.Text,
@@ -137,16 +168,28 @@ export default function Signup({navigation}) {
                                             placeholder="Email"
                                             placeholderTextColor="#FFFFFF80"
                                             onChangeText={(email) => setData((prev) => ({...prev, email: email}))}
+
                                         />
                                     </View>
                                 </View>
-                                <View style={{margin: 5}}>
-                                    <Text style={{
-                                        ...Theme.Subtitle,
-                                        color: Theme.colors.White,
-                                    }
-                                    }> Mot de passe </Text>
-                                    <View style={{...Styles.styleInput}}>
+                                <View style={{
+                                    height: "25%",
+                                    justifyContent: "space-evenly"
+                                }}>
+                                    <View style={{
+                                        marginLeft: "5%",
+                                    }}>
+                                        <Text style={{
+                                            ...Theme.Subtitle,
+                                            color: Theme.colors.White,
+                                        }
+                                        }> Mot de Passe </Text>
+                                    </View>
+                                    <View style={{
+                                        ...Styles.styleInput,
+                                        width: "90%",
+                                        alignSelf: "center"
+                                    }}>
                                         <TextInput
                                             style={{
                                                 ...Theme.Text,
@@ -154,31 +197,35 @@ export default function Signup({navigation}) {
                                                 marginVertical: 5
 
                                             }}
-                                            placeholder="Mot de passe"
+                                            placeholder="Mot de Passe"
                                             placeholderTextColor="#FFFFFF80"
-                                            secureTextEntry={true}
-                                            onChangeText={(password) => setData((prev) => ({...prev, password: password}))}
+                                            onChangeText={(email) => setData((prev) => ({...prev, email: email}))}
+
                                         />
                                     </View>
                                 </View>
 
                             </View>
-                            <View style={{ height: "8%",
-                            width: "90%",
-                                marginHorizontal: "8%"
+                            <View style={{
+                                height: "5%",
+                                width: "90%",
+                                justifyContent: "space-evenly"
                             }}>
-                                <View>
+                                <View style={{
+                                    alignItems: "center"
+                                }}>
                                     {error ? <Text style={{
                                         color: 'red',
                                         flexWrap: "wrap",
-                                        position:"absolute",
+                                        position: "absolute",
                                         textAlign: "center"
                                     }}>
                                         {error}
                                     </Text> : null}
                                 </View>
                             </View>
-                            <View style={{height: "28%"}}>
+                            <View style={{height: "30%",
+                            justifyContent: "space-evenly"}}>
 
                                 <View style={{
                                     height: "50%",
@@ -196,7 +243,7 @@ export default function Signup({navigation}) {
                                         onPress={() => {
                                             signupPost(data).then((res) => {
                                                 EncryptedStorage.setItem('userToken', res.access_token).then(() =>
-                                                navigation.push("BottomBar"))
+                                                    navigation.push("BottomBar"))
                                             }).catch((err) => {
                                                 setError(err.toString());
                                             })
@@ -207,7 +254,7 @@ export default function Signup({navigation}) {
 
                                 <View style={{
                                     alignItems: "center",
-                                    height: "30%"
+                                    height: "50%"
                                 }}>
                                     <Text style={{
                                         ...Theme.Text,
