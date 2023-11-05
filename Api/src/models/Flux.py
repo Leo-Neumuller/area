@@ -377,7 +377,7 @@ def get_flux_by_id(fluxId: int, User: UserMe, db: Session) -> Flux:
     """
     flux = db.query(Flux).filter(Flux.id == fluxId, Flux.user_id == User.id).first()
     if flux is None:
-        raise Flux.Exception.NotFoundException("Flux not found")
+        raise Flux.Exception.NotFoundException("Flux non trouvé")
     return flux
 
 

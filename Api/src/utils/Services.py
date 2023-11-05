@@ -96,12 +96,12 @@ class Google:
         refresh = db.query(Service).filter(Service.name == db_service_name,
                                            Service.user_id == User.id).first()
         if refresh is None:
-            raise Service.Exception.InvalidService("Service not found or not authorized")
+            raise Service.Exception.InvalidService("Service non trouvé ou non autorisé")
         refresh = refresh.refresh
         if not refresh:
             db.query(Service).filter(Service.name == db_service_name, Service.user_id == User.id).delete()
             db.commit()
-            raise Service.Exception.InvalidService("Service not found or not authorized")
+            raise Service.Exception.InvalidService("Service non trouvé ou non autorisé")
 
         credentials = google.oauth2.credentials.Credentials(**refresh)
         db.query(Service).filter(Service.name == db_service_name, Service.user_id == User.id).update(

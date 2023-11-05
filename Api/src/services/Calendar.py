@@ -84,41 +84,41 @@ class Calendar(BaseService):
         }
 
     @add_metadata(ServiceMetadata(
-        name="Create Event",
-        description="Create an event",
+        name="Création d'un événement",
+        description="Créer un événement dans Google Calendar",
         type=ServiceType.reaction,
         inputsData=[
             inputData(
                 id="summary",
-                name="Title",
+                name="Titre de l'événement",
                 inputType=DataConfigurationType.text,
                 type="string",
                 required=True,
             ),
             inputData(
                 id="location",
-                name="Location",
+                name="Position de l'événement",
                 inputType=DataConfigurationType.text,
                 type="string",
                 required=False,
             ),
             inputData(
                 id="description",
-                name="Description",
+                name="Description de l'événement",
                 inputType=DataConfigurationType.textMultiline,
                 type="string",
                 required=True,
             ),
             inputData(
                 id="start",
-                name="Start",
+                name="Début de l'événement",
                 inputType=DataConfigurationType.date,
                 type="date",
                 required=True,
             ),
             inputData(
                 id="end",
-                name="End",
+                name="Fin de l'événement",
                 inputType=DataConfigurationType.date,
                 type="date",
                 required=True,
@@ -127,7 +127,7 @@ class Calendar(BaseService):
         outputsData=[
             outputData(
                 id="event_url",
-                name="Event URL",
+                name="Lien de l'événement",
                 type="string",
             ),
         ]
@@ -149,30 +149,30 @@ class Calendar(BaseService):
         return {"signal": True, "data": [{"event_url": event.get("htmlLink")}]}
 
     @add_metadata(ServiceMetadata(
-        name="New Created Event",
-        description="New created event",
+        name="Nouvel événement créé",
+        description="Récupérer les événements créés dans Google Calendar",
         type=ServiceType.action,
         prev_data={"time": lambda: datetime.now().astimezone(timezone.utc).timestamp()},
         inputsData=[],
         outputsData=[
             outputData(
                 id="summary",
-                name="Title",
+                name="Titre de l'événement",
                 type="string",
             ),
             outputData(
                 id="start",
-                name="Start Date",
+                name="Début de l'événement",
                 type="date",
             ),
             outputData(
                 id="end",
-                name="End Date",
+                name="Fin de l'événement",
                 type="date",
             ),
             outputData(
                 id="link",
-                name="Event URL",
+                name="Lien de l'événement",
                 type="string",
             ),
         ]
