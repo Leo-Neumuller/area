@@ -38,6 +38,34 @@ JWT_EXPIRE_SECONDS=3600
 REDIRECT_URI=http://localhost:8000
 ```
 
+## Setup secrets
+
+Create a Google.json file in the Api/secrets folder containing your secret that should look like this:
+
+```sh
+{
+  "web": {
+    "client_id": "#################-#############-###############",
+    "project_id": "####-#####",
+    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+    "token_uri": "https://oauth2.googleapis.com/token",
+    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+    "client_secret": "######-#####################"
+  }
+}
+```
+
+Do the same thing for Spotify with a file called Spotify.json:
+
+```sh
+{
+    "client_id": "################################",
+    "client_secret": ""################################"
+}
+
+```
+
+
 ## Docker run
 
 ```bash
