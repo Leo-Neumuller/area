@@ -29,7 +29,7 @@
             <button class="font-SpaceGrotesk text-red-600 border border-red-600 rounded-2xl px-6 font-bold hover:text-customWhite hover:bg-red-600"
                 on:click={() => {
                     deleteFlux(getCookie("token"), flux.id).then((res) => {
-                        console.log(res)
+                        window.location.reload();
                     });
                 }}>
                 Supprimer
