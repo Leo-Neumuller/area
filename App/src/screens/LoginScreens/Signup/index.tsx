@@ -25,6 +25,13 @@ import Login from "../Login";
 import {ThemeTypeContext} from "../../../constants/Theme";
 import EncryptedStorage from "react-native-encrypted-storage";
 
+/**
+ * Route for sign up page.
+ *
+ * @param navigation the navigation prop.
+ * @returns The sign up page as jsx.
+ */
+
 // @ts-ignore
 export default function Signup({navigation}) {
     const Styles = useThemedStyles(styles);
@@ -103,7 +110,7 @@ export default function Signup({navigation}) {
                                             }}
                                             placeholder="Nom"
                                             placeholderTextColor="#FFFFFF80"
-                                            onChangeText={(email) => setData((prev) => ({...prev, email: email}))}
+                                            onChangeText={(nom) => setData((prev) => ({...prev, surname: nom}))}
 
                                         />
                                     </View>
@@ -135,7 +142,7 @@ export default function Signup({navigation}) {
                                             }}
                                             placeholder="Prénom"
                                             placeholderTextColor="#FFFFFF80"
-                                            onChangeText={(email) => setData((prev) => ({...prev, email: email}))}
+                                            onChangeText={(prenom) => setData((prev) => ({...prev, name: prenom}))}
 
                                         />
                                     </View>
@@ -199,7 +206,7 @@ export default function Signup({navigation}) {
                                             }}
                                             placeholder="Mot de Passe"
                                             placeholderTextColor="#FFFFFF80"
-                                            onChangeText={(email) => setData((prev) => ({...prev, email: email}))}
+                                            onChangeText={(password) => setData((prev) => ({...prev, password: password}))}
 
                                         />
                                     </View>

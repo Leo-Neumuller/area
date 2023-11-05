@@ -12,6 +12,8 @@ import EncryptedStorage from "react-native-encrypted-storage";
 import DashboardFluxOverview from "../../components/dashboardFluxoverview";
 import window from "@react-navigation/native/lib/typescript/src/__mocks__/window";
 import ActiveComponent from "../../components/activeComponent";
+import VectorSVG from "../../../assets/Vector.svg";
+import {calculateInputHeight} from "react-native-paper/lib/typescript/components/TextInput/helpers";
 
 
 type RootStackParamList = {
@@ -45,7 +47,13 @@ function sortActiveFlux(data: flux[]): flux[] {
     return (res)
 }
 
-
+/**
+ * Route for Dashboard page.
+ * The Dashboard is the first page when you are connected. There are all your flux.
+ *
+ * @param navigation the navigation prop.
+ * @returns The Dashboard page as jsx.
+ */
 export const Dashboard: React.FC<Props> = ({navigation}) => {
     const Styles = useThemedStyles(styles);
     const Theme = useTheme();
@@ -160,6 +168,42 @@ export const Dashboard: React.FC<Props> = ({navigation}) => {
 
 
             </View>
+            {userFluxs.length == 0 && <View style={{
+                height: Dimensions.get("window").height * 0.60,
+                alignItems: "center",
+                justifyContent: "space-around"
+            }}>
+                <View style={{
+                    height: "50%",
+                    alignItems: "center"
+                }}>
+                    <View style={{
+                        height: "50%",
+                        width: "100%",
+
+                        alignItems: "center"
+
+                    }}>
+                        <TouchableOpacity style={{
+                            height: "100%",
+                            width: "30%",
+                            borderRadius: 50,
+                            alignItems: "center",
+                            justifyContent: "center"
+                        }}
+                        onPress={() => navigation.navigate('FluxEditor' as never)}>
+                            <VectorSVG style={{color: "#37363790"}}/>
+
+                        </TouchableOpacity>
+                    </View>
+                    <Text style={{
+                        ...Theme.Text
+                    }}>
+                        Ajouter un flux
+                    </Text>
+                </View>
+
+            </View>}
 
         </ScrollView>
 

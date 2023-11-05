@@ -13,6 +13,14 @@ interface Props {
     name?: string;
 }
 
+/**
+ * This component display an active flux on the map of the Dashboard page.
+ *
+ * @param Props.name The name of the flux.
+ * @param Props.desc The desc of the flux.
+ * @param Props.onPress The action when we press the arrow.
+ * @returns a flux overview.
+ */
 export default function dashboardFluxOverview(Props: Props) {
     const Styles = useThemedStyles(styles);
     const Theme = useTheme();

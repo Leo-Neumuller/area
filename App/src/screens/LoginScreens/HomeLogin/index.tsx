@@ -11,6 +11,15 @@ import {RFValue} from "react-native-responsive-fontsize";
 import {ThemeTypeContext} from "../../../constants/Theme";
 import {GoogleSignin, statusCodes} from "@react-native-google-signin/google-signin";
 
+
+/**
+ * Route for Home Login page.
+ * With this page you chose to log or sign up on flux.
+ *
+ * @param navigation the navigation prop.
+ * @returns The HomeLogin page as jsx.
+ */
+
 // @ts-ignore
 export default function HomeLogin({navigation}) {
     const Styles = useThemedStyles(styles);

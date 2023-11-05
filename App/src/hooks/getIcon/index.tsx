@@ -1,5 +1,12 @@
 import {ImageSourcePropType} from "react-native/Libraries/Image/Image";
 
+
+/**
+ * A function to get the icon of the App.
+ *
+ * @param data The name of the App.
+ * @returns The path to the icon.
+ */
 export default function getUrlImg(data: string | undefined): ImageSourcePropType {
     if (data == "Gmail")
         return (require("../../../assets/gmail_icon.png"));

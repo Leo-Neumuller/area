@@ -18,6 +18,19 @@ interface Props {
     id: number;
 }
 
+/**
+ * This component display an active flux on the map of the Flux page.
+ * With this component we can edit and delete the flux.
+ *
+ * @param Props.name The name of the flux.
+ * @param Props.desc The desc of the flux.
+ * @param Props.onPress The action when we press the arrow.
+ * @param Props.refresh The function to refresh the list after deleting a flux.
+ * @param Props.id The flux id.
+ *
+ *
+ * @returns a flux overview.
+ */
 export default function FluxOverview(Props: Props) {
     const Styles = useThemedStyles(styles);
     const Theme = useTheme();

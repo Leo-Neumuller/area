@@ -18,6 +18,13 @@ import {ThemeTypeContext} from "../../../constants/Theme";
 import EncryptedStorage from "react-native-encrypted-storage";
 
 
+
+/**
+ * Route for login page.
+ *
+ * @param navigation the navigation prop.
+ * @returns The login page as jsx.
+ */
 // @ts-ignore
 export default function Login({navigation}) {
     const Styles = useThemedStyles(styles);
