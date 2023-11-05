@@ -43,6 +43,8 @@ Needed:
 
 ## Documentation
 
+> **Note** : [Run docs](#run-docs) before reading this section
+
 ## Routes documentation
 You can find the documentation of routes in the [routes_doc](docs/routes_doc.md) folder or when running the project in the /docs route
 
