@@ -32,6 +32,12 @@ export const Flux: React.FC<Props> = ({navigation}) => {
     const Theme = useTheme();
     const [userFluxs, setUserFluxs] = useState<flux[]>([])
 
+    function refreshFlux() {
+        fluxGet().then((res) => {
+            setUserFluxs(res);
+        })
+    }
+
     useEffect(() => {
         const onFocus = navigation.addListener('focus', () => {
             fluxGet().then((res) => {
@@ -42,6 +48,7 @@ export const Flux: React.FC<Props> = ({navigation}) => {
             onFocus();
         }
     }, [])
+
 
     return (
         <ScrollView>
@@ -97,6 +104,8 @@ export const Flux: React.FC<Props> = ({navigation}) => {
                     <FluxOverview key={index}
                                   desc={value.description}
                                   name={value.name}
+                                  refresh={refreshFlux}
+                                  id={value.id}
                                   onPress={() => {
                                       return(
                                           EncryptedStorage.getItem("userToken").then((token) => {

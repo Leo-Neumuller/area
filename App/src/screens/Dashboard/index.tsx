@@ -16,7 +16,9 @@ import ActiveComponent from "../../components/activeComponent";
 
 type RootStackParamList = {
     Flux: undefined;
-    Details: { itemId: number };
+    Details: {
+        itemId: number
+    };
 };
 
 type Props = {
@@ -60,49 +62,55 @@ export const Dashboard: React.FC<Props> = ({navigation}) => {
     }
 
     useEffect(() => {
-        fluxGet().then((res) => {
-            setUserFluxs(res);
-            setActiveFlux(sortActiveFlux(res));
+        const onFocus = navigation.addListener('focus', () => {
+            fluxGet().then((res) => {
+                setUserFluxs(res);
+                setActiveFlux(sortActiveFlux(res));
+            })
         })
-
+        return function clean() {
+            onFocus();
+        }
     }, [])
 
     return (
         <ScrollView>
 
-            <View style={{
-                height: Dimensions.get("window").height * 0.10,
-                justifyContent: "space-evenly"
-
-            }}>
+            {activeFlux.length != 0 && <View>
                 <View style={{
-                    marginLeft: "3%"
-                }}>
-                    <Text style={{
-                        ...Theme.Title,
-                        color: Theme.colors.Black,
-                        fontWeight: "bold"
-                    }}>
-                        Actifs
-                    </Text>
-                </View>
-            </View>
-            <View style={{
-                height: Dimensions.get("window").height * 0.45
-            }}>
-                <FlatList style={{
-                    alignContent: "space-around"
-                }}
-                          horizontal={true}
-                          data={activeFlux} renderItem={({item}) => {
-                    return (
-                        <DashboardFluxOverview name={item.name}
-                                               desc={item.description}
-                        />
+                    height: Dimensions.get("window").height * 0.10,
+                    justifyContent: "space-evenly"
 
-                    )
-                }}/>
-            </View>
+                }}>
+                    <View style={{
+                        marginLeft: "3%"
+                    }}>
+                        <Text style={{
+                            ...Theme.Title,
+                            color: Theme.colors.Black,
+                            fontWeight: "bold"
+                        }}>
+                            Actifs
+                        </Text>
+                    </View>
+                </View>
+                <View style={{
+                    height: Dimensions.get("window").height * 0.45
+                }}>
+                    <FlatList style={{
+                        alignContent: "space-around"
+                    }}
+                              horizontal={true}
+                              data={activeFlux} renderItem={({item}) => {
+                        return (
+                            <DashboardFluxOverview name={item.name}
+                                                   desc={item.description}
+                            />
+
+                        )
+                    }}/>
+                </View>
+            </View>}
 
             <View style={{
                 height: Dimensions.get("window").height * 0.10,
@@ -129,12 +137,14 @@ export const Dashboard: React.FC<Props> = ({navigation}) => {
             }}>
                 {userFluxs.map((value, index) => {
                     return (
-                        <View>
-                            <ActiveComponent id={value.id}
-                                             name={value.name}
-                                             active={value.active}
-                                             desc={value.description}
-                                             refresh={refreshFlux}/>
+                        <View key={index}>
+                            <ActiveComponent
+                                key={index}
+                                id={value.id}
+                                name={value.name}
+                                active={value.active}
+                                desc={value.description}
+                                refresh={refreshFlux}/>
                             {index < userFluxs.length - 1 ?
                                 <View style={{
                                     alignSelf: "center",
