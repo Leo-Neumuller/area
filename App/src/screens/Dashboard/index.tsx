@@ -60,7 +60,7 @@ export const Dashboard: React.FC<Props> = ({navigation}) => {
             setActiveFlux(sortActiveFlux(res))
         })
     }
-    
+
     useEffect(() => {
         const onFocus = navigation.addListener('focus', () => {
             fluxGet().then((res) => {
