@@ -17,12 +17,26 @@ import IAREAComponent from "../../interfaces/IAREAComponent";
 import {Board} from "../../components/Editor/Board";
 import IFLUX from "../../interfaces/IFLUX";
 
+/**
+ * Navigation Props for the FluxEditor route.
+ * @type RootStackParamList
+ * @property FluxEditor the FluxEditor route.
+ * @property Details the Details route.
+ * @property params the params of the route.
+ * @property params.flux the flux of the route.
+ */
 type RootStackParamList = {
     FluxEditor: undefined;
     Details: { itemId: number };
     params: { flux?: IFLUX };
 };
 
+/**
+ * Props for the HeaderTitle component.
+ * @param props the props of the component.
+ * @param setTitle the function to set the title.
+ * @constructor
+ */
 const HeaderTitle: React.FC<{props: HeaderTitleProps, setTitle: React.Dispatch<React.SetStateAction<string>> }> = ({ props, setTitle }) => {
     const refInput: React.LegacyRef<TextInput> = React.useRef(null)
     const [editable, setEditable] = useState<boolean>(false);
@@ -71,6 +85,12 @@ const HeaderTitle: React.FC<{props: HeaderTitleProps, setTitle: React.Dispatch<R
     )
 }
 
+/**
+ * The FluxEditor screen.
+ * @param navigation the navigation props.
+ * @param route the route props.
+ * @constructor
+ */
 export const FluxEditor: React.FC<StackScreenProps<RootStackParamList, 'FluxEditor'>> = ({navigation, route }) => {
     const [title, setTitle] = useState<string>("Sans nom");
     const Theme = useTheme();

@@ -12,15 +12,31 @@ import useTheme from "../../hooks/Theme/useTheme";
 
 const Tab = createMaterialTopTabNavigator();
 
+/**
+ * Root stack param list.
+ * @type {{BottomBar: undefined, Details: {itemId: number}}} root stack param list.
+ */
 type RootStackParamList = {
     BottomBar: undefined;
     Details: { itemId: number };
 };
 
+/**
+ * Props for the bottom tab bar.
+ * @type {StackNavigationProp<RootStackParamList, 'BottomBar'>} navigation.
+ */
 type Props = {
     navigation: StackNavigationProp<RootStackParamList, 'BottomBar'>;
 };
 
+/**
+ * Item for the bottom tab bar.
+ *
+ * @param icon svg icon.
+ * @param label text label.
+ * @param focused if the item is focused.
+ * @constructor
+ */
 const TabItem: React.FC<{icon: any, label: string, focused: boolean}> = ({icon, label, focused}) => {
     const Styles = useThemedStyles(styles);
     const Theme = useTheme();
@@ -39,6 +55,11 @@ return (
     )
 }
 
+/**
+ * Tab item for the flux editor.
+ * @param stackNavigation navigation.
+ * @constructor
+ */
 const FluxEditor: React.FC<{stackNavigation: StackNavigationProp<RootStackParamList, 'BottomBar'>}> = ({stackNavigation}) => {
     const Styles = useThemedStyles(styles);
     const Theme = useTheme();
@@ -56,6 +77,14 @@ const FluxEditor: React.FC<{stackNavigation: StackNavigationProp<RootStackParamL
     )
 }
 
+/**
+ * Overide of the default top tab bar from @react-navigation/material-top-tabs.
+ * @param state navigation state.
+ * @param navigation navigation helpers.
+ * @param descriptors material top tab descriptor map.
+ * @param stackNavigation navigation.
+ * @constructor
+ */
 export const MyTabBar: React.FC<{ state: TabNavigationState<ParamListBase>, navigation: NavigationHelpers<any>,
     descriptors: MaterialTopTabDescriptorMap, stackNavigation: StackNavigationProp<RootStackParamList, 'BottomBar'> }>
     = ({state, navigation, descriptors, stackNavigation}) => {
@@ -105,6 +134,11 @@ export const MyTabBar: React.FC<{ state: TabNavigationState<ParamListBase>, navi
     )
 }
 
+/**
+ * Bottom tab bar.
+ * @param navigation navigation.
+ * @constructor
+ */
 export const BottomBar: React.FC<Props> = ({ navigation }) => {
     const routes = bottomBarList;
     const Styles = useThemedStyles(styles);

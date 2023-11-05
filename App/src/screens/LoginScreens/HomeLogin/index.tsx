@@ -33,7 +33,7 @@ export default function HomeLogin({navigation}) {
 
             // You can now use userInfo to authenticate the user with your backend
             console.log('Google Sign-In Success', userInfo);
-        } catch (error) {
+        } catch (error: any) {
             if (error.code === statusCodes.SIGN_IN_CANCELLED) {
                 // User canceled the Google Sign-In
                 console.log('Google Sign-In canceled');

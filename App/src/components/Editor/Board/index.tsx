@@ -19,11 +19,25 @@ import DropdownSVG from "../../../../assets/dropdown.svg";
 import AddSVG from "../../../../assets/Vector.svg"
 
 
+/**
+ * Post flux to the API.
+ * @param flux flux to post.
+ * @return {Promise<any>} response as json.
+ * @constructor
+ */
 async function postFlux(flux: IFLUX): Promise<any> {
     const token = await EncryptedStorage.getItem("userToken");
     return await fluxPost(token as string, flux);
 }
 
+/**
+ * Save all areas and send them to the API.
+ * @param id id of the flux.
+ * @param title title of the flux.
+ * @param actions list of actions.
+ * @param reactions list of reactions.
+ * @constructor
+ */
 function saveFlux(id: number, title: string, actions: IAREAComponent[], reactions: IAREAComponent[]) {
     let flux: IFLUX = {
         id: id,
@@ -97,6 +111,15 @@ function saveFlux(id: number, title: string, actions: IAREAComponent[], reaction
         console.error(err);
     })
 }
+
+/**
+ * Board component.
+ * @param title title of the flux.
+ * @param setTitle set the title of the flux.
+ * @param flux flux to edit.
+ * @param goBack function to call when the user want to go back.
+ * @constructor
+ */
 export const Board: React.FC<{title?: string, setTitle?: React.Dispatch<React.SetStateAction<string>>, flux?: IFLUX, goBack?: Function}> = ({title, setTitle, flux, goBack}) => {
     const [bottomSheetOpened, setBottomSheetOpened] = useState<boolean>(false);
     const bottomSheetRef = useRef<BottomSheet>(null);
@@ -126,6 +149,10 @@ export const Board: React.FC<{title?: string, setTitle?: React.Dispatch<React.Se
         type: "reaction",
     }
 
+    /**
+     * Delete the selected area.
+     * @constructor
+     */
     const deleteArea = () => {
         if (selectedArea?.type == "action") {
             const index = action.findIndex((item) => item == selectedArea);
