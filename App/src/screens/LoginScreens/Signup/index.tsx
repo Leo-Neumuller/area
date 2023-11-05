@@ -64,7 +64,6 @@ export default function Signup({navigation}) {
                     justifyContent: "space-evenly",
                     alignItems: "center",
                     paddingVertical: 10
-
                 }}>
                     <View style={{height: "95%",
                     width: Dimensions.get("window").width,

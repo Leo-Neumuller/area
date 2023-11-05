@@ -1,15 +1,27 @@
 import React, {useEffect, useState} from "react";
-import {Button, Dimensions, DimensionValue, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {
+    Button,
+    Dimensions,
+    DimensionValue,
+    Image,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View
+} from "react-native";
 import useThemedStyles from "../../hooks/Theme/useThemedStyle";
 import useTheme from "../../hooks/Theme/useTheme";
 import {ThemeTypeContext} from "../../constants/Theme";
+import {RFValue} from "react-native-responsive-fontsize";
+import getUrlImg from "../../hooks/getIcon";
+
 
 
 interface Props {
     desc?: string;
     data?: string[];
 }
-
 export default function AppWidget(Props: Props) {
     const Styles = useThemedStyles(styles);
     const Theme = useTheme();
@@ -34,7 +46,12 @@ export default function AppWidget(Props: Props) {
                         height: '70%',
                         justifyContent: "space-evenly"
                     }}>
-                        {/* mettre l'img*/}
+                        {Props.data?.at(0) != undefined &&  <Image style={{width: RFValue(80),
+                            height: RFValue(60),
+                        }}
+                            source={
+                                getUrlImg(Props.data?.at(0))
+                            } />}
 
                     </View>
                     <View style={{
@@ -67,7 +84,10 @@ export default function AppWidget(Props: Props) {
                         height: '70%',
                         justifyContent: "space-evenly"
                     }}>
-                        {/* mettre zzzl'img*/}
+                        {Props.data.at(1) != undefined &&  <Image style={{width: RFValue(80),
+                            height: RFValue(60),
+                        }}
+                                                  source={getUrlImg(Props.data.at(1))} />}
 
                     </View>
                     <View style={{
